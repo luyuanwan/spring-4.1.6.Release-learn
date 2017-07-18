@@ -211,6 +211,7 @@ public class AnnotationConfigUtils {
 	}
 
 	static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd, AnnotatedTypeMetadata metadata) {
+		// 如果该bean定义了Lazy注解，则设置Lazy值（是否延迟初始化）
 		if (metadata.isAnnotated(Lazy.class.getName())) {
 			abd.setLazyInit(attributesFor(metadata, Lazy.class).getBoolean("value"));
 		}

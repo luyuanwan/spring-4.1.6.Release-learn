@@ -462,6 +462,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+				//注册BEAN的POST处理器,在调用之前，工厂里面已经有所有BEAN了
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
@@ -477,6 +478,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
+				//实例化bean并注入依赖
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
@@ -503,6 +505,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * active flag as well as performing any initialization of property sources.
 	 */
 	protected void prepareRefresh() {
+		//拿到启动时间
 		this.startupDate = System.currentTimeMillis();
 		this.active.set(true);
 
@@ -521,7 +524,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/**
 	 * <p>Replace any stub property sources with actual instances.
 	 * @see org.springframework.core.env.PropertySource.StubPropertySource
-	 * @see org.springframework.web.context.support.WebApplicationContextUtils#initServletPropertySources
 	 */
 	protected void initPropertySources() {
 		// For subclasses: do nothing by default.
@@ -1021,7 +1023,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	@Override
 	public boolean containsBeanDefinition(String beanName) {
-		return getBeanFactory().containsBeanDefinition(beanName);
+		//拿到BEAN工厂
+		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+		//判定是否存在这个BEAN（根据名字判断）
+		return beanFactory.containsBeanDefinition(beanName);
 	}
 
 	@Override

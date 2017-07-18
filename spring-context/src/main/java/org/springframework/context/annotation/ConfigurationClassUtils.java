@@ -71,6 +71,7 @@ abstract class ConfigurationClassUtils {
 	 * @return whether the candidate qualifies as (any kind of) configuration class
 	 */
 	public static boolean checkConfigurationClassCandidate(BeanDefinition beanDef, MetadataReaderFactory metadataReaderFactory) {
+		//判定class名字
 		String className = beanDef.getBeanClassName();
 		if (className == null) {
 			return false;

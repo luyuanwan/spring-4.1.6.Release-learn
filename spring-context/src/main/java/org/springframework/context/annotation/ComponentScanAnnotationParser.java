@@ -50,6 +50,7 @@ import org.springframework.util.StringUtils;
  * @since 3.1
  * @see ClassPathBeanDefinitionScanner#scan(String...)
  * @see ComponentScanBeanDefinitionParser
+ * 用于解析ComponentScan
  */
 class ComponentScanAnnotationParser {
 
@@ -72,7 +73,8 @@ class ComponentScanAnnotationParser {
 	}
 
 
-	public Set<BeanDefinitionHolder> parse(AnnotationAttributes componentScan, final String declaringClass) {
+	public Set<BeanDefinitionHolder> parse(AnnotationAttributes componentScan/*注解属性*/, final String declaringClass) {
+		//定义扫描器
 		ClassPathBeanDefinitionScanner scanner =
 				new ClassPathBeanDefinitionScanner(this.registry, componentScan.getBoolean("useDefaultFilters"));
 
@@ -82,7 +84,9 @@ class ComponentScanAnnotationParser {
 		Assert.notNull(this.resourceLoader, "ResourceLoader must not be null");
 		scanner.setResourceLoader(this.resourceLoader);
 
-		Class<? extends BeanNameGenerator> generatorClass = componentScan.getClass("nameGenerator");
+
+		//设置bean名字生成器
+		Class<? extends BeanNameGenerator> generatorClass = componentScan.getClass("nameGenerator");//拿到bean名字生成器类
 		boolean useInheritedGenerator = BeanNameGenerator.class.equals(generatorClass);
 		scanner.setBeanNameGenerator(useInheritedGenerator ? this.beanNameGenerator :
 				BeanUtils.instantiateClass(generatorClass));
@@ -141,12 +145,14 @@ class ComponentScanAnnotationParser {
 	}
 
 	private List<TypeFilter> typeFiltersFor(AnnotationAttributes filterAttributes) {
+		//类型过滤器集合
 		List<TypeFilter> typeFilters = new ArrayList<TypeFilter>();
+		//拿到类型
 		FilterType filterType = filterAttributes.getEnum("type");
 
 		for (Class<?> filterClass : filterAttributes.getClassArray("value")) {
 			switch (filterType) {
-				case ANNOTATION:
+				case ANNOTATION://是注解
 					Assert.isAssignable(Annotation.class, filterClass,
 							"An error occured while processing a @ComponentScan ANNOTATION type filter: ");
 					@SuppressWarnings("unchecked")

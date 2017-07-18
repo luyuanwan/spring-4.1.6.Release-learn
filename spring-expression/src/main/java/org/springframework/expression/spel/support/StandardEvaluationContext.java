@@ -60,6 +60,7 @@ public class StandardEvaluationContext implements EvaluationContext {
 
 	private List<PropertyAccessor> propertyAccessors;
 
+	//类型定位器
 	private TypeLocator typeLocator;
 
 	private TypeConverter typeConverter;

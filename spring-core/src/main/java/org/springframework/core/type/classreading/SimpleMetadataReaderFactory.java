@@ -29,9 +29,11 @@ import org.springframework.util.ClassUtils;
  *
  * @author Juergen Hoeller
  * @since 2.5
+ * 简单的元数据读取器工厂
  */
 public class SimpleMetadataReaderFactory implements MetadataReaderFactory {
 
+	// 资源加载器
 	private final ResourceLoader resourceLoader;
 
 
@@ -70,10 +72,19 @@ public class SimpleMetadataReaderFactory implements MetadataReaderFactory {
 	}
 
 
+	/**
+	 * 根据类名拿到一个元数据读取器
+	 * @param className the class name (to be resolved to a ".class" file)
+	 * @return
+	 * @throws IOException
+     */
 	@Override
 	public MetadataReader getMetadataReader(String className) throws IOException {
+		//拿到类似于 classpath:com/getter/hello.class这样的字符串
 		String resourcePath = ResourceLoader.CLASSPATH_URL_PREFIX +
 				ClassUtils.convertClassNameToResourcePath(className) + ClassUtils.CLASS_FILE_SUFFIX;
+
+		//通过资源加载器加载该资源
 		Resource resource = this.resourceLoader.getResource(resourcePath);
 		if (!resource.exists()) {
 			// Maybe an inner class name using the dot name syntax? Need to use the dollar syntax here...
@@ -95,6 +106,7 @@ public class SimpleMetadataReaderFactory implements MetadataReaderFactory {
 
 	@Override
 	public MetadataReader getMetadataReader(Resource resource) throws IOException {
+		// 因为类名是简单的元数据读取器工厂，所以这里直接返回简单的元数据读取器
 		return new SimpleMetadataReader(resource, this.resourceLoader.getClassLoader());
 	}
 

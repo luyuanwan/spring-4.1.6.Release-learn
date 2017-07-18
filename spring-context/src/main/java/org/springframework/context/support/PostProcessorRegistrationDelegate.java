@@ -195,6 +195,9 @@ class PostProcessorRegistrationDelegate {
 		List<String> orderedPostProcessorNames = new ArrayList<String>();
 		List<String> nonOrderedPostProcessorNames = new ArrayList<String>();
 		for (String ppName : postProcessorNames) {
+			//遍历每一个bean名字
+
+			//是否是首要的
 			if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 				BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
 				priorityOrderedPostProcessors.add(pp);
@@ -211,7 +214,9 @@ class PostProcessorRegistrationDelegate {
 		}
 
 		// First, register the BeanPostProcessors that implement PriorityOrdered.
+		//排序
 		OrderComparator.sort(priorityOrderedPostProcessors);
+		//注册
 		registerBeanPostProcessors(beanFactory, priorityOrderedPostProcessors);
 
 		// Next, register the BeanPostProcessors that implement Ordered.

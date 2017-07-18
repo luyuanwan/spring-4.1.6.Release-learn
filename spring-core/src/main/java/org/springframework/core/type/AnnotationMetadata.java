@@ -37,6 +37,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	 * Return the names of all annotation types that are <em>present</em> on the
 	 * underlying class.
 	 * @return the annotation type names
+	 * 拿到类下面所有的注解类型
 	 */
 	Set<String> getAnnotationTypes();
 
@@ -53,6 +54,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	 * the underlying class.
 	 * @param annotationType the annotation type to look for
 	 * @return whether a matching annotation is present
+	 * 是否含有指定的注解
 	 */
 	boolean hasAnnotation(String annotationType);
 

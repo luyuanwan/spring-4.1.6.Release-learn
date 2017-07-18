@@ -46,10 +46,11 @@ final class SimpleMetadataReader implements MetadataReader {
 	private final AnnotationMetadata annotationMetadata;
 
 
-	SimpleMetadataReader(Resource resource, ClassLoader classLoader) throws IOException {
+	SimpleMetadataReader(Resource resource/*资源*/, ClassLoader classLoader) throws IOException {
 		InputStream is = new BufferedInputStream(resource.getInputStream());
 		ClassReader classReader;
 		try {
+			//这里为什么非要用ASM，没搞明白
 			classReader = new ClassReader(is);
 		}
 		catch (IllegalArgumentException ex) {
@@ -60,6 +61,7 @@ final class SimpleMetadataReader implements MetadataReader {
 			is.close();
 		}
 
+		//访问者模式
 		AnnotationMetadataReadingVisitor visitor = new AnnotationMetadataReadingVisitor(classLoader);
 		classReader.accept(visitor, ClassReader.SKIP_DEBUG);
 

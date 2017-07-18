@@ -38,6 +38,7 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	//转换器
 	protected ConfigurableConversionService conversionService = new DefaultConversionService();
 
 	private PropertyPlaceholderHelper nonStrictHelper;

@@ -31,15 +31,19 @@ import org.springframework.core.io.ResourceLoader;
  * @author Juergen Hoeller
  * @author Costin Leau
  * @since 2.5
+ * 带有缓存功能的元数据读取器工厂
  */
 public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 
 	/** Default maximum number of entries for the MetadataReader cache: 256 */
+	// 默认缓存的极限值
 	public static final int DEFAULT_CACHE_LIMIT = 256;
 
 
+	// 缓存极限值
 	private volatile int cacheLimit = DEFAULT_CACHE_LIMIT;
 
+	// 缓存信息
 	@SuppressWarnings("serial")
 	private final Map<Resource, MetadataReader> metadataReaderCache =
 			new LinkedHashMap<Resource, MetadataReader>(DEFAULT_CACHE_LIMIT, 0.75f, true) {
@@ -52,6 +56,7 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 
 	/**
 	 * Create a new CachingMetadataReaderFactory for the default class loader.
+	 * 构造函数
 	 */
 	public CachingMetadataReaderFactory() {
 		super();
@@ -61,6 +66,7 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 	 * Create a new CachingMetadataReaderFactory for the given resource loader.
 	 * @param resourceLoader the Spring ResourceLoader to use
 	 * (also determines the ClassLoader to use)
+	 *  构造函数(资源加载器)
 	 */
 	public CachingMetadataReaderFactory(ResourceLoader resourceLoader) {
 		super(resourceLoader);
@@ -69,6 +75,7 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 	/**
 	 * Create a new CachingMetadataReaderFactory for the given class loader.
 	 * @param classLoader the ClassLoader to use
+	 * 构造函数
 	 */
 	public CachingMetadataReaderFactory(ClassLoader classLoader) {
 		super(classLoader);
@@ -78,6 +85,7 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 	/**
 	 * Specify the maximum number of entries for the MetadataReader cache.
 	 * Default is 256.
+	 * 设置缓存的极限值
 	 */
 	public void setCacheLimit(int cacheLimit) {
 		this.cacheLimit = cacheLimit;
@@ -85,18 +93,29 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 
 	/**
 	 * Return the maximum number of entries for the MetadataReader cache.
+	 * 拿到缓存的极限值
 	 */
 	public int getCacheLimit() {
 		return this.cacheLimit;
 	}
 
 
+	/**
+	 * 拿到元数据读取器
+	 * @param resource
+	 * @return
+	 * @throws IOException
+     */
 	@Override
 	public MetadataReader getMetadataReader(Resource resource) throws IOException {
+		// 如果缓存极限值为非正数，则不使用缓存，永远可以拿到读取器
 		if (getCacheLimit() <= 0) {
+			//返回简单的元数据读取器
 			return super.getMetadataReader(resource);
 		}
+
 		synchronized (this.metadataReaderCache) {
+			// 从缓存中拿取，如果没有，则新生成一个，并加入缓存中
 			MetadataReader metadataReader = this.metadataReaderCache.get(resource);
 			if (metadataReader == null) {
 				metadataReader = super.getMetadataReader(resource);

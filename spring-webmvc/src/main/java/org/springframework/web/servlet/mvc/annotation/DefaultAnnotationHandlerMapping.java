@@ -113,6 +113,7 @@ public class DefaultAnnotationHandlerMapping extends AbstractDetectingUrlHandler
 	protected String[] determineUrlsForHandler(String beanName) {
 		ApplicationContext context = getApplicationContext();
 		Class<?> handlerType = context.getType(beanName);
+		//获取在这个bean上的RequestMapping注解信息
 		RequestMapping mapping = context.findAnnotationOnBean(beanName, RequestMapping.class);
 		if (mapping != null) {
 			// @RequestMapping found at type level
@@ -179,8 +180,11 @@ public class DefaultAnnotationHandlerMapping extends AbstractDetectingUrlHandler
 				@Override
 				public void doWith(Method method) {
 					RequestMapping mapping = AnnotationUtils.findAnnotation(method, RequestMapping.class);
+					//配置了RequestMapping
 					if (mapping != null) {
+						//value
 						String[] mappedPatterns = mapping.value();
+						//value has length
 						if (mappedPatterns.length > 0) {
 							for (String mappedPattern : mappedPatterns) {
 								if (!hasTypeLevelMapping && !mappedPattern.startsWith("/")) {

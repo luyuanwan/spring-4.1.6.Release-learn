@@ -72,6 +72,7 @@ class ConditionEvaluator {
 	 */
 	public boolean shouldSkip(AnnotatedTypeMetadata metadata, ConfigurationPhase phase) {
 		if (metadata == null || !metadata.isAnnotated(Conditional.class.getName())) {
+			// 不该跳过，从而成为spring管理的Bean
 			return false;
 		}
 

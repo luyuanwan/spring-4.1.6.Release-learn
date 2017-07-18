@@ -96,6 +96,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * @see #getResourcePatternResolver
 	 */
 	protected String[] getConfigLocations() {
+		//如果配置了，则直接获取，如果没有配置，则默认取WEB-INF/applicationContext.xml
 		return (this.configLocations != null ? this.configLocations : getDefaultConfigLocations());
 	}
 

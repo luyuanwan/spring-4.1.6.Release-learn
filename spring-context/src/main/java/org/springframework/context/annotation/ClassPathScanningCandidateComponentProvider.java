@@ -263,10 +263,15 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * @return a corresponding Set of autodetected bean definitions
 	 */
 	public Set<BeanDefinition> findCandidateComponents(String basePackage) {
+		// 候选者
 		Set<BeanDefinition> candidates = new LinkedHashSet<BeanDefinition>();
 		try {
+			// 假设我们需要扫描的包名是com.geeter.service
+			// 那么packageSearchPath就是classpath*:com.getter.service/**/*.class
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + "/" + this.resourcePattern;
+
+			// spring会根据构造好的path自己去查找的
 			Resource[] resources = this.resourcePatternResolver.getResources(packageSearchPath);
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
@@ -277,6 +282,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 				if (resource.isReadable()) {
 					try {
 						MetadataReader metadataReader = this.metadataReaderFactory.getMetadataReader(resource);
+						// 判定是否为候选组件
 						if (isCandidateComponent(metadataReader)) {
 							ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
 							sbd.setResource(resource);
@@ -336,12 +342,16 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * @param metadataReader the ASM ClassReader for the class
 	 * @return whether the class qualifies as a candidate component
 	 */
+	//<context:component-scan base-package="com"/>
 	protected boolean isCandidateComponent(MetadataReader metadataReader) throws IOException {
+		// 如果在排除过滤中，则不是候选者组件
 		for (TypeFilter tf : this.excludeFilters) {
 			if (tf.match(metadataReader, this.metadataReaderFactory)) {
 				return false;
 			}
 		}
+
+		// 如果在包含过滤中，则需继续判定是否满足条件
 		for (TypeFilter tf : this.includeFilters) {
 			if (tf.match(metadataReader, this.metadataReaderFactory)) {
 				return isConditionMatch(metadataReader);

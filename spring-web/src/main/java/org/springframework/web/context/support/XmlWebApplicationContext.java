@@ -119,6 +119,7 @@ public class XmlWebApplicationContext extends AbstractRefreshableWebApplicationC
 	 * @see #getResourcePatternResolver
 	 */
 	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws IOException {
+		//每一个配置文件，就是在WEB.xml中配置的contextLoaderLocation
 		String[] configLocations = getConfigLocations();
 		if (configLocations != null) {
 			for (String configLocation : configLocations) {

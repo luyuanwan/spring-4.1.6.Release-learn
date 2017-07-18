@@ -36,6 +36,7 @@ public class CompositeComponentDefinition extends AbstractComponentDefinition {
 
 	private final Object source;
 
+	// 组件定义列表
 	private final List<ComponentDefinition> nestedComponents = new LinkedList<ComponentDefinition>();
 
 

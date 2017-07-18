@@ -182,11 +182,15 @@ class ConfigurationClassBeanDefinitionReader {
 	 * with the BeanDefinitionRegistry based on its contents.
 	 */
 	private void loadBeanDefinitionsForBeanMethod(BeanMethod beanMethod) {
+		//拿到配置类
 		ConfigurationClass configClass = beanMethod.getConfigurationClass();
+		//拿到方法元数据
 		MethodMetadata metadata = beanMethod.getMetadata();
+		//拿到方法名
 		String methodName = metadata.getMethodName();
 
 		// Do we need to mark the bean as skipped by its condition?
+		// 我们是否需要标注这个bean是跳过的
 		if (this.conditionEvaluator.shouldSkip(metadata, ConfigurationPhase.REGISTER_BEAN)) {
 			configClass.skippedBeanMethods.add(methodName);
 			return;

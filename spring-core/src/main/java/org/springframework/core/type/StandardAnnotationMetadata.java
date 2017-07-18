@@ -34,6 +34,9 @@ import org.springframework.util.MultiValueMap;
  * @author Chris Beams
  * @author Phillip Webb
  * @since 2.5
+ * 标准的注解元数据，从反射中读取元数据
+ * 继承自标准的类元数据，所以能获取到所有的类元数据
+ * 实现了注解元数据接口，所以能获取到所有的注解元数据
  */
 public class StandardAnnotationMetadata extends StandardClassMetadata implements AnnotationMetadata {
 
@@ -66,11 +69,19 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 	}
 
 
+	/**
+	 * 拿到类下面所有的注解类型
+	 * @return
+     */
 	@Override
 	public Set<String> getAnnotationTypes() {
+		// 类下面所有的注解类型
 		Set<String> types = new LinkedHashSet<String>();
+
+		// 拿到所有注解
 		Annotation[] anns = getIntrospectedClass().getAnnotations();
 		for (Annotation ann : anns) {
+			// 遍历每一个注解，拿到名字后，添加到set容器中
 			types.add(ann.annotationType().getName());
 		}
 		return types;
@@ -81,14 +92,23 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 		return AnnotatedElementUtils.getMetaAnnotationTypes(getIntrospectedClass(), annotationType);
 	}
 
+	/**
+	 * 是否含有指定的注解
+	 * @param annotationType the annotation type to look for
+	 * @return
+     */
 	@Override
 	public boolean hasAnnotation(String annotationType) {
+		// 拿到所有的注解
 		Annotation[] anns = getIntrospectedClass().getAnnotations();
+		// 遍历每一个注解
 		for (Annotation ann : anns) {
+			// 如果其中有一个注解的名字和给定的名字相同，则表示含有该注解
 			if (ann.annotationType().getName().equals(annotationType)) {
 				return true;
 			}
 		}
+		//都没有，则表示没有该注解
 		return false;
 	}
 

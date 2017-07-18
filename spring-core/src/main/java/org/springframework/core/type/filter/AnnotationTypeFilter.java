@@ -34,6 +34,7 @@ import org.springframework.util.ClassUtils;
  * @author Ramnivas Laddad
  * @author Juergen Hoeller
  * @since 2.5
+ * 指定注解类型的过滤器
  */
 public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter {
 
@@ -72,14 +73,18 @@ public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 	 */
 	public AnnotationTypeFilter(Class<? extends Annotation> annotationType, boolean considerMetaAnnotations, boolean considerInterfaces) {
 		super(annotationType.isAnnotationPresent(Inherited.class), considerInterfaces);
+		//注解类型
 		this.annotationType = annotationType;
+		//是否考虑元注解
 		this.considerMetaAnnotations = considerMetaAnnotations;
 	}
 
 
 	@Override
 	protected boolean matchSelf(MetadataReader metadataReader) {
+		//拿到注解元数据
 		AnnotationMetadata metadata = metadataReader.getAnnotationMetadata();
+		//是否包含指定注解的名字
 		return metadata.hasAnnotation(this.annotationType.getName()) ||
 				(this.considerMetaAnnotations && metadata.hasMetaAnnotation(this.annotationType.getName()));
 	}

@@ -26,16 +26,20 @@ import org.springframework.core.type.ClassMetadata;
  *
  * @author Juergen Hoeller
  * @since 2.5
+ *
+ * 元数据读取器
  */
 public interface MetadataReader {
 
 	/**
 	 * Return the resource reference for the class file.
+	 * 拿到资源
 	 */
 	Resource getResource();
 
 	/**
 	 * Read basic class metadata for the underlying class.
+	 * 拿到类元数据
 	 */
 	ClassMetadata getClassMetadata();
 

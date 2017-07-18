@@ -45,17 +45,23 @@ import org.springframework.util.ClassUtils;
  * @since 3.0
  * @see BeanMethod
  * @see ConfigurationClassParser
+ * 代表一个用户定义的Configuration类
  */
 final class ConfigurationClass {
 
+	//注解元数据
 	private final AnnotationMetadata metadata;
 
+	// 从哪个资源中读取到的本类信息
 	private final Resource resource;
 
+	//bean的名字
 	private String beanName;
 
+	// 是由哪个配置类导入本类的
 	private final Set<ConfigurationClass> importedBy = new LinkedHashSet<ConfigurationClass>(1);
 
+	//生成bean的方法
 	private final Set<BeanMethod> beanMethods = new LinkedHashSet<BeanMethod>();
 
 	private final Map<String, Class<? extends BeanDefinitionReader>> importedResources =
@@ -135,14 +141,17 @@ final class ConfigurationClass {
 	}
 
 
+	//拿到注解元数据
 	public AnnotationMetadata getMetadata() {
 		return this.metadata;
 	}
 
+	// 拿到资源
 	public Resource getResource() {
 		return this.resource;
 	}
 
+	// 拿到类的短名形式
 	public String getSimpleName() {
 		return ClassUtils.getShortName(getMetadata().getClassName());
 	}

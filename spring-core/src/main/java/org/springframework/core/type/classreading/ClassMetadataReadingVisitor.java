@@ -40,6 +40,7 @@ import org.springframework.util.ClassUtils;
  * @author Ramnivas Laddad
  * @author Chris Beams
  * @since 2.5
+ * 类的元数据读取访问者
  */
 class ClassMetadataReadingVisitor extends ClassVisitor implements ClassMetadata {
 

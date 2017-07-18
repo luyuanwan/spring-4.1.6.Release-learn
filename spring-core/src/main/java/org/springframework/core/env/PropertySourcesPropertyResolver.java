@@ -31,6 +31,7 @@ import org.springframework.util.ClassUtils;
  */
 public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 
+	//数据源
 	private final PropertySources propertySources;
 
 
@@ -75,14 +76,17 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 		if (logger.isTraceEnabled()) {
 			logger.trace(String.format("getProperty(\"%s\", %s)", key, targetValueType.getSimpleName()));
 		}
+		//数据源不为空的情况下
 		if (this.propertySources != null) {
+			//每一个数据
 			for (PropertySource<?> propertySource : this.propertySources) {
 				if (debugEnabled) {
 					logger.debug(String.format("Searching for key '%s' in [%s]", key, propertySource.getName()));
 				}
 				Object value;
 				if ((value = propertySource.getProperty(key)) != null) {
-					Class<?> valueType = value.getClass();
+					//拿到值不为空
+					Class<?> valueType = value.getClass();//拿到值的类型
 					if (resolveNestedPlaceholders && value instanceof String) {
 						value = resolveNestedPlaceholders((String) value);
 					}

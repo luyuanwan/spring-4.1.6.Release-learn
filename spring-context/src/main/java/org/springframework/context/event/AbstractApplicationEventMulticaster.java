@@ -76,6 +76,7 @@ public abstract class AbstractApplicationEventMulticaster
 
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
+		//设置bean工厂
 		this.beanFactory = beanFactory;
 		if (this.beanClassLoader == null && beanFactory instanceof ConfigurableBeanFactory) {
 			this.beanClassLoader = ((ConfigurableBeanFactory) beanFactory).getBeanClassLoader();
@@ -158,9 +159,11 @@ public abstract class AbstractApplicationEventMulticaster
 	protected Collection<ApplicationListener<?>> getApplicationListeners(ApplicationEvent event) {
 		Object source = event.getSource();
 		Class<?> sourceType = (source != null ? source.getClass() : null);
+		//事件Class类型 ->  事件源Class类型
 		ListenerCacheKey cacheKey = new ListenerCacheKey(event.getClass(), sourceType);
 
 		// Quick check for existing entry on ConcurrentHashMap...
+		// 先从缓存中拿，拿到了则直接返回
 		ListenerRetriever retriever = this.retrieverCache.get(cacheKey);
 		if (retriever != null) {
 			return retriever.getApplicationListeners();
@@ -205,20 +208,28 @@ public abstract class AbstractApplicationEventMulticaster
 			listeners = new LinkedHashSet<ApplicationListener<?>>(this.defaultRetriever.applicationListeners);
 			listenerBeans = new LinkedHashSet<String>(this.defaultRetriever.applicationListenerBeans);
 		}
+		//首先处理监听者
 		for (ApplicationListener<?> listener : listeners) {
+			// 遍历每一个监听者
 			if (supportsEvent(listener, event.getClass(), sourceType)) {
+				// 判定是否支持这种类型
 				if (retriever != null) {
 					retriever.applicationListeners.add(listener);
 				}
+				//添加
 				allListeners.add(listener);
 			}
 		}
+		//接着处理监听者bean名字
 		if (!listenerBeans.isEmpty()) {
-			BeanFactory beanFactory = getBeanFactory();
+			BeanFactory beanFactory = getBeanFactory();//拿到bean工厂，想来要在这里创建bean了
 			for (String listenerBeanName : listenerBeans) {
+				// 遍历每一个bean名字
 				try {
+					//拿到bean的类型
 					Class<?> listenerType = beanFactory.getType(listenerBeanName);
 					if (listenerType == null || supportsEvent(listenerType, event)) {
+						// 创建（反射）监听者
 						ApplicationListener<?> listener =
 								beanFactory.getBean(listenerBeanName, ApplicationListener.class);
 						if (!allListeners.contains(listener) && supportsEvent(listener, event.getClass(), sourceType)) {
@@ -235,6 +246,7 @@ public abstract class AbstractApplicationEventMulticaster
 				}
 			}
 		}
+		//排序监听者
 		OrderComparator.sort(allListeners);
 		return allListeners;
 	}

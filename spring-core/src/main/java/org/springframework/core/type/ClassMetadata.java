@@ -25,38 +25,45 @@ package org.springframework.core.type;
  * @see StandardClassMetadata
  * @see org.springframework.core.type.classreading.MetadataReader#getClassMetadata()
  * @see AnnotationMetadata
+ * 类的元数据
  */
 public interface ClassMetadata {
 
 	/**
 	 * Return the name of the underlying class.
+	 * 获取类名
 	 */
 	String getClassName();
 
 	/**
 	 * Return whether the underlying class represents an interface.
+	 * 判定是否为一个接口
 	 */
 	boolean isInterface();
 
 	/**
 	 * Return whether the underlying class represents an annotation.
 	 * @since 4.1
+	 * 判定是否是一个注解
 	 */
 	boolean isAnnotation();
 
 	/**
 	 * Return whether the underlying class is marked as abstract.
+	 * 判定类是否是抽象的
 	 */
 	boolean isAbstract();
 
 	/**
 	 * Return whether the underlying class represents a concrete class,
 	 * i.e. neither an interface nor an abstract class.
+	 * 判定类是否是一个具体的类
 	 */
 	boolean isConcrete();
 
 	/**
 	 * Return whether the underlying class is marked as 'final'.
+	 * 判定类是否是最终的
 	 */
 	boolean isFinal();
 
@@ -65,6 +72,7 @@ public interface ClassMetadata {
 	 * i.e. whether it is a top-level class or a nested class
 	 * (static inner class) that can be constructed independent
 	 * from an enclosing class.
+	 * 判定类是否是独立的
 	 */
 	boolean isIndependent();
 

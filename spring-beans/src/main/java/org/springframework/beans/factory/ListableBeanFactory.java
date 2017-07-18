@@ -52,6 +52,7 @@ import org.springframework.beans.BeansException;
  * @since 16 April 2001
  * @see HierarchicalBeanFactory
  * @see BeanFactoryUtils
+ * 提供了对bean的匹配查找，是一个BEAN工厂
  */
 public interface ListableBeanFactory extends BeanFactory {
 
@@ -63,6 +64,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @param beanName the name of the bean to look for
 	 * @return if this bean factory contains a bean definition with the given name
 	 * @see #containsBean
+	 * 判定在工厂中是否包含bean的定义
 	 */
 	boolean containsBeanDefinition(String beanName);
 

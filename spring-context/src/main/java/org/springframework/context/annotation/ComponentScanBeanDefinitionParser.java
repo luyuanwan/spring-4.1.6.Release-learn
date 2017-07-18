@@ -77,14 +77,23 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
 	@Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
+		// 拿到类似
+		// <context:component-scan base-package="com.geeter.service" />
+		// 中base-package的部分，在这里就是com.geeter.service
 		String basePackage = element.getAttribute(BASE_PACKAGE_ATTRIBUTE);
+
+		//解析占位符
 		basePackage = parserContext.getReaderContext().getEnvironment().resolvePlaceholders(basePackage);
+		// 切分为多个，以逗号分隔的包名
 		String[] basePackages = StringUtils.tokenizeToStringArray(basePackage,
 				ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
 
 		// Actually scan for bean definitions and register them.
+		// 定义扫描包类
 		ClassPathBeanDefinitionScanner scanner = configureScanner(parserContext, element);
+		// 扫描基础包，拿到bean定义
 		Set<BeanDefinitionHolder> beanDefinitions = scanner.doScan(basePackages);
+		// 注册bean定义
 		registerComponents(parserContext.getReaderContext(), beanDefinitions, element);
 
 		return null;
@@ -92,6 +101,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
 	protected ClassPathBeanDefinitionScanner configureScanner(ParserContext parserContext, Element element) {
 		boolean useDefaultFilters = true;
+		// 判定节点是否有属性use-default-filters
 		if (element.hasAttribute(USE_DEFAULT_FILTERS_ATTRIBUTE)) {
 			useDefaultFilters = Boolean.valueOf(element.getAttribute(USE_DEFAULT_FILTERS_ATTRIBUTE));
 		}
@@ -103,6 +113,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		scanner.setBeanDefinitionDefaults(parserContext.getDelegate().getBeanDefinitionDefaults());
 		scanner.setAutowireCandidatePatterns(parserContext.getDelegate().getAutowireCandidatePatterns());
 
+		//如果节点中设置了resource-pattern,则设置resource-pattern
 		if (element.hasAttribute(RESOURCE_PATTERN_ATTRIBUTE)) {
 			scanner.setResourcePattern(element.getAttribute(RESOURCE_PATTERN_ATTRIBUTE));
 		}
@@ -121,6 +132,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 			parserContext.getReaderContext().error(ex.getMessage(), parserContext.extractSource(element), ex.getCause());
 		}
 
+		//解析typeFilter并设置到scanner中
 		parseTypeFilters(element, scanner, parserContext);
 
 		return scanner;
@@ -153,6 +165,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 			}
 		}
 
+		//发送一次组件注册事件
 		readerContext.fireComponentRegistered(compositeDef);
 	}
 
@@ -195,19 +208,23 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		}
 	}
 
+	//<context:component-scan base-package="com"/>
 	protected void parseTypeFilters(Element element, ClassPathBeanDefinitionScanner scanner, ParserContext parserContext) {
 		// Parse exclude and include filter elements.
 		ClassLoader classLoader = scanner.getResourceLoader().getClassLoader();
 		NodeList nodeList = element.getChildNodes();
 		for (int i = 0; i < nodeList.getLength(); i++) {
+			//每一个节点
 			Node node = nodeList.item(i);
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				String localName = parserContext.getDelegate().getLocalName(node);
 				try {
+					// 如果是包含过滤器include-filter
 					if (INCLUDE_FILTER_ELEMENT.equals(localName)) {
 						TypeFilter typeFilter = createTypeFilter((Element) node, classLoader, parserContext);
 						scanner.addIncludeFilter(typeFilter);
 					}
+					// 如果是不包含过滤器exclude-filter
 					else if (EXCLUDE_FILTER_ELEMENT.equals(localName)) {
 						TypeFilter typeFilter = createTypeFilter((Element) node, classLoader, parserContext);
 						scanner.addExcludeFilter(typeFilter);
@@ -225,9 +242,11 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 	protected TypeFilter createTypeFilter(Element element, ClassLoader classLoader, ParserContext parserContext) {
 		String filterType = element.getAttribute(FILTER_TYPE_ATTRIBUTE);
 		String expression = element.getAttribute(FILTER_EXPRESSION_ATTRIBUTE);
+		// 占位符解析成表达式
 		expression = parserContext.getReaderContext().getEnvironment().resolvePlaceholders(expression);
 		try {
 			if ("annotation".equals(filterType)) {
+				//要过滤anontation
 				return new AnnotationTypeFilter((Class<Annotation>) classLoader.loadClass(expression));
 			}
 			else if ("assignable".equals(filterType)) {

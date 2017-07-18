@@ -173,6 +173,7 @@ public class ContextLoader {
 		// This is currently strictly internal and not meant to be customized
 		// by application developers.
 		try {
+			//加载默认策略
 			ClassPathResource resource = new ClassPathResource(DEFAULT_STRATEGIES_PATH, ContextLoader.class);
 			defaultStrategies = PropertiesLoaderUtils.loadProperties(resource);
 		}
@@ -290,6 +291,7 @@ public class ContextLoader {
 			// Store context in local instance variable, to guarantee that
 			// it is available on ServletContext shutdown.
 			if (this.context == null) {
+				//这里拿到的是org.springframework.web.context.support.XmlWebApplicationContext的实例
 				this.context = createWebApplicationContext(servletContext);
 			}
 			if (this.context instanceof ConfigurableWebApplicationContext) {
@@ -301,6 +303,7 @@ public class ContextLoader {
 						// The context instance was injected without an explicit parent ->
 						// determine parent for root web application context, if any.
 						ApplicationContext parent = loadParentContext(servletContext);
+						//一般情况，父上下文是空
 						cwac.setParent(parent);
 					}
 					configureAndRefreshWebApplicationContext(cwac, servletContext);
@@ -352,7 +355,9 @@ public class ContextLoader {
 	 * @see ConfigurableWebApplicationContext
 	 */
 	protected WebApplicationContext createWebApplicationContext(ServletContext sc) {
+		//这里拿到的是org.springframework.web.context.support.XmlWebApplicationContext
 		Class<?> contextClass = determineContextClass(sc);
+
 		if (!ConfigurableWebApplicationContext.class.isAssignableFrom(contextClass)) {
 			throw new ApplicationContextException("Custom context class [" + contextClass.getName() +
 					"] is not of type [" + ConfigurableWebApplicationContext.class.getName() + "]");
@@ -385,9 +390,12 @@ public class ContextLoader {
 			}
 		}
 
+		//WEB上下文中存入Servlet上下文
 		wac.setServletContext(sc);
+		//拿到contextConfigLocation的内容
 		String configLocationParam = sc.getInitParameter(CONFIG_LOCATION_PARAM);
 		if (configLocationParam != null) {
+			//如果不为空，则直接设置
 			wac.setConfigLocation(configLocationParam);
 		}
 
@@ -471,6 +479,7 @@ public class ContextLoader {
 			}
 		}
 		else {
+			//这里拿到的是org.springframework.web.context.support.XmlWebApplicationContext
 			contextClassName = defaultStrategies.getProperty(WebApplicationContext.class.getName());
 			try {
 				return ClassUtils.forName(contextClassName, ContextLoader.class.getClassLoader());
@@ -544,6 +553,7 @@ public class ContextLoader {
 	 * @see org.springframework.context.access.ContextSingletonBeanFactoryLocator
 	 */
 	protected ApplicationContext loadParentContext(ServletContext servletContext) {
+		//父上下文
 		ApplicationContext parentContext = null;
 		String locatorFactorySelector = servletContext.getInitParameter(LOCATOR_FACTORY_SELECTOR_PARAM);
 		String parentContextKey = servletContext.getInitParameter(LOCATOR_FACTORY_KEY_PARAM);

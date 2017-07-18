@@ -39,6 +39,7 @@ import org.springframework.util.ErrorHandler;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see #setTaskExecutor
+ * 简单的事件监听器管理者
  */
 public class SimpleApplicationEventMulticaster extends AbstractApplicationEventMulticaster {
 
@@ -72,6 +73,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	 * transaction association) unless the TaskExecutor explicitly supports this.
 	 * @see org.springframework.core.task.SyncTaskExecutor
 	 * @see org.springframework.core.task.SimpleAsyncTaskExecutor
+	 * 设置执行器
 	 */
 	public void setTaskExecutor(Executor taskExecutor) {
 		this.taskExecutor = taskExecutor;
@@ -79,6 +81,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 
 	/**
 	 * Return the current task executor for this multicaster.
+	 * 拿到执行器
 	 */
 	protected Executor getTaskExecutor() {
 		return this.taskExecutor;
@@ -114,9 +117,12 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 
 	@Override
 	public void multicastEvent(final ApplicationEvent event) {
+		// 接受到一个事件，则遍历每一个事件监听者，向他们发送消息
 		for (final ApplicationListener<?> listener : getApplicationListeners(event)) {
+			//拿到执行器
 			Executor executor = getTaskExecutor();
 			if (executor != null) {
+				//执行器不为空的情况，开线程执行（线程池）
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
@@ -125,6 +131,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 				});
 			}
 			else {
+				//没有拿到执行器，则同步执行
 				invokeListener(listener, event);
 			}
 		}
@@ -137,7 +144,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	 * @since 4.1
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	protected void invokeListener(ApplicationListener listener, ApplicationEvent event) {
+	protected void invokeListener(ApplicationListener listener/*监听器*/, ApplicationEvent event/*事件*/) {
 		ErrorHandler errorHandler = getErrorHandler();
 		if (errorHandler != null) {
 			try {

@@ -41,6 +41,7 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	//各种实现参数解析的解析器
 	private final List<HandlerMethodArgumentResolver> argumentResolvers =
 			new LinkedList<HandlerMethodArgumentResolver>();
 

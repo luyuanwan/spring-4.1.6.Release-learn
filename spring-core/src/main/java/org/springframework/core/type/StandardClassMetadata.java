@@ -27,6 +27,7 @@ import org.springframework.util.Assert;
  *
  * @author Juergen Hoeller
  * @since 2.5
+ * 标准的类元数据，是通过反射获取类元数据的
  */
 public class StandardClassMetadata implements ClassMetadata {
 

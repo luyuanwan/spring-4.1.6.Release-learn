@@ -87,6 +87,7 @@ public class PathVariableMethodArgumentResolver extends AbstractNamedValueMethod
 
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
+		// 拿到PathVariable注解
 		PathVariable annotation = parameter.getParameterAnnotation(PathVariable.class);
 		return new PathVariableNamedValueInfo(annotation);
 	}
@@ -154,6 +155,7 @@ public class PathVariableMethodArgumentResolver extends AbstractNamedValueMethod
 	private static class PathVariableNamedValueInfo extends NamedValueInfo {
 
 		public PathVariableNamedValueInfo(PathVariable annotation) {
+			//PathVariable("xi") xi = annotation.value() 且是必须的
 			super(annotation.value(), true, ValueConstants.DEFAULT_NONE);
 		}
 	}

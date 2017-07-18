@@ -457,8 +457,10 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 
 		RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter();
 		adapter.setContentNegotiationManager(mvcContentNegotiationManager());
+		//设置消息转换器
 		adapter.setMessageConverters(getMessageConverters());
 		adapter.setWebBindingInitializer(getConfigurableWebBindingInitializer());
+		//设置用户自定义参数解析器
 		adapter.setCustomArgumentResolvers(argumentResolvers);
 		adapter.setCustomReturnValueHandlers(returnValueHandlers);
 

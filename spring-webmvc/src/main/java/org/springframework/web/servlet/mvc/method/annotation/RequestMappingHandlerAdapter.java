@@ -215,6 +215,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	/**
 	 * Return the configured argument resolvers, or possibly {@code null} if
 	 * not initialized yet via {@link #afterPropertiesSet()}.
+	 * 拿到参数解析器
 	 */
 	public List<HandlerMethodArgumentResolver> getArgumentResolvers() {
 		return (this.argumentResolvers != null) ? this.argumentResolvers.getResolvers() : null;
@@ -236,6 +237,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	/**
 	 * Return the argument resolvers for {@code @InitBinder} methods, or possibly
 	 * {@code null} if not initialized yet via {@link #afterPropertiesSet()}.
+	 * 拿到初始绑定参数解析器
 	 */
 	public List<HandlerMethodArgumentResolver> getInitBinderArgumentResolvers() {
 		return (this.initBinderArgumentResolvers != null) ? this.initBinderArgumentResolvers.getResolvers() : null;
@@ -495,6 +497,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		// Do this first, it may add ResponseBody advice beans
 		initControllerAdviceCache();
 
+		//初始化解析器
 		if (this.argumentResolvers == null) {
 			List<HandlerMethodArgumentResolver> resolvers = getDefaultArgumentResolvers();
 			this.argumentResolvers = new HandlerMethodArgumentResolverComposite().addResolvers(resolvers);
@@ -517,11 +520,14 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			logger.info("Looking for @ControllerAdvice: " + getApplicationContext());
 		}
 
+		// 找到所有的bean
 		List<ControllerAdviceBean> beans = ControllerAdviceBean.findAnnotatedBeans(getApplicationContext());
+		// 排个序
 		OrderComparator.sort(beans);
 
 		List<Object> responseBodyAdviceBeans = new ArrayList<Object>();
 
+		// 遍历每一个bean
 		for (ControllerAdviceBean bean : beans) {
 			Set<Method> attrMethods = HandlerMethodSelector.selectMethods(bean.getBeanType(), MODEL_ATTRIBUTE_METHODS);
 			if (!attrMethods.isEmpty()) {

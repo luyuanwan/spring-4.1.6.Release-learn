@@ -88,6 +88,7 @@ public class AnnotationSessionFactoryBean extends LocalSessionFactoryBean implem
 
 	private String[] packagesToScan;
 
+	//类型过滤器集合
 	private TypeFilter[] entityTypeFilters = new TypeFilter[] {
 			new AnnotationTypeFilter(Entity.class, false),
 			new AnnotationTypeFilter(Embeddable.class, false),

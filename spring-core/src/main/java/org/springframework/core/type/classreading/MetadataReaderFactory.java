@@ -28,6 +28,7 @@ import org.springframework.core.io.Resource;
  * @since 2.5
  * @see SimpleMetadataReaderFactory
  * @see CachingMetadataReaderFactory
+ * 元数据读取器工厂，负责生产元数据读取器
  */
 public interface MetadataReaderFactory {
 
@@ -36,6 +37,7 @@ public interface MetadataReaderFactory {
 	 * @param className the class name (to be resolved to a ".class" file)
 	 * @return a holder for the ClassReader instance (never {@code null})
 	 * @throws IOException in case of I/O failure
+	 * 拿到一个元数据读取器
 	 */
 	MetadataReader getMetadataReader(String className) throws IOException;
 
@@ -44,6 +46,7 @@ public interface MetadataReaderFactory {
 	 * @param resource the resource (pointing to a ".class" file)
 	 * @return a holder for the ClassReader instance (never {@code null})
 	 * @throws IOException in case of I/O failure
+	 * 拿到一个元数据读取器
 	 */
 	MetadataReader getMetadataReader(Resource resource) throws IOException;
 

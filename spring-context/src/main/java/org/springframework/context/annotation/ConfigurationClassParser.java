@@ -261,8 +261,10 @@ class ConfigurationClassParser {
 		AnnotationAttributes componentScan = AnnotationConfigUtils.attributesFor(sourceClass.getMetadata(), ComponentScan.class);
 		if (componentScan != null && !this.conditionEvaluator.shouldSkip(sourceClass.getMetadata(), ConfigurationPhase.REGISTER_BEAN)) {
 			// The config class is annotated with @ComponentScan -> perform the scan immediately
+			// 拿到bean定义
 			Set<BeanDefinitionHolder> scannedBeanDefinitions =
 					this.componentScanParser.parse(componentScan, sourceClass.getMetadata().getClassName());
+
 			// Check the set of scanned definitions for any further config classes and parse recursively if necessary
 			for (BeanDefinitionHolder holder : scannedBeanDefinitions) {
 				if (ConfigurationClassUtils.checkConfigurationClassCandidate(holder.getBeanDefinition(), this.metadataReaderFactory)) {

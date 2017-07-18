@@ -47,6 +47,7 @@ public class StandardTypeConverter implements TypeConverter {
 	public StandardTypeConverter() {
 		synchronized (this) {
 			if (defaultConversionService == null) {
+				//默认转换服务，以前这里是存放了很多很多的转换器的
 				defaultConversionService = new DefaultConversionService();
 			}
 		}

@@ -82,6 +82,7 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 	public final Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
+		// 拿到参数类型
 		Class<?> paramType = parameter.getParameterType();
 		NamedValueInfo namedValueInfo = getNamedValueInfo(parameter);
 
@@ -115,6 +116,7 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 	private NamedValueInfo getNamedValueInfo(MethodParameter parameter) {
 		NamedValueInfo namedValueInfo = this.namedValueInfoCache.get(parameter);
 		if (namedValueInfo == null) {
+			// 创建
 			namedValueInfo = createNamedValueInfo(parameter);
 			namedValueInfo = updateNamedValueInfo(parameter, namedValueInfo);
 			this.namedValueInfoCache.put(parameter, namedValueInfo);

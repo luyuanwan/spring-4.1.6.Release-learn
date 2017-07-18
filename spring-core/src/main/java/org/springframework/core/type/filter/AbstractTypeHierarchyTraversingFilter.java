@@ -41,13 +41,17 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	//是否需要考虑继承
 	private final boolean considerInherited;
 
+	//是否需要考虑接口
 	private final boolean considerInterfaces;
 
 
 	protected AbstractTypeHierarchyTraversingFilter(boolean considerInherited, boolean considerInterfaces) {
+		//是否需要考虑继承
 		this.considerInherited = considerInherited;
+		//是否需要考虑接口
 		this.considerInterfaces = considerInterfaces;
 	}
 
@@ -61,12 +65,16 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 		if (matchSelf(metadataReader)) {
 			return true;
 		}
+		//类元数据------太有意思了
 		ClassMetadata metadata = metadataReader.getClassMetadata();
+		//是否符合类名
 		if (matchClassName(metadata.getClassName())) {
 			return true;
 		}
 
+		//是否需要考虑继承
 		if (this.considerInherited) {
+			//是否含有超类
 			if (metadata.hasSuperClass()) {
 				// Optimization to avoid creating ClassReader for super class.
 				Boolean superClassMatch = matchSuperClass(metadata.getSuperClassName());
@@ -90,7 +98,9 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 			}
 		}
 
+		//是否需要考虑接口
 		if (this.considerInterfaces) {
+			//获取每一个接口名
 			for (String ifc : metadata.getInterfaceNames()) {
 				// Optimization to avoid creating ClassReader for super class
 				Boolean interfaceMatch = matchInterface(ifc);
@@ -118,6 +128,7 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 	}
 
 	private boolean match(String className, MetadataReaderFactory metadataReaderFactory) throws IOException {
+		//递归
 		return match(metadataReaderFactory.getMetadataReader(className), metadataReaderFactory);
 	}
 
@@ -125,6 +136,7 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 	 * Override this to match self characteristics alone. Typically,
 	 * the implementation will use a visitor to extract information
 	 * to perform matching.
+	 * 模板方法
 	 */
 	protected boolean matchSelf(MetadataReader metadataReader) {
 		return false;

@@ -23,11 +23,14 @@ import org.springframework.core.type.MethodMetadata;
 /**
  * @author Chris Beams
  * @since 3.1
+ * 配置方法
  */
 abstract class ConfigurationMethod {
 
+	//方法元数据
 	protected final MethodMetadata metadata;
 
+	//配置类
 	protected final ConfigurationClass configurationClass;
 
 

@@ -318,10 +318,12 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		}
 
 		Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
+		//缓存
 		if (currentResources == null) {
 			currentResources = new HashSet<EncodedResource>(4);
 			this.resourcesCurrentlyBeingLoaded.set(currentResources);
 		}
+		//添加进SET中，如果添加不成功，说明以前已经添加过了
 		if (!currentResources.add(encodedResource)) {
 			throw new BeanDefinitionStoreException(
 					"Detected cyclic loading of " + encodedResource + " - check your import definitions!");

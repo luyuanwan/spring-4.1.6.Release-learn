@@ -34,6 +34,7 @@ import org.springframework.util.ClassUtils;
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.1
+ * 默认转换服务
  */
 public class DefaultConversionService extends GenericConversionService {
 
