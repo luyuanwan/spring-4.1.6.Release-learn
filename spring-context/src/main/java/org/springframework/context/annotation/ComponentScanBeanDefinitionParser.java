@@ -52,14 +52,19 @@ import org.springframework.util.StringUtils;
  */
 public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
+	//这个属性表示需要扫描那个包及其子包下的类，可以使用;分号写多个包名，在默认情况下会扫描指定包下的所有被
+	//Component及其子类注解的类
 	private static final String BASE_PACKAGE_ATTRIBUTE = "base-package";
 
 	private static final String RESOURCE_PATTERN_ATTRIBUTE = "resource-pattern";
 
+	//该属性如果被设置为true，则表示会默认添加上对被Component及其子类注解的扫描过滤器，并且交由spring托管，默认是true
+	//如果设置为fasle,则默认是不会扫描被Component及其子类注解的类的
 	private static final String USE_DEFAULT_FILTERS_ATTRIBUTE = "use-default-filters";
 
 	private static final String ANNOTATION_CONFIG_ATTRIBUTE = "annotation-config";
 
+	//可以自定义一个bean名字的生成器，如果不设置，则使用默认的bean名字生成器
 	private static final String NAME_GENERATOR_ATTRIBUTE = "name-generator";
 
 	private static final String SCOPE_RESOLVER_ATTRIBUTE = "scope-resolver";

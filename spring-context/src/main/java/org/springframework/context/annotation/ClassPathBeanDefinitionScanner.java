@@ -246,18 +246,22 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<BeanDefinitionHolder>();
 		for (String basePackage : basePackages) {
-			//根据包名拿到bean定义信息
+			//遍历每一个包名，根据包名拿到bean定义信息，findCandidateComponents函数的意思是查找候选者组件
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
 			for (BeanDefinition candidate : candidates) {
 				// 遍历每一个候选者
-				// 确定Score的值
+				// 解析出score元数据信息
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
+				//设置元数据Score名字
 				candidate.setScope(scopeMetadata.getScopeName());
-				//确定BEAN的名字
+				//根据bean名字生成器确定BEAN的名字，这里是一个扩展点，bean名字生成器是可以用户自定义的
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
 				if (candidate instanceof AbstractBeanDefinition) {
+					//是否是一个抽象的bean定义，如果是，则触发postProcessBeanDefinition
+					//这里也是一个扩展点，如果用户监听postProcessBeanDefinition，则可以收到bean的定义被处理完毕了
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
+				//是否是一个注解bean定义，如果是就处理注解相关的部分
 				if (candidate instanceof AnnotatedBeanDefinition) {
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
