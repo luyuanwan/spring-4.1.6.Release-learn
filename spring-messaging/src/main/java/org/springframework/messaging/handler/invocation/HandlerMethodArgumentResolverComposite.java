@@ -67,22 +67,30 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 
 	/**
 	 * Iterate over registered {@link HandlerMethodArgumentResolver}s and invoke the one that supports it.
+	 *
+	 * 解析参数
 	 * @exception IllegalStateException if no suitable {@link HandlerMethodArgumentResolver} is found.
 	 */
 	@Override
 	public Object resolveArgument(MethodParameter parameter, Message<?> message) throws Exception {
 
+		// 拿到一个可用的函数参数解析器
 		HandlerMethodArgumentResolver resolver = getArgumentResolver(parameter);
+
 		Assert.notNull(resolver, "Unknown parameter type [" + parameter.getParameterType().getName() + "]");
+
+		// 就用找到的这个解析参数
 		return resolver.resolveArgument(parameter, message);
 	}
 
 	/**
 	 * Find a registered {@link HandlerMethodArgumentResolver} that supports the given method parameter.
+	 * 拿到一个可用的函数参数解析器
 	 */
 	private HandlerMethodArgumentResolver getArgumentResolver(MethodParameter parameter) {
 		HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
 		if (result == null) {
+			//有好多的函数参数解析器，一个一个判断，直到找到第一个可用的
 			for (HandlerMethodArgumentResolver resolver : this.argumentResolvers) {
 				if (resolver.supportsParameter(parameter)) {
 					result = resolver;

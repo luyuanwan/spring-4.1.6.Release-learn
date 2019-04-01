@@ -44,6 +44,9 @@ import org.springframework.core.io.Resource;
  */
 public abstract class AbstractXmlApplicationContext extends AbstractRefreshableConfigApplicationContext {
 
+	/**
+	 * 只有XML才有校验问题，默认是校验的
+	 */
 	private boolean validating = true;
 
 
@@ -72,6 +75,8 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 
 	/**
 	 * Loads the bean definitions via an XmlBeanDefinitionReader.
+	 *
+	 * XML加载bean定义哦
 	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 	 * @see #initBeanDefinitionReader
 	 * @see #loadBeanDefinitions
@@ -83,14 +88,14 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 
 		// Configure the bean definition reader with this context's
 		// resource loading environment.
-		beanDefinitionReader.setEnvironment(this.getEnvironment());
-		beanDefinitionReader.setResourceLoader(this);
-		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
+		beanDefinitionReader.setEnvironment(this.getEnvironment());//设置环境
+		beanDefinitionReader.setResourceLoader(this);//设置资源加载器，它自己就是一个资源加载器
+		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));//设置实体解析器
 
 		// Allow a subclass to provide custom initialization of the reader,
 		// then proceed with actually loading the bean definitions.
-		initBeanDefinitionReader(beanDefinitionReader);
-		loadBeanDefinitions(beanDefinitionReader);
+		initBeanDefinitionReader(beanDefinitionReader);//初始化
+		loadBeanDefinitions(beanDefinitionReader);//加载bean定义
 	}
 
 	/**
@@ -109,6 +114,9 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 * Load the bean definitions with the given XmlBeanDefinitionReader.
 	 * <p>The lifecycle of the bean factory is handled by the {@link #refreshBeanFactory}
 	 * method; hence this method is just supposed to load and/or register bean definitions.
+	 *
+	 * 从一个阅读器中读取bean定义
+	 *
 	 * @param reader the XmlBeanDefinitionReader to use
 	 * @throws BeansException in case of bean registration errors
 	 * @throws IOException if the required XML document isn't found
@@ -118,10 +126,14 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 * @see #getResourcePatternResolver
 	 */
 	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws BeansException, IOException {
+		// 拿到资源
 		Resource[] configResources = getConfigResources();
+		// 加载资源
 		if (configResources != null) {
 			reader.loadBeanDefinitions(configResources);
 		}
+
+
 		String[] configLocations = getConfigLocations();
 		if (configLocations != null) {
 			reader.loadBeanDefinitions(configLocations);

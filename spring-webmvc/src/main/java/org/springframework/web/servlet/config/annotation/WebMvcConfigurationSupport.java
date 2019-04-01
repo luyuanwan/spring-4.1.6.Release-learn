@@ -194,6 +194,9 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 
 	private PathMatchConfigurer pathMatchConfigurer;
 
+	/**
+	 * 从客户端请求中解析出媒体类型的管理器
+	 */
 	private ContentNegotiationManager contentNegotiationManager;
 
 	private List<HttpMessageConverter<?>> messageConverters;
@@ -296,14 +299,21 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	/**
 	 * Return a {@link ContentNegotiationManager} instance to use to determine
 	 * requested {@linkplain MediaType media types} in a given request.
+	 *
+	 * 获取从客户端请求中解析出媒体类型的管理器
 	 */
 	@Bean
 	public ContentNegotiationManager mvcContentNegotiationManager() {
+		//如果是第一次启动，则一定为null
 		if (this.contentNegotiationManager == null) {
+			//生成一个配置器
 			ContentNegotiationConfigurer configurer = new ContentNegotiationConfigurer(this.servletContext);
+			//设置媒体类型信息
 			configurer.mediaTypes(getDefaultMediaTypes());
+			//对这个配置器做一些其他的工作
 			configureContentNegotiation(configurer);
 			try {
+				//获取从客户端请求中解析出媒体类型的管理器
 				this.contentNegotiationManager = configurer.getContentNegotiationManager();
 			}
 			catch (Exception ex) {
@@ -456,6 +466,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 		addReturnValueHandlers(returnValueHandlers);
 
 		RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter();
+		//设置从客户端请求中解析出媒体类型的管理器
 		adapter.setContentNegotiationManager(mvcContentNegotiationManager());
 		//设置消息转换器
 		adapter.setMessageConverters(getMessageConverters());

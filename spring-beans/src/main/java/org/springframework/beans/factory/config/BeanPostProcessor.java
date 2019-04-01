@@ -38,6 +38,9 @@ import org.springframework.beans.BeansException;
  * @see DestructionAwareBeanPostProcessor
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
+ *
+ *
+ * 仅适合对单个Bean进行后处理
  */
 public interface BeanPostProcessor {
 

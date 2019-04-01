@@ -78,21 +78,26 @@ class ComponentScanAnnotationParser {
 		ClassPathBeanDefinitionScanner scanner =
 				new ClassPathBeanDefinitionScanner(this.registry, componentScan.getBoolean("useDefaultFilters"));
 
+		//设置环境
 		Assert.notNull(this.environment, "Environment must not be null");
 		scanner.setEnvironment(this.environment);
 
+		//设置资源加载器
 		Assert.notNull(this.resourceLoader, "ResourceLoader must not be null");
 		scanner.setResourceLoader(this.resourceLoader);
 
 
-		//设置bean名字生成器
-		Class<? extends BeanNameGenerator> generatorClass = componentScan.getClass("nameGenerator");//拿到bean名字生成器类
+		//拿到bean名字生成器类
+		Class<? extends BeanNameGenerator> generatorClass = componentScan.getClass("nameGenerator");
 		boolean useInheritedGenerator = BeanNameGenerator.class.equals(generatorClass);
+		//设置bean名字生成器
 		scanner.setBeanNameGenerator(useInheritedGenerator ? this.beanNameGenerator :
 				BeanUtils.instantiateClass(generatorClass));
 
+		//是否需要代理
 		ScopedProxyMode scopedProxyMode = componentScan.getEnum("scopedProxy");
 		if (scopedProxyMode != ScopedProxyMode.DEFAULT) {
+			//设置代理模式
 			scanner.setScopedProxyMode(scopedProxyMode);
 		}
 		else {
@@ -100,30 +105,37 @@ class ComponentScanAnnotationParser {
 			scanner.setScopeMetadataResolver(BeanUtils.instantiateClass(resolverClass));
 		}
 
+		//设置resourcePattern，一般是.class
 		scanner.setResourcePattern(componentScan.getString("resourcePattern"));
 
+		//添加包含过滤器
 		for (AnnotationAttributes filter : componentScan.getAnnotationArray("includeFilters")) {
 			for (TypeFilter typeFilter : typeFiltersFor(filter)) {
 				scanner.addIncludeFilter(typeFilter);
 			}
 		}
+
+		//添加不包含过滤器
 		for (AnnotationAttributes filter : componentScan.getAnnotationArray("excludeFilters")) {
 			for (TypeFilter typeFilter : typeFiltersFor(filter)) {
 				scanner.addExcludeFilter(typeFilter);
 			}
 		}
 
+		//设置是否需要懒加载
 		boolean lazyInit = componentScan.getBoolean("lazyInit");
 		if (lazyInit) {
 			scanner.getBeanDefinitionDefaults().setLazyInit(true);
 		}
 
+		//拿到扫描的包
 		Set<String> basePackages = new LinkedHashSet<String>();
 		Set<String> specifiedPackages = new LinkedHashSet<String>();
 		specifiedPackages.addAll(Arrays.asList(componentScan.getStringArray("value")));
 		specifiedPackages.addAll(Arrays.asList(componentScan.getStringArray("basePackages")));
 
 		for (String pkg : specifiedPackages) {
+			//遍历每一个包，解析，并且设置包
 			String[] tokenized = StringUtils.tokenizeToStringArray(this.environment.resolvePlaceholders(pkg),
 					ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
 			basePackages.addAll(Arrays.asList(tokenized));
@@ -135,6 +147,7 @@ class ComponentScanAnnotationParser {
 			basePackages.add(ClassUtils.getPackageName(declaringClass));
 		}
 
+		//添加一个特殊的过滤器
 		scanner.addExcludeFilter(new AbstractTypeHierarchyTraversingFilter(false, false) {
 			@Override
 			protected boolean matchClassName(String className) {

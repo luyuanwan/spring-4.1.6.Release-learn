@@ -52,6 +52,8 @@ import org.springframework.util.StringUtils;
  * @see RootBeanDefinition
  * @see ChildBeanDefinition
  */
+//继承了BeanMetadataAttributeAccessor，就带有对属性的增删查改，底层实现是Map，这里是对Bean的属性的增删查改
+//本类包含了Bean定义的核心主要逻辑，继承它的都是一些小的参数改动
 @SuppressWarnings("serial")
 public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccessor
 		implements BeanDefinition, Cloneable {
@@ -135,6 +137,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	public static final String INFER_METHOD = "(inferred)";
 
 
+	//the class of the bean to instantiate
 	private volatile Object beanClass;
 
 	private String scope = SCOPE_DEFAULT;
@@ -180,8 +183,14 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private boolean synthetic = false;
 
+	/**
+	 * Bean的角色
+	 */
 	private int role = BeanDefinition.ROLE_APPLICATION;
 
+	/**
+	 * 可以对Bean做一个描述
+	 */
 	private String description;
 
 	private Resource resource;
@@ -213,12 +222,19 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		setBeanClassName(original.getBeanClassName());
 		setFactoryBeanName(original.getFactoryBeanName());
 		setFactoryMethodName(original.getFactoryMethodName());
+		//保持范围一致
 		setScope(original.getScope());
+		//保持抽象一致
 		setAbstract(original.isAbstract());
+		//保持懒加载一致
 		setLazyInit(original.isLazyInit());
+		//保持角色一致
 		setRole(original.getRole());
+		//保护性构造
 		setConstructorArgumentValues(new ConstructorArgumentValues(original.getConstructorArgumentValues()));
+		//设置属性
 		setPropertyValues(new MutablePropertyValues(original.getPropertyValues()));
+		//设置源
 		setSource(original.getSource());
 		copyAttributesFrom(original);
 
@@ -318,13 +334,29 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Apply the provided default values to this bean.
+	 * 应用默认值给这个Bean
 	 * @param defaults the defaults to apply
 	 */
 	public void applyDefaults(BeanDefinitionDefaults defaults) {
+		/**
+		 * 是否懒初始化
+		 */
 		setLazyInit(defaults.isLazyInit());
+		/**
+		 * autowire模式
+		 */
 		setAutowireMode(defaults.getAutowireMode());
+		/**
+		 * 依赖检查
+		 */
 		setDependencyCheck(defaults.getDependencyCheck());
+		/**
+		 * 初始化函数名字
+		 */
 		setInitMethodName(defaults.getInitMethodName());
+		/**
+		 * 是否强制初始化方法
+		 */
 		setEnforceInitMethod(false);
 		setDestroyMethodName(defaults.getDestroyMethodName());
 		setEnforceDestroyMethod(false);
@@ -686,6 +718,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Specify constructor argument values for this bean.
+	 * 设置构造参数
 	 */
 	public void setConstructorArgumentValues(ConstructorArgumentValues constructorArgumentValues) {
 		this.constructorArgumentValues =
@@ -709,6 +742,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Specify property values for this bean, if any.
+	 * 设置属性
 	 */
 	public void setPropertyValues(MutablePropertyValues propertyValues) {
 		this.propertyValues = (propertyValues != null ? propertyValues : new MutablePropertyValues());
@@ -716,6 +750,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Return property values for this bean (never {@code null}).
+	 * 返回属性
 	 */
 	@Override
 	public MutablePropertyValues getPropertyValues() {
@@ -724,6 +759,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Specify method overrides for the bean, if any.
+	 * 设置方法复写
 	 */
 	public void setMethodOverrides(MethodOverrides methodOverrides) {
 		this.methodOverrides = (methodOverrides != null ? methodOverrides : new MethodOverrides());
@@ -733,6 +769,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * Return information about methods to be overridden by the IoC
 	 * container. This will be empty if there are no method overrides.
 	 * Never returns null.
+	 * 返回方法复写
 	 */
 	public MethodOverrides getMethodOverrides() {
 		return this.methodOverrides;

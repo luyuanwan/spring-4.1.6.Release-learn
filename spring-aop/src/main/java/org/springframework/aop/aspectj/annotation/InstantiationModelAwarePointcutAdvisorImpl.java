@@ -42,6 +42,7 @@ class InstantiationModelAwarePointcutAdvisorImpl
 
 	private final AspectJExpressionPointcut declaredPointcut;
 
+	//声明一个切点
 	private Pointcut pointcut;
 
 	private final MetadataAwareAspectInstanceFactory aspectInstanceFactory;
@@ -50,6 +51,9 @@ class InstantiationModelAwarePointcutAdvisorImpl
 
 	private final boolean lazy;
 
+	/**
+	 * 增强工厂
+	 */
 	private final AspectJAdvisorFactory atAspectJAdvisorFactory;
 
 	private Advice instantiatedAdvice;
@@ -141,7 +145,12 @@ class InstantiationModelAwarePointcutAdvisorImpl
 	}
 
 
-	private Advice instantiateAdvice(AspectJExpressionPointcut pcut) {
+	/**
+	 * 根据切点表达式的包装类，返回增强
+	 * @param pcut
+	 * @return
+     */
+	private Advice instantiateAdvice(AspectJExpressionPointcut pcut/**切点表达式的包装类*/) {
 		return this.atAspectJAdvisorFactory.getAdvice(
 				this.method, pcut, this.aspectInstanceFactory, this.declarationOrder, this.aspectName);
 	}

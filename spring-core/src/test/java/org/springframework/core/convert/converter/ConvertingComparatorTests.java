@@ -86,6 +86,7 @@ public class ConvertingComparatorTests {
 	}
 
 	private void testConversion(ConvertingComparator<String, Integer> convertingComparator) {
+		//将字符串转换为数字并比较
 		assertThat(convertingComparator.compare("0", "0"), is(0));
 		assertThat(convertingComparator.compare("0", "1"), is(-1));
 		assertThat(convertingComparator.compare("1", "0"), is(1));

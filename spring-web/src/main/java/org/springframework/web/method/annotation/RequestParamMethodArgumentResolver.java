@@ -124,13 +124,16 @@ public class RequestParamMethodArgumentResolver extends AbstractNamedValueMethod
 	 */
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		//参数类型
 		Class<?> paramType = parameter.getParameterType();
+		//是否含有注解RequestParam
 		if (parameter.hasParameterAnnotation(RequestParam.class)) {
 			if (Map.class.isAssignableFrom(paramType)) {
 				String paramName = parameter.getParameterAnnotation(RequestParam.class).value();
 				return StringUtils.hasText(paramName);
 			}
 			else {
+				//返回true，可以支持参数
 				return true;
 			}
 		}
@@ -150,8 +153,15 @@ public class RequestParamMethodArgumentResolver extends AbstractNamedValueMethod
 		}
 	}
 
+	/**
+	 * 创建键值对
+	 *
+	 * @param parameter the method parameter
+	 * @return
+     */
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
+		//拿到注解RequestParam
 		RequestParam ann = parameter.getParameterAnnotation(RequestParam.class);
 		return (ann != null ? new RequestParamNamedValueInfo(ann) : new RequestParamNamedValueInfo());
 	}

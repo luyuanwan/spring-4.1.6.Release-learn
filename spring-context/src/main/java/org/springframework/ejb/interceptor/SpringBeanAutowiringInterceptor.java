@@ -116,7 +116,9 @@ public class SpringBeanAutowiringInterceptor {
 	 * @param target the target bean to autowire
 	 */
 	protected void doAutowireBean(Object target) {
+		// Create a new AutowiredAnnotationBeanPostProcessor for Spring's standard {@link Autowired} annotation.
 		AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
+
 		configureBeanPostProcessor(bpp, target);
 		bpp.setBeanFactory(getBeanFactory(target));
 		bpp.processInjection(target);

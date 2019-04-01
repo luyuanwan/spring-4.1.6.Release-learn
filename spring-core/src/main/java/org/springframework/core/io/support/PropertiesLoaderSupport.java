@@ -32,6 +32,8 @@ import org.springframework.util.PropertiesPersister;
  * from one or more resources. Supports local properties as well, with
  * configurable overriding.
  *
+ * 属性加载的支持底层抽象类
+ *
  * @author Juergen Hoeller
  * @since 1.2.2
  */
@@ -44,6 +46,9 @@ public abstract class PropertiesLoaderSupport {
 
 	protected boolean localOverride = false;
 
+	/**
+	 * 资源的位置
+	 */
 	private Resource[] locations;
 
 	private boolean ignoreResourceNotFound = false;
@@ -161,6 +166,10 @@ public abstract class PropertiesLoaderSupport {
 
 	/**
 	 * Load properties into the given instance.
+	 *
+	 * 加载资源到给定的props实例中
+	 * 注意，这里加载的资源时你在locations中指定的哦
+	 *
 	 * @param props the Properties instance to load into
 	 * @throws IOException in case of I/O errors
 	 * @see #setLocations

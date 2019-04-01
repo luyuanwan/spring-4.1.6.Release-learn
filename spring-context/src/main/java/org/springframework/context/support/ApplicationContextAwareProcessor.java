@@ -56,14 +56,23 @@ import org.springframework.util.StringValueResolver;
  * @see org.springframework.context.MessageSourceAware
  * @see org.springframework.context.ApplicationContextAware
  * @see org.springframework.context.support.AbstractApplicationContext#refresh()
+ *
+ *
+ * 这是一个BeanPostProcessor，所以会在一个bean创建后反向调用本方法的
+ * postProcessBeforeInitialization
+ * postProcessAfterInitialization
  */
 class ApplicationContextAwareProcessor implements BeanPostProcessor {
 
+	/**
+	 * 上下文
+	 */
 	private final ConfigurableApplicationContext applicationContext;
 
 
 	/**
 	 * Create a new ApplicationContextAwareProcessor for the given context.
+	 * 赋值上下文
 	 */
 	public ApplicationContextAwareProcessor(ConfigurableApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
@@ -91,14 +100,23 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 			}, acc);
 		}
 		else {
+			//调用Aware接口
 			invokeAwareInterfaces(bean);
 		}
 
 		return bean;
 	}
 
+	/**
+	 * 通知所有的Aware
+	 *
+	 * @param bean
+     */
 	private void invokeAwareInterfaces(Object bean) {
 		if (bean instanceof Aware) {
+			/**
+			 * 这说明，在这之前environment已经读取完毕了，因为这里都设置进去了呀
+			 */
 			if (bean instanceof EnvironmentAware) {
 				((EnvironmentAware) bean).setEnvironment(this.applicationContext.getEnvironment());
 			}
@@ -140,5 +158,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 			return this.beanFactory.resolveEmbeddedValue(strVal);
 		}
 	}
+
+
 
 }

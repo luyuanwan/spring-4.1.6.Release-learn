@@ -102,7 +102,7 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> T doGet(String attributeName, Class<T> expectedType) {
+	private <T> T doGet(String attributeName,/*属性名*/ Class<T> expectedType/*期望的类型*/) {
 		Assert.hasText(attributeName, "attributeName must not be null or empty");
 		Object value = get(attributeName);//键值对
 		Assert.notNull(value, String.format("Attribute '%s' not found", attributeName));

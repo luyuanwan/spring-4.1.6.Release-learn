@@ -276,6 +276,7 @@ public class MediaType extends MimeType implements Serializable {
 	}
 
 
+	@Override
 	protected void checkParameters(String attribute, String value) {
 		super.checkParameters(attribute, value);
 		if (PARAM_QUALITY_FACTOR.equals(attribute)) {
@@ -313,6 +314,7 @@ public class MediaType extends MimeType implements Serializable {
 	 * In effect, this method is similar to {@link #includes(MediaType)}, except that it <b>is</b> symmetric.
 	 * @param other the reference media type with which to compare
 	 * @return {@code true} if this media type is compatible with the given media type; {@code false} otherwise
+	 * 判定媒体类型是否兼容，也就是other是否兼容本媒体类型
 	 */
 	public boolean isCompatibleWith(MediaType other) {
 		return super.isCompatibleWith(other);
@@ -361,7 +363,7 @@ public class MediaType extends MimeType implements Serializable {
 	 * @return the media type
 	 * @throws InvalidMediaTypeException if the string cannot be parsed
 	 */
-	public static MediaType parseMediaType(String mediaType) {
+	public static MediaType parseMediaType(String mediaType) {//比如text/html
 		MimeType type;
 		try {
 			type = MimeTypeUtils.parseMimeType(mediaType);
@@ -491,11 +493,15 @@ public class MediaType extends MimeType implements Serializable {
 
 		@Override
 		public int compare(MediaType mediaType1, MediaType mediaType2) {
-			double quality1 = mediaType1.getQualityValue();
-			double quality2 = mediaType2.getQualityValue();
+			double quality1 = mediaType1.getQualityValue();//质量数1
+			double quality2 = mediaType2.getQualityValue();//质量数2
+
+			//比较质量
 			int qualityComparison = Double.compare(quality2, quality1);
+
+			//如果质量不相等，则直接返回
 			if (qualityComparison != 0) {
-				return qualityComparison;  // audio/*;q=0.7 < audio/*;q=0.3
+				return qualityComparison;  // audio/*;q=0.7 > audio/*;q=0.3
 			}
 			else if (mediaType1.isWildcardType() && !mediaType2.isWildcardType()) { // */* < audio/*
 				return 1;
@@ -526,6 +532,8 @@ public class MediaType extends MimeType implements Serializable {
 	};
 
 
+
+
 	/**
 	 * Comparator used by {@link #sortBySpecificity(List)}.
 	 */
@@ -533,12 +541,17 @@ public class MediaType extends MimeType implements Serializable {
 
 		@Override
 		protected int compareParameters(MediaType mediaType1, MediaType mediaType2) {
-			double quality1 = mediaType1.getQualityValue();
-			double quality2 = mediaType2.getQualityValue();
+			double quality1 = mediaType1.getQualityValue();//质量数1
+			double quality2 = mediaType2.getQualityValue();//质量数2
+
+			//比较质量
 			int qualityComparison = Double.compare(quality2, quality1);
+			//质量不相等，则返回
 			if (qualityComparison != 0) {
 				return qualityComparison;  // audio/*;q=0.7 < audio/*;q=0.3
 			}
+
+			//交给父类比较
 			return super.compareParameters(mediaType1, mediaType2);
 		}
 	};

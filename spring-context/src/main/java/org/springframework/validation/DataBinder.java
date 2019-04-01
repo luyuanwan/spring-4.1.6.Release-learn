@@ -597,14 +597,15 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	}
 
 	@Override
-	public <T> T convertIfNecessary(Object value, Class<T> requiredType, MethodParameter methodParam)
+	public <T> T convertIfNecessary(Object value/**参数的值*/, Class<T> requiredType/**参数类型*/, MethodParameter methodParam/**参数信息*/)
 			throws TypeMismatchException {
 
+		//拿到类型转换器，进行必要的转换
 		return getTypeConverter().convertIfNecessary(value, requiredType, methodParam);
 	}
 
 	@Override
-	public <T> T convertIfNecessary(Object value, Class<T> requiredType, Field field)
+	public <T> T convertIfNecessary(Object value/**参数的值*/, Class<T> requiredType/**参数类型*/, Field field)
 			throws TypeMismatchException {
 
 		return getTypeConverter().convertIfNecessary(value, requiredType, field);

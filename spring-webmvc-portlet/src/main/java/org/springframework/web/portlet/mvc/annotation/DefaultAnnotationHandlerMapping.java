@@ -106,11 +106,17 @@ public class DefaultAnnotationHandlerMapping extends AbstractMapBasedHandlerMapp
 	 * @throws org.springframework.beans.BeansException if the handler couldn't be registered
 	 */
 	protected void detectHandlers() throws BeansException {
+		//拿到上下文
 		ApplicationContext context = getApplicationContext();
+		//拿到所有bean的名字
 		String[] beanNames = context.getBeanNamesForType(Object.class);
+		//遍历每一个名字
 		for (String beanName : beanNames) {
+			//拿到类型
 			Class<?> handlerType = context.getType(beanName);
+			//拿到注解
 			RequestMapping mapping = context.findAnnotationOnBean(beanName, RequestMapping.class);
+			//如果注解不为空，则表示有映射
 			if (mapping != null) {
 				// @RequestMapping found at type level
 				String[] modeKeys = mapping.value();

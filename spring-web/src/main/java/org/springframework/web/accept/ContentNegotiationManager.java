@@ -45,6 +45,8 @@ import org.springframework.web.context.request.NativeWebRequest;
  * resolvers, you can use the method
  * {@link #addFileExtensionResolvers(MediaTypeFileExtensionResolver...)}.
  *
+ * 从客户端请求中解析出媒体类型的管理器
+ *
  * @author Rossen Stoyanchev
  * @since 3.2
  */
@@ -67,7 +69,10 @@ public class ContentNegotiationManager implements ContentNegotiationStrategy, Me
 	 */
 	public ContentNegotiationManager(ContentNegotiationStrategy... strategies) {
 		Assert.notEmpty(strategies, "At least one ContentNegotiationStrategy is expected");
+
+		//把那么多的策略放进去
 		this.contentNegotiationStrategies.addAll(Arrays.asList(strategies));
+		//遍历这些策略
 		for (ContentNegotiationStrategy strategy : this.contentNegotiationStrategies) {
 			if (strategy instanceof MediaTypeFileExtensionResolver) {
 				this.fileExtensionResolvers.add((MediaTypeFileExtensionResolver) strategy);
@@ -117,10 +122,17 @@ public class ContentNegotiationManager implements ContentNegotiationStrategy, Me
 	 * @param webRequest the current request
 	 * @return the requested media types or an empty list, never {@code null}
 	 * @throws HttpMediaTypeNotAcceptableException if the requested media types cannot be parsed
+	 *
+	 * 解析出客户端可接受的媒体类型
 	 */
 	@Override
-	public List<MediaType> resolveMediaTypes(NativeWebRequest webRequest) throws HttpMediaTypeNotAcceptableException {
+	public List<MediaType> resolveMediaTypes(NativeWebRequest webRequest/*本次请求*/) throws HttpMediaTypeNotAcceptableException {
+		//这里有好多的策略
+		/**
+		 * SpringMVC使用ContentNegotiationStrategy来判定用户请求希望得到什么样格式的数据
+		 */
 		for (ContentNegotiationStrategy strategy : this.contentNegotiationStrategies) {
+			//遍历每一种策略
 			List<MediaType> mediaTypes = strategy.resolveMediaTypes(webRequest);
 			if (mediaTypes.isEmpty() || mediaTypes.equals(MEDIA_TYPE_ALL)) {
 				continue;
@@ -137,6 +149,8 @@ public class ContentNegotiationManager implements ContentNegotiationStrategy, Me
 	@Override
 	public List<String> resolveFileExtensions(MediaType mediaType) {
 		Set<String> result = new LinkedHashSet<String>();
+
+		//文件后缀解析器
 		for (MediaTypeFileExtensionResolver resolver : this.fileExtensionResolvers) {
 			result.addAll(resolver.resolveFileExtensions(mediaType));
 		}

@@ -78,6 +78,9 @@ public class ContextSingletonBeanFactoryLocator extends SingletonBeanFactoryLoca
 	 * definition. In the case where the name uses a Spring "classpath:" prefix, or
 	 * a standard URL prefix, then only one resource file will be loaded as the
 	 * definition.
+	 *
+	 * 返回一个工厂定位器
+	 *
 	 * @param selector the location of the resource(s) which will be read and
 	 * combined to form the definition for the BeanFactoryLocator instance.
 	 * Any such files must form a valid ApplicationContext definition.

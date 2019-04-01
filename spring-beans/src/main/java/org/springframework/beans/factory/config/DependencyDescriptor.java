@@ -120,10 +120,10 @@ public class DependencyDescriptor implements Serializable {
 	 */
 	public DependencyDescriptor(Field field, boolean required, boolean eager) {
 		Assert.notNull(field, "Field must not be null");
-		this.field = field;
+		this.field = field;// 字段
 		this.declaringClass = field.getDeclaringClass();
 		this.fieldName = field.getName();
-		this.required = required;
+		this.required = required;  //是否需要
 		this.eager = eager;
 	}
 

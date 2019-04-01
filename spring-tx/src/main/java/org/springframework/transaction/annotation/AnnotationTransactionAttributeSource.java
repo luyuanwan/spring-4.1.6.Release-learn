@@ -128,6 +128,12 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 	}
 
 
+	/**
+	 * 从方法中找到事务注解属性
+	 *
+	 * @param method the method to retrieve the attribute for
+	 * @return
+     */
 	@Override
 	protected TransactionAttribute findTransactionAttribute(Method method) {
 		return determineTransactionAttribute(method);
@@ -150,6 +156,7 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 	 * or {@code null} if none was found
 	 */
 	protected TransactionAttribute determineTransactionAttribute(AnnotatedElement ae) {
+		//遍历每一个事务注解解析器，去解析这个注解，只有有一个解析成功，就返回
 		for (TransactionAnnotationParser annotationParser : this.annotationParsers) {
 			TransactionAttribute attr = annotationParser.parseTransactionAnnotation(ae);
 			if (attr != null) {

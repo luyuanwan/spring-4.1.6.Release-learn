@@ -111,6 +111,7 @@ public class ServletServerHttpResponse implements ServerHttpResponse {
 					this.headers.getContentType().getCharSet() != null) {
 				this.servletResponse.setCharacterEncoding(this.headers.getContentType().getCharSet().name());
 			}
+			//已经写过头部了
 			this.headersWritten = true;
 		}
 	}

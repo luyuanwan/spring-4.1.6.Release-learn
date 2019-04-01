@@ -133,7 +133,7 @@ final class ConfigurationClass {
 	 * @param beanName name of the {@code @Configuration} class bean
 	 * @see ConfigurationClass#ConfigurationClass(Class, ConfigurationClass)
 	 */
-	public ConfigurationClass(AnnotationMetadata metadata, String beanName) {
+	public ConfigurationClass(AnnotationMetadata metadata/**注解元数据*/, String beanName/**注解元数据*/) {
 		Assert.hasText(beanName, "Bean name must not be null");
 		this.metadata = metadata;
 		this.resource = new DescriptiveResource(metadata.getClassName());

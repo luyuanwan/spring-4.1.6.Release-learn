@@ -118,6 +118,7 @@ public class AnnotatedElementUtils {
 		process(element, annotationType, false, new Processor<Void>() {
 			@Override
 			public Void process(Annotation annotation, int metaDepth) {
+				//注解类型的名字和annotationType一样的话，遍历注解的属性
 				if (annotation.annotationType().getName().equals(annotationType)) {
 					for (Map.Entry<String, Object> entry : AnnotationUtils.getAnnotationAttributes(
 							annotation, classValuesAsString, nestedAnnotationsAsMap).entrySet()) {
@@ -187,6 +188,7 @@ public class AnnotatedElementUtils {
 	private static <T> T doProcess(AnnotatedElement element, String annotationType, boolean traverseClassHierarchy,
 			Processor<T> processor, Set<AnnotatedElement> visited, int metaDepth) {
 
+		//添加一个元素，如果成功，则继续
 		if (visited.add(element)) {
 			Annotation[] annotations =
 					(traverseClassHierarchy ? element.getDeclaredAnnotations() : element.getAnnotations());

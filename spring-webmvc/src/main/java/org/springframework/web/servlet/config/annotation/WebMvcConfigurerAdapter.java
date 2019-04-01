@@ -164,5 +164,4 @@ public abstract class WebMvcConfigurerAdapter implements WebMvcConfigurer {
 	@Override
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 	}
-
 }

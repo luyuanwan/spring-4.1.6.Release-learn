@@ -25,6 +25,9 @@ import java.io.OutputStream;
  *
  * <p>Typically implemented by an HTTP request on the client-side, or a response on the server-side.
  *
+ * 代表HTTP的输出消息
+ * 包含 身体、头部
+ *
  * @author Arjen Poutsma
  * @since 3.0
  */

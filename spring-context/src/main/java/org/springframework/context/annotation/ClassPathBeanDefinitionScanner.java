@@ -63,8 +63,14 @@ import org.springframework.util.PatternMatchUtils;
  */
 public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateComponentProvider {
 
+	/**
+	 * bean定义注册器
+	 */
 	private final BeanDefinitionRegistry registry;
 
+	/**
+	 * bean默认定义信息
+	 */
 	private BeanDefinitionDefaults beanDefinitionDefaults = new BeanDefinitionDefaults();
 
 	private String[] autowireCandidatePatterns;
@@ -149,6 +155,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	/**
 	 * Return the BeanDefinitionRegistry that this scanner operates on.
 	 */
+	@Override
 	public final BeanDefinitionRegistry getRegistry() {
 		return this.registry;
 	}
@@ -222,6 +229,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @return number of beans registered
 	 */
 	public int scan(String... basePackages) {
+		//个数
 		int beanCountAtScanStart = this.registry.getBeanDefinitionCount();
 
 		doScan(basePackages);
@@ -231,6 +239,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 			AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 		}
 
+		//个数差，返回的是到底有多少注册了
 		return (this.registry.getBeanDefinitionCount() - beanCountAtScanStart);
 	}
 
@@ -245,6 +254,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<BeanDefinitionHolder>();
+
 		for (String basePackage : basePackages) {
 			//遍历每一个包名，根据包名拿到bean定义信息，findCandidateComponents函数的意思是查找候选者组件
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
@@ -257,11 +267,10 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 				//根据bean名字生成器确定BEAN的名字，这里是一个扩展点，bean名字生成器是可以用户自定义的
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
 				if (candidate instanceof AbstractBeanDefinition) {
-					//是否是一个抽象的bean定义，如果是，则触发postProcessBeanDefinition
-					//这里也是一个扩展点，如果用户监听postProcessBeanDefinition，则可以收到bean的定义被处理完毕了
+					//是否是一个抽象的bean定义,是的话，就做一些设置工作，比如设置一些默认值
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
-				//是否是一个注解bean定义，如果是就处理注解相关的部分
+				//是否是一个《注解》bean定义，如果是就处理《注解》相关的部分
 				if (candidate instanceof AnnotatedBeanDefinition) {
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
@@ -269,6 +278,8 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
 					definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
 					beanDefinitions.add(definitionHolder);
+
+					//注册进spring
 					registerBeanDefinition(definitionHolder, this.registry);
 				}
 			}
@@ -283,7 +294,12 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @param beanName the generated bean name for the given bean
 	 */
 	protected void postProcessBeanDefinition(AbstractBeanDefinition beanDefinition, String beanName) {
+		/**
+		 * 应用默认值给这个Bean
+		 */
 		beanDefinition.applyDefaults(this.beanDefinitionDefaults);
+
+
 		if (this.autowireCandidatePatterns != null) {
 			beanDefinition.setAutowireCandidate(PatternMatchUtils.simpleMatch(this.autowireCandidatePatterns, beanName));
 		}

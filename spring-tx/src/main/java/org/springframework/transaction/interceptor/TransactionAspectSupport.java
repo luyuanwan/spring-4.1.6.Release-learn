@@ -263,14 +263,16 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	 * @return the return value of the method, if any
 	 * @throws Throwable propagated from the target invocation
 	 */
-	protected Object invokeWithinTransaction(Method method, Class<?> targetClass, final InvocationCallback invocation)
+	protected Object invokeWithinTransaction(Method method/**被调用的方法*/, Class<?> targetClass/**被调用的类*/, final InvocationCallback invocation)
 			throws Throwable {
 
 		// If the transaction attribute is null, the method is non-transactional.
+		// 获得事务属性
 		final TransactionAttribute txAttr = getTransactionAttributeSource().getTransactionAttribute(method, targetClass);
 		final PlatformTransactionManager tm = determineTransactionManager(txAttr);
 		final String joinpointIdentification = methodIdentification(method, targetClass);
 
+		// If the transaction attribute is null, the method is non-transactional.
 		if (txAttr == null || !(tm instanceof CallbackPreferringPlatformTransactionManager)) {
 			// Standard transaction demarcation with getTransaction and commit/rollback calls.
 			TransactionInfo txInfo = createTransactionIfNecessary(tm, txAttr, joinpointIdentification);
@@ -282,7 +284,8 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			}
 			catch (Throwable ex) {
 				// target invocation exception
-				completeTransactionAfterThrowing(txInfo, ex);
+				// 抛出异常后的事务处理
+				completeTransactionAfterThrowing(txInfo/**事务信息*/, ex/**抛出的异常*/);
 				throw ex;
 			}
 			finally {
@@ -527,15 +530,21 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	 * We may commit or roll back, depending on the configuration.
 	 * @param txInfo information about the current transaction
 	 * @param ex throwable encountered
+	 *
+	 * 抛出异常后的事务处理
 	 */
-	protected void completeTransactionAfterThrowing(TransactionInfo txInfo, Throwable ex) {
+	protected void completeTransactionAfterThrowing(TransactionInfo txInfo/**事务信息*/, Throwable ex/**抛出的异常*/) {
+		// 本次调用是事务的 txInfo.hasTransaction() 为true
 		if (txInfo != null && txInfo.hasTransaction()) {
+			//打印日志
 			if (logger.isTraceEnabled()) {
 				logger.trace("Completing transaction for [" + txInfo.getJoinpointIdentification() +
 						"] after exception: " + ex);
 			}
+			// 判断抛出的异常是否需要回滚
 			if (txInfo.transactionAttribute.rollbackOn(ex)) {
 				try {
+					// 需要回滚的话，就回滚
 					txInfo.getTransactionManager().rollback(txInfo.getTransactionStatus());
 				}
 				catch (TransactionSystemException ex2) {

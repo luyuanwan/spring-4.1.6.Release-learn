@@ -60,6 +60,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -321,6 +322,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		BeanWrapper bw = new BeanWrapperImpl(existingBean);
 		initBeanWrapper(bw);
 		populateBean(beanName, bd, bw);
+
+		//调用bean的初始化方法
 		return initializeBean(beanName, existingBean, bd);
 	}
 
@@ -413,12 +416,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return result;
 	}
 
+	/**
+	 * 为什么是after initialization呢？原因是它在调用了init-method方法后执行的
+	 *
+	 * @param existingBean the new bean instance
+	 * @param beanName the name of the bean
+	 * @return
+	 * @throws BeansException
+     */
 	@Override
-	public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName)
+	public Object applyBeanPostProcessorsAfterInitialization(Object existingBean/*刚刚创建的Bean，很新鲜*/, String beanName/*刚创建的bean的名字*/)
 			throws BeansException {
 
-		Object result = existingBean;
-		for (BeanPostProcessor beanProcessor : getBeanPostProcessors()) {
+		Object result = existingBean;//刚刚创建的Bean
+		for (BeanPostProcessor beanProcessor : getBeanPostProcessors()) {//遍历所有的BeanPostProcessor处理器
+			//调用每一个BeanPost处理器
 			result = beanProcessor.postProcessAfterInitialization(result, beanName);
 			if (result == null) {
 				return result;
@@ -494,7 +506,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see #instantiateUsingFactoryMethod
 	 * @see #autowireConstructor
 	 */
-	protected Object doCreateBean(final String beanName, final RootBeanDefinition mbd, final Object[] args) {
+	protected Object doCreateBean(final String beanName/**the name of the bean*/, final RootBeanDefinition mbd/**最根部的Bean定义*/, final Object[] args) {
 		// Instantiate the bean.
 		BeanWrapper instanceWrapper = null;
 		if (mbd.isSingleton()) {
@@ -508,8 +520,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Allow post-processors to modify the merged bean definition.
 		synchronized (mbd.postProcessingLock) {
+			// 没有执行过Process
 			if (!mbd.postProcessed) {
-				applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
+				//执行MergedBeanDefinitionPostProcessors  这里头会执行@PostContruct
+				applyMergedBeanDefinitionPostProcessors(mbd/**最根部的Bean定义*/, beanType, beanName);
 				mbd.postProcessed = true;
 			}
 		}
@@ -921,14 +935,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @throws BeansException if any post-processing failed
 	 * @see MergedBeanDefinitionPostProcessor#postProcessMergedBeanDefinition
 	 */
-	protected void applyMergedBeanDefinitionPostProcessors(RootBeanDefinition mbd, Class<?> beanType, String beanName)
+	protected void applyMergedBeanDefinitionPostProcessors(RootBeanDefinition mbd/**最根部的Bean定义*/, Class<?> beanType, String beanName)
 			throws BeansException {
 
 		try {
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
+				//如果它是MergedBeanDefinitionPostProcessor就执行
 				if (bp instanceof MergedBeanDefinitionPostProcessor) {
 					MergedBeanDefinitionPostProcessor bdp = (MergedBeanDefinitionPostProcessor) bp;
-					bdp.postProcessMergedBeanDefinition(mbd, beanType, beanName);
+					bdp.postProcessMergedBeanDefinition(mbd/**最根部的Bean定义*/, beanType, beanName);
 				}
 			}
 		}
@@ -1142,6 +1157,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	/**
 	 * Populate the bean instance in the given BeanWrapper with the property values
 	 * from the bean definition.
+	 *
+	 * 这个函数的主要功能就是属性填充
 	 * @param beanName the name of the bean
 	 * @param mbd the bean definition for the bean
 	 * @param bw BeanWrapper with bean instance
@@ -1177,6 +1194,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
+		//如果后处理器发出停止填充命令则终止后续的执行
 		if (!continueWithPropertyPopulation) {
 			return;
 		}
@@ -1186,11 +1204,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
 
 			// Add property values based on autowire by name if applicable.
+			// 通过名称来注入bean
 			if (mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_BY_NAME) {
 				autowireByName(beanName, mbd, bw, newPvs);
 			}
 
 			// Add property values based on autowire by type if applicable.
+			//通过类型来注入bean
 			if (mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_BY_TYPE) {
 				autowireByType(beanName, mbd, bw, newPvs);
 			}
@@ -1239,6 +1259,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (containsBean(propertyName)) {
 				Object bean = getBean(propertyName);
 				pvs.add(propertyName, bean);
+
 				registerDependentBean(propertyName, beanName);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Added autowiring by name from bean name '" + beanName +
@@ -1535,6 +1556,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * as well as init methods and bean post processors.
 	 * <p>Called from {@link #createBean} for traditionally defined beans,
 	 * and from {@link #initializeBean} for existing bean instances.
+	 *
+	 * 初始化一个bean
+	 *
 	 * @param beanName the bean name in the factory (for debugging purposes)
 	 * @param bean the new bean instance we may need to initialize
 	 * @param mbd the bean definition that the bean was created with
@@ -1562,11 +1586,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		Object wrappedBean = bean;
+		/**
+		 * 执行BeanPostProcessor接口中的方法
+		 */
 		if (mbd == null || !mbd.isSynthetic()) {
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
 		try {
+			//执行init-method方法 && InitializingBean方法
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		}
 		catch (Throwable ex) {
@@ -1575,6 +1603,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					beanName, "Invocation of init method failed", ex);
 		}
 
+		/**
+		 * 执行BeanPostProcessor接口中的方法
+		 */
 		if (mbd == null || !mbd.isSynthetic()) {
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
@@ -1610,6 +1641,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected void invokeInitMethods(String beanName, final Object bean, RootBeanDefinition mbd)
 			throws Throwable {
 
+		/**
+		 * 执行InitializingBean接口方法
+		 */
+		//bean是否是InitializingBean的实例
 		boolean isInitializingBean = (bean instanceof InitializingBean);
 		if (isInitializingBean && (mbd == null || !mbd.isExternallyManagedInitMethod("afterPropertiesSet"))) {
 			if (logger.isDebugEnabled()) {
@@ -1634,10 +1669,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
+
+		/**
+		 * 执行init-method方法
+		 */
 		if (mbd != null) {
+			//判断是否指定了init-method方法，如果指定了init-method方法，则再调用指定的init-method
 			String initMethodName = mbd.getInitMethodName();
 			if (initMethodName != null && !(isInitializingBean && "afterPropertiesSet".equals(initMethodName)) &&
 					!mbd.isExternallyManagedInitMethod(initMethodName)) {
+				//调用客户指定的init-method方法
 				invokeCustomInitMethod(beanName, bean, mbd);
 			}
 		}

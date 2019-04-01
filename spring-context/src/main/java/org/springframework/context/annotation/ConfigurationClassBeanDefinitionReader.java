@@ -67,6 +67,7 @@ import org.springframework.util.StringUtils;
  * @author Phillip Webb
  * @since 3.0
  * @see ConfigurationClassParser
+ * 注册配置类中的bean定义
  */
 class ConfigurationClassBeanDefinitionReader {
 
@@ -119,8 +120,12 @@ class ConfigurationClassBeanDefinitionReader {
 	 * with the registry based on its contents.
 	 */
 	public void loadBeanDefinitions(Set<ConfigurationClass> configurationModel) {
+		//很经典的评估器设计，可以很容易得替换设计
 		TrackedConditionEvaluator trackedConditionEvaluator = new TrackedConditionEvaluator();
+
+		//遍历每一个用户自定义的配置类
 		for (ConfigurationClass configClass : configurationModel) {
+			//从配置类中加载bean定义
 			loadBeanDefinitionsForConfigurationClass(configClass, trackedConditionEvaluator);
 		}
 	}
@@ -129,9 +134,10 @@ class ConfigurationClassBeanDefinitionReader {
 	 * Read a particular {@link ConfigurationClass}, registering bean definitions
 	 * for the class itself and all of its {@link Bean} methods.
 	 */
-	private void loadBeanDefinitionsForConfigurationClass(ConfigurationClass configClass,
-			TrackedConditionEvaluator trackedConditionEvaluator) {
+	private void loadBeanDefinitionsForConfigurationClass(ConfigurationClass configClass/**用户自定义的配置类*/,
+			TrackedConditionEvaluator trackedConditionEvaluator/**评估器*/) {
 
+		//是否要跳过，跳过的话，就直接return了
 		if (trackedConditionEvaluator.shouldSkip(configClass)) {
 			String beanName = configClass.getBeanName();
 			if (StringUtils.hasLength(beanName) && this.registry.containsBeanDefinition(beanName)) {
@@ -141,6 +147,7 @@ class ConfigurationClassBeanDefinitionReader {
 			return;
 		}
 
+		//是否是导入的
 		if (configClass.isImported()) {
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
@@ -148,13 +155,16 @@ class ConfigurationClassBeanDefinitionReader {
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
 		loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());
+		//从注册器中加载bean定义
 		loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());
 	}
 
 	/**
 	 * Register the {@link Configuration} class itself as a bean definition.
+	 * 如果某个类是@Import进来的，则会执行本方法
 	 */
-	private void registerBeanDefinitionForImportedConfigurationClass(ConfigurationClass configClass) {
+	private void registerBeanDefinitionForImportedConfigurationClass(ConfigurationClass configClass/**配置类*/) {
+		//拿到注解元数据
 		AnnotationMetadata metadata = configClass.getMetadata();
 		AnnotatedGenericBeanDefinition configBeanDef = new AnnotatedGenericBeanDefinition(metadata);
 
@@ -165,6 +175,7 @@ class ConfigurationClassBeanDefinitionReader {
 			AnnotationConfigUtils.processCommonDefinitionAnnotations(configBeanDef, metadata);
 			BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(configBeanDef, configBeanName);
 			definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+			//注册bean定义
 			this.registry.registerBeanDefinition(definitionHolder.getBeanName(), definitionHolder.getBeanDefinition());
 			configClass.setBeanName(configBeanName);
 			if (logger.isDebugEnabled()) {

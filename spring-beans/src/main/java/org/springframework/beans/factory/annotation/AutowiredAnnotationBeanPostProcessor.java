@@ -105,6 +105,8 @@ import org.springframework.util.StringUtils;
  * version of {@code getBean(Class, args)} and {@code getBean(String, args)},
  * See {@link Lookup @Lookup's javadoc} for details.
  *
+ * 针对Autowired的实现是通过BeanPostProcessor
+ *
  * @author Juergen Hoeller
  * @author Mark Fisher
  * @since 2.5
@@ -126,6 +128,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 	private int order = Ordered.LOWEST_PRECEDENCE - 2;
 
+	// 工厂
 	private ConfigurableListableBeanFactory beanFactory;
 
 	private final Set<String> lookupMethodsChecked =
@@ -145,9 +148,12 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	 */
 	@SuppressWarnings("unchecked")
 	public AutowiredAnnotationBeanPostProcessor() {
+		// 第一个注解@Autowired
 		this.autowiredAnnotationTypes.add(Autowired.class);
+		// 第二个注解@Value
 		this.autowiredAnnotationTypes.add(Value.class);
 		try {
+			// 第三个注解@Inject
 			this.autowiredAnnotationTypes.add((Class<? extends Annotation>)
 					ClassUtils.forName("javax.inject.Inject", AutowiredAnnotationBeanPostProcessor.class.getClassLoader()));
 			logger.info("JSR-330 'javax.inject.Inject' annotation found and supported for autowiring");
@@ -228,9 +234,11 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 
 	@Override
-	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
+	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition/**最根部的Bean定义*/, Class<?> beanType/**bean类型*/, String beanName/**bean名字*/) {
 		if (beanType != null) {
-			InjectionMetadata metadata = findAutowiringMetadata(beanName, beanType, null);
+			//查找被@Autowired标记的元素
+			InjectionMetadata metadata = findAutowiringMetadata(beanName/**bean名字*/, beanType/**bean类型*/, null);
+			//检查成员?
 			metadata.checkConfigMembers(beanDefinition);
 		}
 	}
@@ -326,8 +334,10 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	public PropertyValues postProcessPropertyValues(
 			PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException {
 
+		//查找被@Autowired标记的元素
 		InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
 		try {
+			//注入
 			metadata.inject(bean, beanName, pvs);
 		}
 		catch (Throwable ex) {
@@ -354,11 +364,22 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	}
 
 
-	private InjectionMetadata findAutowiringMetadata(String beanName, Class<?> clazz, PropertyValues pvs) {
+	/**
+	 * 查找被@Autowired标记的元素
+	 *
+	 * @param beanName
+	 * @param clazz
+	 * @param pvs
+     * @return
+     */
+	private InjectionMetadata findAutowiringMetadata(String beanName/**bean名字*/, Class<?> clazz/**bean类型*/, PropertyValues pvs) {
+		// 首先取缓存
 		// Fall back to class name as cache key, for backwards compatibility with custom callers.
 		String cacheKey = (StringUtils.hasLength(beanName) ? beanName : clazz.getName());
 		// Quick check on the concurrent map first, with minimal locking.
 		InjectionMetadata metadata = this.injectionMetadataCache.get(cacheKey);
+
+		// 需要刷新
 		if (InjectionMetadata.needsRefresh(metadata, clazz)) {
 			synchronized (this.injectionMetadataCache) {
 				metadata = this.injectionMetadataCache.get(cacheKey);
@@ -367,7 +388,9 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 						metadata.clear(pvs);
 					}
 					try {
+						//构建
 						metadata = buildAutowiringMetadata(clazz);
+						//放入缓存中
 						this.injectionMetadataCache.put(cacheKey, metadata);
 					}
 					catch (NoClassDefFoundError err) {
@@ -380,13 +403,22 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 		return metadata;
 	}
 
+	/**
+	 * 构建
+	 *
+	 * @param clazz
+	 * @return
+     */
 	private InjectionMetadata buildAutowiringMetadata(Class<?> clazz) {
 		LinkedList<InjectionMetadata.InjectedElement> elements = new LinkedList<InjectionMetadata.InjectedElement>();
 		Class<?> targetClass = clazz;
 
 		do {
 			LinkedList<InjectionMetadata.InjectedElement> currElements = new LinkedList<InjectionMetadata.InjectedElement>();
+
+			//每一个字段
 			for (Field field : targetClass.getDeclaredFields()) {
+				//查找@Autowired、@Value注解
 				AnnotationAttributes ann = findAutowiredAnnotation(field);
 				if (ann != null) {
 					if (Modifier.isStatic(field.getModifiers())) {
@@ -395,10 +427,14 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 						}
 						continue;
 					}
+					//
 					boolean required = determineRequiredStatus(ann);
+					//添加
 					currElements.add(new AutowiredFieldElement(field, required));
 				}
 			}
+
+			//每一个方法
 			for (Method method : targetClass.getDeclaredMethods()) {
 				Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(method);
 				if (!BridgeMethodResolver.isVisibilityBridgeMethodPair(method, bridgedMethod)) {
@@ -430,6 +466,12 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 		return new InjectionMetadata(clazz, elements);
 	}
 
+	/**
+	 * 查找@Autowired、@Value注解
+	 *
+	 * @param ao
+	 * @return
+     */
 	private AnnotationAttributes findAutowiredAnnotation(AccessibleObject ao) {
 		for (Class<? extends Annotation> type : this.autowiredAnnotationTypes) {
 			AnnotationAttributes ann = AnnotatedElementUtils.getAnnotationAttributes(ao, type.getName());
@@ -503,6 +545,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 	/**
 	 * Class representing injection information about an annotated field.
+	 * @Autowired作用在字段上
 	 */
 	private class AutowiredFieldElement extends InjectionMetadata.InjectedElement {
 
@@ -519,6 +562,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 		@Override
 		protected void inject(Object bean, String beanName, PropertyValues pvs) throws Throwable {
+			// 拿到这个字段
 			Field field = (Field) this.member;
 			try {
 				Object value;
@@ -529,7 +573,9 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 					DependencyDescriptor desc = new DependencyDescriptor(field, this.required);
 					desc.setContainingClass(bean.getClass());
 					Set<String> autowiredBeanNames = new LinkedHashSet<String>(1);
+					// 拿到转换器
 					TypeConverter typeConverter = beanFactory.getTypeConverter();
+					// 根据接口定为到实现类的过程发生在此处
 					value = beanFactory.resolveDependency(desc, beanName, autowiredBeanNames, typeConverter);
 					synchronized (this) {
 						if (!this.cached) {
@@ -553,7 +599,9 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 					}
 				}
 				if (value != null) {
+					// 设置可以访问
 					ReflectionUtils.makeAccessible(field);
+					// 设置字段值
 					field.set(bean, value);
 				}
 			}

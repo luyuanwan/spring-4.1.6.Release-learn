@@ -165,7 +165,9 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	 * @param dataSource the JDBC DataSource to obtain connections from
 	 */
 	public JdbcTemplate(DataSource dataSource) {
+		//设置数据源
 		setDataSource(dataSource);
+		//
 		afterPropertiesSet();
 	}
 
@@ -388,6 +390,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public <T> T execute(StatementCallback<T> action) throws DataAccessException {
 		Assert.notNull(action, "Callback object must not be null");
 
+		//获取Connection
 		Connection con = DataSourceUtils.getConnection(getDataSource());
 		Statement stmt = null;
 		try {
@@ -402,8 +405,10 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			if (this.nativeJdbcExtractor != null) {
 				stmtToUse = this.nativeJdbcExtractor.getNativeStatement(stmt);
 			}
+			//执行SQL，拿到结果
 			T result = action.doInStatement(stmtToUse);
 			handleWarnings(stmt);
+			//返回结果
 			return result;
 		}
 		catch (SQLException ex) {
@@ -457,6 +462,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 					if (nativeJdbcExtractor != null) {
 						rsToUse = nativeJdbcExtractor.getNativeResultSet(rs);
 					}
+					//解析出数据
 					return rse.extractData(rsToUse);
 				}
 				finally {
@@ -532,9 +538,12 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing SQL update [" + sql + "]");
 		}
+
+		//定义了一个UpdateStatementCallback类
 		class UpdateStatementCallback implements StatementCallback<Integer>, SqlProvider {
 			@Override
 			public Integer doInStatement(Statement stmt) throws SQLException {
+				//执行SQL
 				int rows = stmt.executeUpdate(sql);
 				if (logger.isDebugEnabled()) {
 					logger.debug("SQL update affected " + rows + " rows");
@@ -546,6 +555,8 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 				return sql;
 			}
 		}
+
+		//执行
 		return execute(new UpdateStatementCallback());
 	}
 
@@ -562,7 +573,9 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 
 			@Override
 			public int[] doInStatement(Statement stmt) throws SQLException, DataAccessException {
+				//影响行数
 				int[] rowsAffected = new int[sql.length];
+				//如果支持批量更新
 				if (JdbcUtils.supportsBatchUpdates(stmt.getConnection())) {
 					for (String sqlStmt : sql) {
 						this.currSql = appendSql(this.currSql, sqlStmt);
@@ -585,6 +598,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 					}
 				}
 				else {
+					//不支持的话，就一条一条执行呗
 					for (int i = 0; i < sql.length; i++) {
 						this.currSql = sql[i];
 						if (!stmt.execute(sql[i])) {
@@ -627,6 +641,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			logger.debug("Executing prepared SQL statement" + (sql != null ? " [" + sql + "]" : ""));
 		}
 
+		//拿到Connection
 		Connection con = DataSourceUtils.getConnection(getDataSource());
 		PreparedStatement ps = null;
 		try {
@@ -700,6 +715,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 					if (pss != null) {
 						pss.setValues(ps);
 					}
+					//执行查询
 					rs = ps.executeQuery();
 					ResultSet rsToUse = rs;
 					if (nativeJdbcExtractor != null) {

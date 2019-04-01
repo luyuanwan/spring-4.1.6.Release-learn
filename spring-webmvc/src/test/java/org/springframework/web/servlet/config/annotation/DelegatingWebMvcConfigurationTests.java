@@ -118,6 +118,7 @@ public class DelegatingWebMvcConfigurationTests {
 	public void configureMessageConverters() {
 		final HttpMessageConverter customConverter = mock(HttpMessageConverter.class);
 		final StringHttpMessageConverter stringConverter = new StringHttpMessageConverter();
+
 		List<WebMvcConfigurer> configurers = new ArrayList<WebMvcConfigurer>();
 		configurers.add(new WebMvcConfigurerAdapter() {
 			@Override

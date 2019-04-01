@@ -163,6 +163,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private final Map<Class<?>, String[]> allBeanNamesByType = new ConcurrentHashMap<Class<?>, String[]>(64);
 
 	/** Map of singleton-only bean names, keyed by dependency type */
+	/** 单例bean */
 	private final Map<Class<?>, String[]> singletonBeanNamesByType = new ConcurrentHashMap<Class<?>, String[]>(64);
 
 	/** List of bean definition names, in registration order */
@@ -346,14 +347,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				beanNames = autowireCandidates.toArray(new String[autowireCandidates.size()]);
 			}
 		}
+		//找到唯一的名字，就doGetBean
 		if (beanNames.length == 1) {
 			return getBean(beanNames[0], requiredType, args);
 		}
 		else if (beanNames.length > 1) {
+			// 拿到所有的
 			Map<String, Object> candidates = new HashMap<String, Object>();
 			for (String beanName : beanNames) {
 				candidates.put(beanName, getBean(beanName, requiredType, args));
 			}
+			//确定 优先级高的
 			String primaryCandidate = determinePrimaryCandidate(candidates, requiredType);
 			if (primaryCandidate != null) {
 				return getBean(primaryCandidate, requiredType, args);
@@ -426,7 +430,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			if (!isAlias(beanName)) {
 				try {
 					RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
-					// Only check bean definition if it is complete.
+					// Only check bean definition if it is complete. 这个Bean不能是抽象的
 					if (!mbd.isAbstract() && (allowEagerInit ||
 							((mbd.hasBeanClass() || !mbd.isLazyInit() || isAllowEagerClassLoading())) &&
 									!requiresEagerInitForType(mbd.getFactoryBeanName()))) {
@@ -440,6 +444,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							matchFound = (includeNonSingletons || mbd.isSingleton()) && isTypeMatch(beanName, type);
 						}
 						if (matchFound) {
+							//找到了，就放进去
 							result.add(beanName);
 						}
 					}
@@ -677,6 +682,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				new BeanDefinitionHolder(mbd, beanName, getAliases(beanDefinitionName)), descriptor);
 	}
 
+	/**
+	 * 获取Bean定义，交由子类实现，子类知道如何取获取一个Bean定义
+	 *
+	 * @param beanName name of the bean to find a definition for
+	 * @return
+	 * @throws NoSuchBeanDefinitionException
+     */
 	@Override
 	public BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
 		BeanDefinition bd = this.beanDefinitionMap.get(beanName);
@@ -699,10 +711,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Override
 	public void freezeConfiguration() {
+		/**
+		 * 配置锁住
+		 */
 		this.configurationFrozen = true;
 		this.frozenBeanDefinitionNames = StringUtils.toStringArray(this.beanDefinitionNames);
 	}
 
+	/**
+	 * 判定是否锁住了配置
+	 * @return
+     */
 	@Override
 	public boolean isConfigurationFrozen() {
 		return this.configurationFrozen;
@@ -731,7 +750,14 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// Trigger initialization of all non-lazy singleton beans...
 		for (String beanName : beanNames) {
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+
+			/**
+			 * 判定不是抽象的，是单例，不是懒初始化
+			 */
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				/**
+				 * 是工厂bean
+				 */
 				if (isFactoryBean(beanName)) {
 					final FactoryBean<?> factory = (FactoryBean<?>) getBean(FACTORY_BEAN_PREFIX + beanName);
 					boolean isEagerInit;
@@ -784,12 +810,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	//---------------------------------------------------------------------
 
 	@Override
-	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
+	public void registerBeanDefinition(String beanName/**bean的名字*/, BeanDefinition beanDefinition/**bean定义*/)
 			throws BeanDefinitionStoreException {
 
 		Assert.hasText(beanName, "Bean name must not be empty");
 		Assert.notNull(beanDefinition, "BeanDefinition must not be null");
 
+		//校验bean定义
 		if (beanDefinition instanceof AbstractBeanDefinition) {
 			try {
 				((AbstractBeanDefinition) beanDefinition).validate();
@@ -800,9 +827,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 
+		//老的bean定义
 		BeanDefinition oldBeanDefinition;
 
+		//拿到老的bean定义
 		oldBeanDefinition = this.beanDefinitionMap.get(beanName);
+
+		//可以拿到老的bean定义，这就说明以前已经有过这个bean定义了
 		if (oldBeanDefinition != null) {
 			if (!isAllowBeanDefinitionOverriding()) {
 				throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
@@ -825,6 +856,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 		else {
+			//没有老的bean定义，直接加入
 			this.beanDefinitionNames.add(beanName);
 			this.manualSingletonNames.remove(beanName);
 			this.frozenBeanDefinitionNames = null;
@@ -948,18 +980,25 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	public Object doResolveDependency(DependencyDescriptor descriptor, String beanName,
 			Set<String> autowiredBeanNames, TypeConverter typeConverter) throws BeansException {
 
+		//准备注入，依赖的类型
 		Class<?> type = descriptor.getDependencyType();
+		//getSuggestedValue这个方法会返回默认值（或者叫推荐值）
 		Object value = getAutowireCandidateResolver().getSuggestedValue(descriptor);
 		if (value != null) {
+			//如果是字符串，则会转化，比如转化一下${}这种东西
 			if (value instanceof String) {
+				//就在这里resolveEmbeddedValue转换${}这种东西
 				String strVal = resolveEmbeddedValue((String) value);
 				BeanDefinition bd = (beanName != null && containsBean(beanName) ? getMergedBeanDefinition(beanName) : null);
 				value = evaluateBeanDefinitionString(strVal, bd);
 			}
+
+			//拿到一个转换器  比如把字符串转换为int
 			TypeConverter converter = (typeConverter != null ? typeConverter : getTypeConverter());
+			//转换信息
 			return (descriptor.getField() != null ?
-					converter.convertIfNecessary(value, type, descriptor.getField()) :
-					converter.convertIfNecessary(value, type, descriptor.getMethodParameter()));
+					converter.convertIfNecessary(value/**当前带转换的值*/, type/**转换成的类型*/, descriptor.getField()) :
+					converter.convertIfNecessary(value/**当前带转换的值*/, type/**转换成的类型*/, descriptor.getMethodParameter()));
 		}
 
 		if (type.isArray()) {

@@ -42,6 +42,7 @@ public class HttpMediaTypeNotAcceptableException extends HttpMediaTypeException 
 	 * @param supportedMediaTypes the list of supported media types
 	 */
 	public HttpMediaTypeNotAcceptableException(List<MediaType> supportedMediaTypes) {
+		//找不到可以支持的媒体类型表示
 		super("Could not find acceptable representation", supportedMediaTypes);
 	}
 

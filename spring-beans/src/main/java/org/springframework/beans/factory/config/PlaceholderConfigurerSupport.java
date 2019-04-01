@@ -79,6 +79,8 @@ import org.springframework.util.StringValueResolver;
  *  <property name="url" value="jdbc:}${dbname:defaultdb}{@code "/>
  *}</pre>
  *
+ * 占位符配置支持类，底层类
+ *
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.1
@@ -111,8 +113,14 @@ public abstract class PlaceholderConfigurerSupport extends PropertyResourceConfi
 
 	protected String nullValue;
 
+	/**
+	 * 占位符替换只能在这个工厂里完成
+	 */
 	private BeanFactory beanFactory;
 
+	/**
+	 * 本工厂的Bean名字
+	 */
 	private String beanName;
 
 
@@ -184,6 +192,9 @@ public abstract class PlaceholderConfigurerSupport extends PropertyResourceConfi
 	 * to avoid failing on unresolvable placeholders in properties file locations.
 	 * The latter case can happen with placeholders for system properties in
 	 * resource locations.
+	 *
+	 * 由于BeanFactoryAware，所以会得到工厂
+	 *
 	 * @see #setLocations
 	 * @see org.springframework.core.io.ResourceEditor
 	 */
@@ -193,16 +204,25 @@ public abstract class PlaceholderConfigurerSupport extends PropertyResourceConfi
 	}
 
 
+	/**
+	 * 交给子类使用的，做实际的在工厂中做属性替换，采用访问者模式完成
+	 *
+	 * @param beanFactoryToProcess
+	 * @param valueResolver
+     */
 	protected void doProcessProperties(ConfigurableListableBeanFactory beanFactoryToProcess,
 			StringValueResolver valueResolver) {
 
+		//访问者模式
 		BeanDefinitionVisitor visitor = new BeanDefinitionVisitor(valueResolver);
 
+		//从工厂中拿到BeanDefinition名字
 		String[] beanNames = beanFactoryToProcess.getBeanDefinitionNames();
 		for (String curName : beanNames) {
 			// Check that we're not parsing our own bean definition,
 			// to avoid failing on unresolvable placeholders in properties file locations.
 			if (!(curName.equals(this.beanName) && beanFactoryToProcess.equals(this.beanFactory))) {
+				//拿到BeanDefinition
 				BeanDefinition bd = beanFactoryToProcess.getBeanDefinition(curName);
 				try {
 					visitor.visitBeanDefinition(bd);

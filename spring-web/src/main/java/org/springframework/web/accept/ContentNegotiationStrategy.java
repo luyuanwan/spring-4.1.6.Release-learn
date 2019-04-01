@@ -25,6 +25,15 @@ import org.springframework.web.context.request.NativeWebRequest;
 /**
  * A strategy for resolving the requested media types in a request.
  *
+ * SpringMVC使用ContentNegotiationStrategy来判定用户请求希望得到什么样格式的数据
+ * ContentNegotiationStrategy通过三种方式来识别用户想要返回什么样的数据
+ * 1、通过请求URL后缀
+ *    http://myserver/myapp/list.html返回HTML格式
+ * 2、通过请求的参数
+ *    http://myserver/myapp/list?format=xls该设置默认不开启，默认key是format
+ * 3、通过HTTP header的Accpet
+ *    Accept:application/xml
+ *
  * @author Rossen Stoyanchev
  * @since 3.2
  */

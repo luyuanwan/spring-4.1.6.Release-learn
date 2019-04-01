@@ -185,6 +185,16 @@ public class NamedParameterJdbcTemplate implements NamedParameterJdbcOperations 
 		query(sql, EmptySqlParameterSource.INSTANCE, rch);
 	}
 
+	/**
+	 * 查询
+	 *
+	 * @param sql SQL query to execute
+	 * @param paramSource container of arguments to bind to the query
+	 * @param rowMapper object that will map one object per row
+	 * @param <T>
+	 * @return
+	 * @throws DataAccessException
+     */
 	@Override
 	public <T> List<T> query(String sql, SqlParameterSource paramSource, RowMapper<T> rowMapper)
 			throws DataAccessException {
@@ -192,10 +202,20 @@ public class NamedParameterJdbcTemplate implements NamedParameterJdbcOperations 
 		return getJdbcOperations().query(getPreparedStatementCreator(sql, paramSource), rowMapper);
 	}
 
+	/**
+	 * 查询
+	 *
+	 * @param sql SQL query to execute
+	 * @param paramMap map of parameters to bind to the query
+	 * (leaving it to the PreparedStatement to guess the corresponding SQL type)
+	 * @param rowMapper object that will map one object per row
+	 * @param <T>
+	 * @return
+	 * @throws DataAccessException
+     */
 	@Override
 	public <T> List<T> query(String sql, Map<String, ?> paramMap, RowMapper<T> rowMapper)
 			throws DataAccessException {
-
 		return query(sql, new MapSqlParameterSource(paramMap), rowMapper);
 	}
 
@@ -369,7 +389,9 @@ public class NamedParameterJdbcTemplate implements NamedParameterJdbcOperations 
 	 * @return the corresponding PreparedStatementCreator
 	 */
 	protected PreparedStatementCreator getPreparedStatementCreator(String sql, SqlParameterSource paramSource) {
+		//获取解析后的SQL
 		ParsedSql parsedSql = getParsedSql(sql);
+
 		String sqlToUse = NamedParameterUtils.substituteNamedParameters(parsedSql, paramSource);
 		Object[] params = NamedParameterUtils.buildValueArray(parsedSql, paramSource, null);
 		List<SqlParameter> declaredParameters = NamedParameterUtils.buildSqlParameterList(parsedSql, paramSource);
@@ -381,14 +403,20 @@ public class NamedParameterJdbcTemplate implements NamedParameterJdbcOperations 
 	 * Obtain a parsed representation of the given SQL statement.
 	 * <p>The default implementation uses an LRU cache with an upper limit
 	 * of 256 entries.
+	 *
+	 * 返回解析过后的SQL对象信息，包含命名参数
+	 *
 	 * @param sql the original SQL
 	 * @return a representation of the parsed SQL statement
 	 */
 	protected ParsedSql getParsedSql(String sql) {
+		//不缓存
 		if (getCacheLimit() <= 0) {
 			return NamedParameterUtils.parseSqlStatement(sql);
 		}
+
 		synchronized (this.parsedSqlCache) {
+			//从缓存中取
 			ParsedSql parsedSql = this.parsedSqlCache.get(sql);
 			if (parsedSql == null) {
 				parsedSql = NamedParameterUtils.parseSqlStatement(sql);

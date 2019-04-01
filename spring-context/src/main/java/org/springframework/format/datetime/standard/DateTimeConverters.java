@@ -51,8 +51,10 @@ final class DateTimeConverters {
 	 * @param registry the converter registry
 	 */
 	public static void registerConverters(ConverterRegistry registry) {
+		//添加转换器
 		DateFormatterRegistrar.addDateConverters(registry);
 
+		//添加转换器
 		registry.addConverter(new LocalDateTimeToLocalDateConverter());
 		registry.addConverter(new LocalDateTimeToLocalTimeConverter());
 		registry.addConverter(new ZonedDateTimeToLocalDateConverter());

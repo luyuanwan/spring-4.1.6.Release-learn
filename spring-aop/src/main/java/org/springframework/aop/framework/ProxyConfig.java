@@ -24,6 +24,8 @@ import org.springframework.util.Assert;
  * Convenience superclass for configuration used in creating proxies,
  * to ensure that all proxy creators have consistent properties.
  *
+ * ProxyConfig是一个数据，提供配置信息
+ *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see AdvisedSupport

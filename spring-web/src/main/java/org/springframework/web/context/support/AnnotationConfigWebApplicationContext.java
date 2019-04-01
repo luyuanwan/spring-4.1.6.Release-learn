@@ -74,6 +74,8 @@ import org.springframework.web.context.ContextLoader;
  * definitions will override ones defined in earlier loaded files. This can be leveraged
  * to deliberately override certain bean definitions via an extra Configuration class.
  *
+ * 注解配置的ApplicationContext是可刷新的
+ *
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.0
@@ -88,6 +90,9 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 
 	private final Set<Class<?>> annotatedClasses = new LinkedHashSet<Class<?>>();
 
+	/**
+	 * 既然这个类是注解配置的，所以有基包
+	 */
 	private final Set<String> basePackages = new LinkedHashSet<String>();
 
 
@@ -141,6 +146,7 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 	 * @see #setConfigLocation(String)
 	 * @see #refresh()
 	 */
+	@Override
 	public void register(Class<?>... annotatedClasses) {
 		Assert.notEmpty(annotatedClasses, "At least one annotated class must be specified");
 		this.annotatedClasses.addAll(Arrays.asList(annotatedClasses));
@@ -156,6 +162,7 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 	 * @see #setConfigLocation(String)
 	 * @see #refresh()
 	 */
+	@Override
 	public void scan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		this.basePackages.addAll(Arrays.asList(basePackages));

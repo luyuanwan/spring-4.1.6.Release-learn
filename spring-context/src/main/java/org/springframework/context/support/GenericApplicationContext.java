@@ -85,8 +85,14 @@ import org.springframework.util.Assert;
  */
 public class GenericApplicationContext extends AbstractApplicationContext implements BeanDefinitionRegistry {
 
+	/**
+	 * bean工厂，负责创建bean,如果你要注册一个单例bean，就用这个bean工厂哦
+	 */
 	private final DefaultListableBeanFactory beanFactory;
 
+	/**
+	 * 资源加载器
+	 */
 	private ResourceLoader resourceLoader;
 
 	private boolean refreshed = false;
@@ -98,6 +104,9 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * @see #refresh
 	 */
 	public GenericApplicationContext() {
+		/**
+		 * 生成工厂
+		 */
 		this.beanFactory = new DefaultListableBeanFactory();
 	}
 
@@ -109,6 +118,9 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 */
 	public GenericApplicationContext(DefaultListableBeanFactory beanFactory) {
 		Assert.notNull(beanFactory, "BeanFactory must not be null");
+		/**
+		 * 设置工厂
+		 */
 		this.beanFactory = beanFactory;
 	}
 
@@ -120,6 +132,9 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 */
 	public GenericApplicationContext(ApplicationContext parent) {
 		this();
+		/**
+		 * 设置父亲，我们遇到的都是父亲为null的情况
+		 */
 		setParent(parent);
 	}
 
@@ -199,13 +214,19 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	/**
 	 * This implementation delegates to this context's ResourceLoader if set,
 	 * falling back to the default superclass behavior else.
+	 *
+	 * 如果资源定位器为空，则交给父类完成资源定位
+	 * 如果资源定位器不为空，则直接交给资源定位器完成定位
+	 *
 	 * @see #setResourceLoader
 	 */
 	@Override
 	public Resource getResource(String location) {
+		//如果资源定位器不为空，则直接交给资源定位器完成定位
 		if (this.resourceLoader != null) {
 			return this.resourceLoader.getResource(location);
 		}
+		//如果资源定位器为空，则交给父类完成资源定位
 		return super.getResource(location);
 	}
 
@@ -213,6 +234,10 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * This implementation delegates to this context's ResourceLoader if it
 	 * implements the ResourcePatternResolver interface, falling back to the
 	 * default superclass behavior else.
+	 *
+	 * 如果资源定位器为ResourcePatternResolver，则交给父类完成资源定位
+	 * 如果资源定位器不为ResourcePatternResolver，则直接交给资源定位器完成定位
+	 *
 	 * @see #setResourceLoader
 	 */
 	@Override
@@ -231,6 +256,9 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	/**
 	 * Do nothing: We hold a single internal BeanFactory and rely on callers
 	 * to register beans through our public methods (or the BeanFactory's).
+	 *
+	 * 这是一个不能refresh多次的类
+	 *
 	 * @see #registerBeanDefinition
 	 */
 	@Override

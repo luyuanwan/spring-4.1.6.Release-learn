@@ -50,6 +50,9 @@ import org.springframework.util.Assert;
  */
 public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContext {
 
+	/**
+	 * 资源的位置
+	 */
 	private Resource[] configResources;
 
 

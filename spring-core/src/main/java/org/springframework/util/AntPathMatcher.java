@@ -47,10 +47,12 @@ import java.util.regex.Pattern;
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
  * @since 16.07.2003
+ *
+ * Ant风格的路径匹配器
  */
 public class AntPathMatcher implements PathMatcher {
 
-	/** Default path separator: "/" */
+	/** Default path separator: "/" */ /**默认的路径分隔符号*/
 	public static final String DEFAULT_PATH_SEPARATOR = "/";
 
 	private static final int CACHE_TURNOFF_THRESHOLD = 65536;
@@ -58,10 +60,12 @@ public class AntPathMatcher implements PathMatcher {
 	private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{[^/]+?\\}");
 
 
+	/** 路径分隔符号 */
 	private String pathSeparator;
 
 	private PathSeparatorPatternCache pathSeparatorPatternCache;
 
+	/** 是否要去除两边空格 */
 	private boolean trimTokens = true;
 
 	private volatile Boolean cachePatterns;
@@ -75,7 +79,9 @@ public class AntPathMatcher implements PathMatcher {
 	 * Create a new instance with the {@link #DEFAULT_PATH_SEPARATOR}.
 	 */
 	public AntPathMatcher() {
+		/** 路径分隔符号 */
 		this.pathSeparator = DEFAULT_PATH_SEPARATOR;
+
 		this.pathSeparatorPatternCache = new PathSeparatorPatternCache(DEFAULT_PATH_SEPARATOR);
 	}
 
@@ -86,7 +92,9 @@ public class AntPathMatcher implements PathMatcher {
 	 */
 	public AntPathMatcher(String pathSeparator) {
 		Assert.notNull(pathSeparator, "'pathSeparator' is required");
+		/** 路径分隔符号 */
 		this.pathSeparator = pathSeparator;
+
 		this.pathSeparatorPatternCache = new PathSeparatorPatternCache(pathSeparator);
 	}
 
@@ -129,7 +137,13 @@ public class AntPathMatcher implements PathMatcher {
 		this.stringMatcherCache.clear();
 	}
 
-
+	/**
+	 * 判定是否是ant模式
+	 * 存在* 或者存在? 返回真
+	 *
+	 * @param path the path String to check
+	 * @return
+     */
 	@Override
 	public boolean isPattern(String path) {
 		return (path.indexOf('*') != -1 || path.indexOf('?') != -1);
@@ -153,7 +167,13 @@ public class AntPathMatcher implements PathMatcher {
 	 * as far as the given base path goes is sufficient)
 	 * @return {@code true} if the supplied {@code path} matched, {@code false} if it didn't
 	 */
-	protected boolean doMatch(String pattern, String path, boolean fullMatch, Map<String, String> uriTemplateVariables) {
+	protected boolean doMatch(String pattern,/**模式*/
+							  String path, /**待测试的路径*/
+							  boolean fullMatch, Map<String, String> uriTemplateVariables) {
+
+		/**
+		 * 第一个路径分隔符的位置不一样的话，就表示不匹配
+		 */
 		if (path.startsWith(this.pathSeparator) != pattern.startsWith(this.pathSeparator)) {
 			return false;
 		}

@@ -79,6 +79,8 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 	 * @param targetClass the target class for this invocation (may be {@code null})
 	 * @return TransactionAttribute for this method, or {@code null} if the method
 	 * is not transactional
+	 *
+	 * 拿到事务属性
 	 */
 	@Override
 	public TransactionAttribute getTransactionAttribute(Method method, Class<?> targetClass) {
@@ -146,13 +148,17 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 		specificMethod = BridgeMethodResolver.findBridgedMethod(specificMethod);
 
 		// First try is the method in the target class.
+		// 从方法中找到事务注解属性
 		TransactionAttribute txAtt = findTransactionAttribute(specificMethod);
+		//找到了注解属性，直接返回
 		if (txAtt != null) {
 			return txAtt;
 		}
 
 		// Second try is the transaction attribute on the target class.
+		// 从类上找事务注解属性
 		txAtt = findTransactionAttribute(specificMethod.getDeclaringClass());
+		//找到了注解属性，直接返回
 		if (txAtt != null) {
 			return txAtt;
 		}

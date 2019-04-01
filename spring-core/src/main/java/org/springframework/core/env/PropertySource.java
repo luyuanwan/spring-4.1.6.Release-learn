@@ -59,18 +59,28 @@ public abstract class PropertySource<T> {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	protected final String name;
+	/**
+	 * name -> source
+	 */
+	protected final String name;//systemProperties
 
-	protected final T source;
+	protected final T source;//Object
 
 
 	/**
 	 * Create a new {@code PropertySource} with the given name and source object.
 	 */
-	public PropertySource(String name, T source) {
+	public PropertySource(String name/**属性名*/, T source/**属性源*/) {
 		Assert.hasText(name, "Property source name must contain at least one character");
 		Assert.notNull(source, "Property source must not be null");
+
+		/**
+		 * 属性名字
+		 */
 		this.name = name;
+		/**
+		 * 属性源
+		 */
 		this.source = source;
 	}
 
@@ -175,7 +185,8 @@ public abstract class PropertySource<T> {
 	 * assert sources.contains(PropertySource.named("sourceA"));
 	 * assert sources.contains(PropertySource.named("sourceB"));
 	 * assert !sources.contains(PropertySource.named("sourceC"));
-	 * }</pre>
+	 * }
+	 * </pre>
 	 * The returned {@code PropertySource} will throw {@code UnsupportedOperationException}
 	 * if any methods other than {@code equals(Object)}, {@code hashCode()}, and {@code toString()}
 	 * are called.

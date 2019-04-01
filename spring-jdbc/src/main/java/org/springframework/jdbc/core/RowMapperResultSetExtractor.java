@@ -59,6 +59,7 @@ import org.springframework.util.Assert;
  */
 public class RowMapperResultSetExtractor<T> implements ResultSetExtractor<List<T>> {
 
+	//行映射器
 	private final RowMapper<T> rowMapper;
 
 	private final int rowsExpected;

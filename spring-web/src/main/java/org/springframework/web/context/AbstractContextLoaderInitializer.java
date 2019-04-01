@@ -54,7 +54,9 @@ public abstract class AbstractContextLoaderInitializer implements WebApplication
 	 * @param servletContext the servlet context to register the listener against
 	 */
 	protected void registerContextLoaderListener(ServletContext servletContext) {
+		//生成Web应用程序上下文
 		WebApplicationContext rootAppContext = createRootApplicationContext();
+		//添加监听
 		if (rootAppContext != null) {
 			servletContext.addListener(new ContextLoaderListener(rootAppContext));
 		}

@@ -22,6 +22,8 @@ import java.io.Serializable;
  * Abstract superclass for expression pointcuts,
  * offering location and expression properties.
  *
+ * 抽象的表达式切点
+ *
  * @author Rod Johnson
  * @author Rob Harrop
  * @since 2.0
@@ -33,6 +35,9 @@ public abstract class AbstractExpressionPointcut implements ExpressionPointcut, 
 
 	private String location;
 
+	/**
+	 * 表达式
+	 */
 	private String expression;
 
 
@@ -53,9 +58,15 @@ public abstract class AbstractExpressionPointcut implements ExpressionPointcut, 
 		return this.location;
 	}
 
+	/**
+	 * 设置表达式
+	 *
+	 * @param expression  表达式
+     */
 	public void setExpression(String expression) {
 		this.expression = expression;
 		try {
+			//交给子类完成
 			onSetExpression(expression);
 		}
 		catch (IllegalArgumentException ex) {

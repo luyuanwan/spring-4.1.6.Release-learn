@@ -50,6 +50,9 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 
 	private final AnnotatedBeanDefinitionReader reader;
 
+	/**
+	 * 由于他是注解配置的，所以可以使用注解扫描器，这就是一个注解扫描器
+	 */
 	private final ClassPathBeanDefinitionScanner scanner;
 
 
@@ -58,7 +61,14 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
 	 */
 	public AnnotationConfigApplicationContext() {
+		/**
+		 * 因为本类是bean定义注册器，所以可以注册bean，所以这里都传递了this
+		 */
 		this.reader = new AnnotatedBeanDefinitionReader(this);
+
+		/**
+		 * 扫描器
+		 */
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 
@@ -91,7 +101,14 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public AnnotationConfigApplicationContext(String... basePackages) {
 		this();
+		/**
+		 * 扫描包
+		 */
 		scan(basePackages);
+
+		/**
+		 * 刷新
+		 */
 		refresh();
 	}
 
@@ -145,8 +162,13 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * @see #scan(String...)
 	 * @see #refresh()
 	 */
+	@Override
 	public void register(Class<?>... annotatedClasses) {
 		Assert.notEmpty(annotatedClasses, "At least one annotated class must be specified");
+
+		/**
+		 * 注册很多类
+		 */
 		this.reader.register(annotatedClasses);
 	}
 
@@ -158,8 +180,12 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * @see #register(Class...)
 	 * @see #refresh()
 	 */
+	@Override
 	public void scan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
+		/**
+		 * 使用注解扫描器扫描包
+		 */
 		this.scanner.scan(basePackages);
 	}
 

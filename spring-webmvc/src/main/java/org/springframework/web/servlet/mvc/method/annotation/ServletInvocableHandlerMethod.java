@@ -67,7 +67,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 	/**
 	 * Creates an instance from the given handler and method.
 	 */
-	public ServletInvocableHandlerMethod(Object handler, Method method) {
+	public ServletInvocableHandlerMethod(Object handler/**控制器增强的具体bean*/, Method method/**处理的方法*/) {
 		super(handler, method);
 		initResponseStatus();
 	}
@@ -81,6 +81,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 	}
 
 	private void initResponseStatus() {
+		//拿到ResponseStatus这个主机
 		ResponseStatus annotation = getMethodAnnotation(ResponseStatus.class);
 		if (annotation != null) {
 			this.responseStatus = annotation.value();
@@ -100,6 +101,9 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 	/**
 	 * Invokes the method and handles the return value through one of the
 	 * configured {@link HandlerMethodReturnValueHandler}s.
+	 *
+	 * 调用方法并且处理返回值
+	 *
 	 * @param webRequest the current request
 	 * @param mavContainer the ModelAndViewContainer for this request
 	 * @param providedArgs "given" arguments matched by type (not resolved)

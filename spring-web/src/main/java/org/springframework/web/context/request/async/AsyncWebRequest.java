@@ -32,16 +32,20 @@ public interface AsyncWebRequest extends NativeWebRequest {
 	 * i.e. when {@link #isAsyncStarted()} is {@code true}.
 	 * @param timeout amount of time in milliseconds; {@code null} means no
 	 * 	timeout, i.e. rely on the default timeout of the container.
+	 *
+	 * 设置超时时间
 	 */
 	void setTimeout(Long timeout);
 
 	/**
 	 * Add a handler to invoke when concurrent handling has timed out.
+	 * 增加超时处理类
 	 */
 	void addTimeoutHandler(Runnable runnable);
 
 	/**
 	 * Add a handle to invoke when request processing completes.
+	 * 增加请求处理完成处理类
 	 */
 	void addCompletionHandler(Runnable runnable);
 
@@ -50,6 +54,7 @@ public interface AsyncWebRequest extends NativeWebRequest {
 	 * processing thread exits, the response remains open for further processing
 	 * in another thread.
 	 * @throws IllegalStateException if async processing has completed or is not supported
+	 * 标示异步请求开始，返回异步Context
 	 */
 	void startAsync();
 
@@ -57,17 +62,20 @@ public interface AsyncWebRequest extends NativeWebRequest {
 	 * Whether the request is in async mode following a call to {@link #startAsync()}.
 	 * Returns "false" if asynchronous processing never started, has completed,
 	 * or the request was dispatched for further processing.
+	 * //判断是否是当前线程是否启动异步模式，false表示没有启动异步模式，或者已经完成，否则请求被分发到其他线程处理
 	 */
 	boolean isAsyncStarted();
 
 	/**
 	 * Dispatch the request to the container in order to resume processing after
 	 * concurrent execution in an application thread.
+	 * 分发请求到容器，唤醒其他线程处理
 	 */
 	void dispatch();
 
 	/**
 	 * Whether asynchronous processing has completed.
+	 * 判断异步处理是否完成
 	 */
 	boolean isAsyncComplete();
 

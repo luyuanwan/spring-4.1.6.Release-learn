@@ -63,6 +63,14 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * Set the config locations for this application context in init-param style,
 	 * i.e. with distinct locations separated by commas, semicolons or whitespace.
 	 * <p>If not set, the implementation may use a default as appropriate.
+	 *
+	 * 比如在WEB.xml中配置的
+	 *   <context-param>
+	            <param-name>contextConfigLocation</param-name>
+	            <param-value>
+	                 classpath*:config/spring/application-service.xml
+	             </param-value>
+	      </context-param>
 	 */
 	public void setConfigLocation(String location) {
 		setConfigLocations(StringUtils.tokenizeToStringArray(location, CONFIG_LOCATION_DELIMITERS));

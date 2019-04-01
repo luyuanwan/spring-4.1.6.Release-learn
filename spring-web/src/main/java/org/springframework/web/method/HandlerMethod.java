@@ -48,12 +48,15 @@ public class HandlerMethod {
 	/** Logger that is available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/** 类的实例，比如Controller */
 	private final Object bean;
 
 	private final BeanFactory beanFactory;
 
+	/** 类的类型，比如Controller */
 	private final Class<?> beanType;
 
+	/** 类的方法 */
 	private final Method method;
 
 	private final Method bridgedMethod;
@@ -164,6 +167,7 @@ public class HandlerMethod {
 	 * user-defined class is returned.
 	 */
 	public Class<?> getBeanType() {
+		/** 类的类型，比如Controller */
 		return this.beanType;
 	}
 

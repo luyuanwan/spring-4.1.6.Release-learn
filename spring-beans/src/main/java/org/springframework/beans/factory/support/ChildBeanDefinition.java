@@ -42,9 +42,11 @@ import org.springframework.util.ObjectUtils;
  * @see GenericBeanDefinition
  * @see RootBeanDefinition
  */
+//它可以继承它父类的设置,即ChildBeanDefinition对RootBeanDefinition有一定的依赖关系。
 @SuppressWarnings("serial")
 public class ChildBeanDefinition extends AbstractBeanDefinition {
 
+	//父亲名
 	private String parentName;
 
 

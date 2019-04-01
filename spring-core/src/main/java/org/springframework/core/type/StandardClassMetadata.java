@@ -31,7 +31,10 @@ import org.springframework.util.Assert;
  */
 public class StandardClassMetadata implements ClassMetadata {
 
-	private final Class<?> introspectedClass;
+	/**
+	 * 标识是哪个类
+	 */
+	private final Class<?> introspectedClass;/**内省的类*/
 
 
 	/**
@@ -40,6 +43,10 @@ public class StandardClassMetadata implements ClassMetadata {
 	 */
 	public StandardClassMetadata(Class<?> introspectedClass) {
 		Assert.notNull(introspectedClass, "Class must not be null");
+
+		/**
+		 * 标识是哪个类
+		 */
 		this.introspectedClass = introspectedClass;
 	}
 

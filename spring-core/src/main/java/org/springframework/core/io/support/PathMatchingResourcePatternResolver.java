@@ -161,6 +161,8 @@ import org.springframework.util.StringUtils;
  * Ant-style pattern in such a case, which will search <i>all</i> class path
  * locations that contain the root package.
  *
+ * 资源搜索器
+ *
  * @author Juergen Hoeller
  * @author Colin Sampaleanu
  * @author Marius Bogoevici
@@ -191,8 +193,14 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	}
 
 
+	/**
+	 * 资源加载器
+	 */
 	private final ResourceLoader resourceLoader;
 
+	/**
+	 * 路径匹配器
+	 */
 	private PathMatcher pathMatcher = new AntPathMatcher();
 
 
@@ -397,7 +405,9 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * Find all resources that match the given location pattern via the
 	 * Ant-style PathMatcher. Supports resources in jar files and zip files
 	 * and in the file system.
-	 * @param locationPattern the location pattern to match
+	 *
+	 *
+	 * @param locationPattern the location pattern to match  有可能是classpath*:/com.proeprties
 	 * @return the result as Resource array
 	 * @throws IOException in case of I/O errors
 	 * @see #doFindPathMatchingJarResources
@@ -405,10 +415,25 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * @see org.springframework.util.PathMatcher
 	 */
 	protected Resource[] findPathMatchingResources(String locationPattern) throws IOException {
+		/**
+		 * 确定根路径
+		 */
 		String rootDirPath = determineRootDir(locationPattern);
+
+		/**
+		 * 取根后面的部分的字符串
+		 */
 		String subPattern = locationPattern.substring(rootDirPath.length());
+
+		/**
+		 * 拿到根下的资源
+		 */
 		Resource[] rootDirResources = getResources(rootDirPath);
 		Set<Resource> result = new LinkedHashSet<Resource>(16);
+
+		/**
+		 * 遍历根下的资源
+		 */
 		for (Resource rootDirResource : rootDirResources) {
 			rootDirResource = resolveRootDirResource(rootDirResource);
 			if (rootDirResource.getURL().getProtocol().startsWith(ResourceUtils.URL_PROTOCOL_VFS)) {
@@ -435,13 +460,17 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * remainder of the location as pattern.
 	 * <p>Will return "/WEB-INF/" for the pattern "/WEB-INF/*.xml",
 	 * for example.
-	 * @param location the location to check
+	 *
+	 * 确定根路径
+	 *
+	 * @param location the location to check  有可能是classpath*:/com.proeprties
 	 * @return the part of the location that denotes the root directory
 	 * @see #retrieveMatchingFiles
 	 */
 	protected String determineRootDir(String location) {
 		int prefixEnd = location.indexOf(":") + 1;
-		int rootDirEnd = location.length();
+		int rootDirEnd = location.length();//一开始认为整个location就是rootDir
+
 		while (rootDirEnd > prefixEnd && getPathMatcher().isPattern(location.substring(prefixEnd, rootDirEnd))) {
 			rootDirEnd = location.lastIndexOf('/', rootDirEnd - 2) + 1;
 		}
@@ -624,6 +653,10 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 			logger.debug("Looking for matching resources in directory tree [" + rootDir.getPath() + "]");
 		}
 		Set<File> matchingFiles = retrieveMatchingFiles(rootDir, subPattern);
+
+		/**
+		 * 把每一个文件转化为Resource的子类
+		 */
 		Set<Resource> result = new LinkedHashSet<Resource>(matchingFiles.size());
 		for (File file : matchingFiles) {
 			result.add(new FileSystemResource(file));
@@ -662,6 +695,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 			}
 			return Collections.emptySet();
 		}
+		//把File.separator替换为/
 		String fullPattern = StringUtils.replace(rootDir.getAbsolutePath(), File.separator, "/");
 		if (!pattern.startsWith("/")) {
 			fullPattern += "/";

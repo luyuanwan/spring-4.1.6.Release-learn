@@ -71,6 +71,7 @@ public class DateFormatterRegistrar implements FormatterRegistrar {
 	 * @param converterRegistry the registry of converters to add to
 	 */
 	public static void addDateConverters(ConverterRegistry converterRegistry) {
+		//添加转换器
 		converterRegistry.addConverter(new DateToLongConverter());
 		converterRegistry.addConverter(new DateToCalendarConverter());
 		converterRegistry.addConverter(new CalendarToDateConverter());

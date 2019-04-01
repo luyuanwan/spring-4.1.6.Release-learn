@@ -72,16 +72,17 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	 * environment will be used by this reader.  Otherwise, the reader will initialize and
 	 * use a {@link StandardEnvironment}. All ApplicationContext implementations are
 	 * EnvironmentCapable, while normal BeanFactory implementations are not.
-	 * @param registry the BeanFactory to load bean definitions into,
+	 * @param registry the BeanFactory to load bean definitions into,  把bean注册到这里去哦
 	 * in the form of a BeanDefinitionRegistry
 	 * @see #setResourceLoader
 	 * @see #setEnvironment
 	 */
-	protected AbstractBeanDefinitionReader(BeanDefinitionRegistry registry) {
+	protected AbstractBeanDefinitionReader(BeanDefinitionRegistry registry/**把bean注册到这里去哦*/) {
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
-		this.registry = registry;
+		this.registry = registry;//把bean注册到这里去哦
 
 		// Determine ResourceLoader to use.
+		// 判定是否是一个资源加载器
 		if (this.registry instanceof ResourceLoader) {
 			this.resourceLoader = (ResourceLoader) this.registry;
 		}
@@ -183,6 +184,14 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 		return counter;
 	}
 
+	/**
+	 * 这个locations可能是这个样子的：classpath*:config/spring/application-service.xml
+	 *
+	 * @param location the resource location, to be loaded with the ResourceLoader
+	 * (or ResourcePatternResolver) of this bean definition reader
+	 * @return
+	 * @throws BeanDefinitionStoreException
+     */
 	@Override
 	public int loadBeanDefinitions(String location) throws BeanDefinitionStoreException {
 		return loadBeanDefinitions(location, null);
@@ -197,6 +206,9 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	 * @param actualResources a Set to be filled with the actual Resource objects
 	 * that have been resolved during the loading process. May be {@code null}
 	 * to indicate that the caller is not interested in those Resource objects.
+	 *
+	 * 这个locations可能是这个样子的：classpath*:config/spring/application-service.xml
+	 *
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
 	 * @see #getResourceLoader()
@@ -244,6 +256,14 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 		}
 	}
 
+	/**
+	 * 这个locations可能是这个样子的：classpath*:config/spring/application-service.xml
+	 *
+	 * @param locations the resource locations, to be loaded with the ResourceLoader
+	 * (or ResourcePatternResolver) of this bean definition reader
+	 * @return
+	 * @throws BeanDefinitionStoreException
+     */
 	@Override
 	public int loadBeanDefinitions(String... locations) throws BeanDefinitionStoreException {
 		Assert.notNull(locations, "Location array must not be null");

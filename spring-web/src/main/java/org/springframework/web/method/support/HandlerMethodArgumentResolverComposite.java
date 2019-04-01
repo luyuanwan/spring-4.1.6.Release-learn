@@ -70,11 +70,12 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	 * @throws IllegalStateException if no suitable {@link HandlerMethodArgumentResolver} is found.
 	 */
 	@Override
-	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+	public Object resolveArgument(MethodParameter parameter,/**方法参数*/ ModelAndViewContainer mavContainer,
+			NativeWebRequest webRequest, WebDataBinderFactory binderFactory/**绑定工厂*/) throws Exception {
 
 		HandlerMethodArgumentResolver resolver = getArgumentResolver(parameter);
 		Assert.notNull(resolver, "Unknown parameter type [" + parameter.getParameterType().getName() + "]");
+		//本类是一个方法的参数解析器（是一个合并解析器），于是就是调用TA
 		return resolver.resolveArgument(parameter, mavContainer, webRequest, binderFactory);
 	}
 
@@ -89,6 +90,7 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 					logger.trace("Testing if argument resolver [" + methodArgumentResolver + "] supports [" +
 							parameter.getGenericParameterType() + "]");
 				}
+				//找到第一个能解析的，就返回
 				if (methodArgumentResolver.supportsParameter(parameter)) {
 					result = methodArgumentResolver;
 					this.argumentResolverCache.put(parameter, result);

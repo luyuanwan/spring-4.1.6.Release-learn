@@ -79,6 +79,8 @@ public class DefaultFormattingConversionService extends FormattingConversionServ
 	public DefaultFormattingConversionService(StringValueResolver embeddedValueResolver, boolean registerDefaultFormatters) {
 		setEmbeddedValueResolver(embeddedValueResolver);
 		DefaultConversionService.addDefaultConverters(this);
+
+		//注册默认的格式化器
 		if (registerDefaultFormatters) {
 			addDefaultFormatters(this);
 		}

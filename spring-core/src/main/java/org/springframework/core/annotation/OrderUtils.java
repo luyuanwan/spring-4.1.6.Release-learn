@@ -64,6 +64,7 @@ public abstract class OrderUtils {
 	 * @return the priority value, or the specified default order if none can be found
 	 */
 	public static Integer getOrder(Class<?> type, Integer defaultOrder) {
+		//找到Order注解
 		Order order = AnnotationUtils.findAnnotation(type, Order.class);
 		if (order != null) {
 			return order.value();

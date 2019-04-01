@@ -40,8 +40,10 @@ public class HandlerExecutionChain {
 
 	private static final Log logger = LogFactory.getLog(HandlerExecutionChain.class);
 
+	//这个就是控制器对象
 	private final Object handler;
 
+	//这是拦截器
 	private HandlerInterceptor[] interceptors;
 
 	private List<HandlerInterceptor> interceptorList;
@@ -63,7 +65,8 @@ public class HandlerExecutionChain {
 	 * @param interceptors the array of interceptors to apply
 	 * (in the given order) before the handler itself executes
 	 */
-	public HandlerExecutionChain(Object handler, HandlerInterceptor... interceptors) {
+	public HandlerExecutionChain(Object handler/**这是控制器*/, HandlerInterceptor... interceptors/**拦截器*/) {
+		//如果它是一个调用链，则会使用装饰模式...?
 		if (handler instanceof HandlerExecutionChain) {
 			HandlerExecutionChain originalChain = (HandlerExecutionChain) handler;
 			this.handler = originalChain.getHandler();
@@ -72,6 +75,7 @@ public class HandlerExecutionChain {
 			CollectionUtils.mergeArrayIntoCollection(interceptors, this.interceptorList);
 		}
 		else {
+			//简单的赋值
 			this.handler = handler;
 			this.interceptors = interceptors;
 		}
@@ -127,10 +131,15 @@ public class HandlerExecutionChain {
 	 * that this interceptor has already dealt with the response itself.
 	 */
 	boolean applyPreHandle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//拦截器
 		HandlerInterceptor[] interceptors = getInterceptors();
+
 		if (!ObjectUtils.isEmpty(interceptors)) {
+			//遍历每一个拦截器
 			for (int i = 0; i < interceptors.length; i++) {
+				//拿到一个拦截器
 				HandlerInterceptor interceptor = interceptors[i];
+				//调用拦截器的预处理
 				if (!interceptor.preHandle(request, response, this.handler)) {
 					triggerAfterCompletion(request, response, null);
 					return false;

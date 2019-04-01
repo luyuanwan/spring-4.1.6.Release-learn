@@ -35,6 +35,8 @@ import org.springframework.aop.support.ComposablePointcut;
  * Enables us to work with different AspectJ instantiation models such as
  * "singleton", "pertarget" and "perthis".
  *
+ * 切入的元数据
+ *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 2.0
@@ -130,6 +132,7 @@ public class AspectMetadata {
 
 	/**
 	 * Return the aspect class.
+	 * 被切入的类类型
 	 */
 	public Class<?> getAspectClass() {
 		return this.ajType.getJavaClass();

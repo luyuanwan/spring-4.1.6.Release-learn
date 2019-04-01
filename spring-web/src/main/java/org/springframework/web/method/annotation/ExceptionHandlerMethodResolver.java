@@ -70,7 +70,9 @@ public class ExceptionHandlerMethodResolver {
 	 * @param handlerType the type to introspect
 	 */
 	public ExceptionHandlerMethodResolver(Class<?> handlerType) {
+		//对每一个标注了ExceptionHandler的方法进行遍历
 		for (Method method : HandlerMethodSelector.selectMethods(handlerType, EXCEPTION_HANDLER_METHODS)) {
+
 			for (Class<? extends Throwable> exceptionType : detectExceptionMappings(method)) {
 				addExceptionMapping(exceptionType, method);
 			}
@@ -81,10 +83,13 @@ public class ExceptionHandlerMethodResolver {
 	/**
 	 * Extract exception mappings from the {@code @ExceptionHandler} annotation first,
 	 * and then as a fallback from the method signature itself.
+	 * @param  method  标注了ExceptionHandler的方法
+	 * @return 在这个方法上的ExceptionHandler注解上标注的value值集合
 	 */
 	@SuppressWarnings("unchecked")
-	private List<Class<? extends Throwable>> detectExceptionMappings(Method method) {
+	private List<Class<? extends Throwable>> detectExceptionMappings(Method method/**标注了ExceptionHandler的方法*/) {
 		List<Class<? extends Throwable>> result = new ArrayList<Class<? extends Throwable>>();
+		//拿到注解的Value，放入result
 		detectAnnotationExceptionMappings(method, result);
 		if (result.isEmpty()) {
 			for (Class<?> paramType : method.getParameterTypes()) {
@@ -97,11 +102,18 @@ public class ExceptionHandlerMethodResolver {
 		return result;
 	}
 
-	protected void detectAnnotationExceptionMappings(Method method, List<Class<? extends Throwable>> result) {
+	protected void detectAnnotationExceptionMappings(Method method/**标注了ExceptionHandler的方法*/, List<Class<? extends Throwable>> result/**出参，返回结果*/) {
+		//拿到在方法上的注解
 		ExceptionHandler annot = AnnotationUtils.findAnnotation(method, ExceptionHandler.class);
+		//把这个值塞进去
 		result.addAll(Arrays.asList(annot.value()));
 	}
 
+	/**
+	 * 添加
+	 * @param exceptionType
+	 * @param method
+     */
 	private void addExceptionMapping(Class<? extends Throwable> exceptionType, Method method) {
 		Method oldMethod = this.mappedMethods.put(exceptionType, method);
 		if (oldMethod != null && !oldMethod.equals(method)) {

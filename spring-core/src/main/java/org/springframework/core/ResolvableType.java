@@ -707,9 +707,11 @@ public final class ResolvableType implements Serializable {
 	 * as it cannot be serialized.
 	 */
 	ResolvableType resolveType() {
+		//判定是否为参数化类型
 		if (this.type instanceof ParameterizedType) {
 			return forType(((ParameterizedType) this.type).getRawType(), this.variableResolver);
 		}
+		//判定是否为通配符表达式类型
 		if (this.type instanceof WildcardType) {
 			Type resolved = resolveBounds(((WildcardType) this.type).getUpperBounds());
 			if (resolved == null) {
@@ -717,7 +719,9 @@ public final class ResolvableType implements Serializable {
 			}
 			return forType(resolved, this.variableResolver);
 		}
+		//判定是否为类型变量
 		if (this.type instanceof TypeVariable) {
+			//强转为类型变量
 			TypeVariable<?> variable = (TypeVariable<?>) this.type;
 			// Try default variable resolution
 			if (this.variableResolver != null) {
@@ -739,6 +743,12 @@ public final class ResolvableType implements Serializable {
 		return bounds[0];
 	}
 
+	/**
+	 * 解析类型变量
+	 *
+	 * @param variable
+	 * @return
+     */
 	private ResolvableType resolveVariable(TypeVariable<?> variable) {
 		if (this.type instanceof TypeVariable) {
 			return resolveType().resolveVariable(variable);
@@ -1220,6 +1230,7 @@ public final class ResolvableType implements Serializable {
 
 	/**
 	 * Strategy interface used to resolve {@link TypeVariable}s.
+	 * 类型变量的解析
 	 */
 	static interface VariableResolver extends Serializable {
 
@@ -1230,6 +1241,8 @@ public final class ResolvableType implements Serializable {
 
 		/**
 		 * Resolve the specified variable.
+		 *
+		 * 针对某个类型变量（即K、V、E等变量），包装成ResolvableType
 		 * @param variable the variable to resolve
 		 * @return the resolved variable or {@code null}
 		 */

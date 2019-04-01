@@ -63,7 +63,7 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 	 * with ASM-based {@link AnnotationMetadata} implementations
 	 * @since 3.1.1
 	 */
-	public StandardAnnotationMetadata(Class<?> introspectedClass, boolean nestedAnnotationsAsMap) {
+	public StandardAnnotationMetadata(Class<?> introspectedClass/**内省的类*/, boolean nestedAnnotationsAsMap) {
 		super(introspectedClass);
 		this.nestedAnnotationsAsMap = nestedAnnotationsAsMap;
 	}

@@ -23,6 +23,8 @@ import org.springframework.util.ClassUtils;
  * {@link PropertyResolver} implementation that resolves property values against
  * an underlying set of {@link PropertySources}.
  *
+ * 从属性（Property）中来的占位符解析器
+ *
  * @author Chris Beams
  * @since 3.1
  * @see PropertySource
@@ -31,7 +33,7 @@ import org.springframework.util.ClassUtils;
  */
 public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 
-	//数据源
+	//数据源，标识了占位符等数据的来源
 	private final PropertySources propertySources;
 
 
@@ -40,6 +42,7 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 	 * @param propertySources the set of {@link PropertySource} objects to use
 	 */
 	public PropertySourcesPropertyResolver(PropertySources propertySources) {
+		//初始化时设置数据来源
 		this.propertySources = propertySources;
 	}
 
@@ -71,6 +74,15 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 		return getProperty(key, String.class, false);
 	}
 
+	/**
+	 * 获取属性
+	 *
+	 * @param key                            待替换的变量
+	 * @param targetValueType                目标类型
+	 * @param resolveNestedPlaceholders
+	 * @param <T>
+     * @return
+     */
 	protected <T> T getProperty(String key, Class<T> targetValueType, boolean resolveNestedPlaceholders) {
 		boolean debugEnabled = logger.isDebugEnabled();
 		if (logger.isTraceEnabled()) {

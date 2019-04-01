@@ -24,6 +24,8 @@ import org.springframework.util.Assert;
  * Simple implementation of the {@link ConnectionHandle} interface,
  * containing a given JDBC Connection.
  *
+ * 仅仅包装了Connection
+ *
  * @author Juergen Hoeller
  * @since 1.1
  */

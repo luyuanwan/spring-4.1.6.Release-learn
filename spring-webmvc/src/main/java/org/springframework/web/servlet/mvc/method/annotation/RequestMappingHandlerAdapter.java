@@ -161,6 +161,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 	private final Map<Class<?>, Set<Method>> initBinderCache = new ConcurrentHashMap<Class<?>, Set<Method>>(64);
 
+	//ControllerAdviceBean类实例->注解了initBinder方法的集合
 	private final Map<ControllerAdviceBean, Set<Method>> initBinderAdviceCache =
 			new LinkedHashMap<ControllerAdviceBean, Set<Method>>();
 
@@ -499,7 +500,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 		//初始化解析器
 		if (this.argumentResolvers == null) {
+			//拿到方法参数解析器
 			List<HandlerMethodArgumentResolver> resolvers = getDefaultArgumentResolvers();
+			//合并成一个Composite参数解析器
 			this.argumentResolvers = new HandlerMethodArgumentResolverComposite().addResolvers(resolvers);
 		}
 		if (this.initBinderArgumentResolvers == null) {
@@ -529,11 +532,13 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 		// 遍历每一个bean
 		for (ControllerAdviceBean bean : beans) {
+			//所有带RequestMapping的方法
 			Set<Method> attrMethods = HandlerMethodSelector.selectMethods(bean.getBeanType(), MODEL_ATTRIBUTE_METHODS);
 			if (!attrMethods.isEmpty()) {
 				this.modelAttributeAdviceCache.put(bean, attrMethods);
 				logger.info("Detected @ModelAttribute methods in " + bean);
 			}
+			//所有带InitBinder的方法
 			Set<Method> binderMethods = HandlerMethodSelector.selectMethods(bean.getBeanType(), INIT_BINDER_METHODS);
 			if (!binderMethods.isEmpty()) {
 				this.initBinderAdviceCache.put(bean, binderMethods);
@@ -678,6 +683,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	 * if it is a simple type, or as a model attribute otherwise. A return value
 	 * not recognized by any HandlerMethodReturnValueHandler will be interpreted
 	 * as a model attribute.
+	 * 都支持
 	 */
 	@Override
 	protected boolean supportsInternal(HandlerMethod handlerMethod) {
@@ -708,6 +714,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			}
 		}
 
+		//调用真正的方法
 		return invokeHandleMethod(request, response, handlerMethod);
 	}
 
@@ -750,17 +757,21 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 		ServletWebRequest webRequest = new ServletWebRequest(request, response);
 
+		/** 获取数据绑定工厂 */
 		WebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
+		/** 获取模型工厂 */
 		ModelFactory modelFactory = getModelFactory(handlerMethod, binderFactory);
 		ServletInvocableHandlerMethod requestMappingMethod = createRequestMappingMethod(handlerMethod, binderFactory);
 
+		//
 		ModelAndViewContainer mavContainer = new ModelAndViewContainer();
+
 		mavContainer.addAllAttributes(RequestContextUtils.getInputFlashMap(request));
 		modelFactory.initModel(webRequest, mavContainer, requestMappingMethod);
 		mavContainer.setIgnoreDefaultModelOnRedirect(this.ignoreDefaultModelOnRedirect);
 
 		AsyncWebRequest asyncWebRequest = WebAsyncUtils.createAsyncWebRequest(request, response);
-		asyncWebRequest.setTimeout(this.asyncRequestTimeout);
+		asyncWebRequest.setTimeout(this.asyncRequestTimeout);//设置异步超时时间
 
 		final WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
 		asyncManager.setTaskExecutor(this.taskExecutor);
@@ -779,8 +790,8 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			requestMappingMethod = requestMappingMethod.wrapConcurrentResult(result);
 		}
 
+		//调用
 		requestMappingMethod.invokeAndHandle(webRequest, mavContainer);
-
 		if (asyncManager.isConcurrentHandlingStarted()) {
 			return null;
 		}
@@ -802,7 +813,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 	private ModelFactory getModelFactory(HandlerMethod handlerMethod, WebDataBinderFactory binderFactory) {
 		SessionAttributesHandler sessionAttrHandler = getSessionAttributesHandler(handlerMethod);
+		/** 类的类型，比如Controller */
 		Class<?> handlerType = handlerMethod.getBeanType();
+		/** 该类下有哪些Model方法(带有RequestMapping的方法) */
 		Set<Method> methods = this.modelAttributeCache.get(handlerType);
 		if (methods == null) {
 			methods = HandlerMethodSelector.selectMethods(handlerType, MODEL_ATTRIBUTE_METHODS);
@@ -834,26 +847,36 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	}
 
 	private WebDataBinderFactory getDataBinderFactory(HandlerMethod handlerMethod) throws Exception {
+		/** Controller类的类型 */
 		Class<?> handlerType = handlerMethod.getBeanType();
+		/** 该类下有哪些方法 */
 		Set<Method> methods = this.initBinderCache.get(handlerType);
 		if (methods == null) {
+			//获取带有绑定(InitBinder)的的方法
 			methods = HandlerMethodSelector.selectMethods(handlerType, INIT_BINDER_METHODS);
 			this.initBinderCache.put(handlerType, methods);
 		}
 		List<InvocableHandlerMethod> initBinderMethods = new ArrayList<InvocableHandlerMethod>();
-		// Global methods first
+		// 首先是全局方法
 		for (Entry<ControllerAdviceBean, Set<Method>> entry : this.initBinderAdviceCache .entrySet()) {
 			if (entry.getKey().isApplicableToBeanType(handlerType)) {
 				Object bean = entry.getKey().resolveBean();
+				//这个bean下每一个标注InitBinder的方法
 				for (Method method : entry.getValue()) {
 					initBinderMethods.add(createInitBinderMethod(bean, method));
 				}
 			}
 		}
+
+		// 该类下的方法次之
 		for (Method method : methods) {
+			/** 类的实例，比如Controller */
 			Object bean = handlerMethod.getBean();
+			/** 把类中的绑定方法添加到里面，一起生成绑定工厂 */
 			initBinderMethods.add(createInitBinderMethod(bean, method));
 		}
+
+		//找到了所有的与该handlerMethod有关的初始化binder的方法，保存起来
 		return createDataBinderFactory(initBinderMethods);
 	}
 

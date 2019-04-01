@@ -32,6 +32,7 @@ import org.springframework.util.Assert;
  * @author Juergen Hoeller
  * @since 2.0
  */
+//抽象的属性访问支持
 @SuppressWarnings("serial")
 public abstract class AttributeAccessorSupport implements AttributeAccessor, Serializable {
 

@@ -96,8 +96,10 @@ public class FormattingConversionServiceTests {
 				return source.toLocalDate();
 			}
 		});
+
 		formattingService.addFormatterForFieldType(LocalDate.class, new ReadablePartialPrinter(DateTimeFormat
 				.shortDate()), new DateTimeParser(DateTimeFormat.shortDate()));
+
 		String formatted = formattingService.convert(new LocalDate(2009, 10, 31), String.class);
 		assertEquals("10/31/09", formatted);
 		LocalDate date = formattingService.convert("10/31/09", LocalDate.class);

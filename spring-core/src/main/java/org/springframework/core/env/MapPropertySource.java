@@ -23,6 +23,9 @@ import org.springframework.util.StringUtils;
 /**
  * {@link PropertySource} that reads keys and values from a {@code Map} object.
  *
+ * Map就是一种特殊的可枚举的属性源，从代码看我估计作者就是这么思考的
+ * 因为里面存放了属性信息，所以称为Source（源），作者的思想有点神奇的
+ *
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.1
@@ -30,21 +33,43 @@ import org.springframework.util.StringUtils;
  */
 public class MapPropertySource extends EnumerablePropertySource<Map<String, Object>> {
 
+	/**
+	 * name -> source
+	 * @param name
+	 * @param source
+     */
 	public MapPropertySource(String name, Map<String, Object> source) {
 		super(name, source);
 	}
 
 
+	/**
+	 * 由于Source是个Map，所以可以get
+	 *
+	 * @param name the property to find
+	 * @return
+     */
 	@Override
 	public Object getProperty(String name) {
 		return this.source.get(name);
 	}
 
+	/**
+	 * 判定是否包含属性
+	 *
+	 * @param name the name of the property to find
+	 * @return
+     */
 	@Override
 	public boolean containsProperty(String name) {
 		return this.source.containsKey(name);
 	}
 
+	/**
+	 * 拿到属性名List
+	 *
+	 * @return
+     */
 	@Override
 	public String[] getPropertyNames() {
 		return StringUtils.toStringArray(this.source.keySet());

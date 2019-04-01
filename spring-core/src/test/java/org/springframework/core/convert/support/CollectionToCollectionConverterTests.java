@@ -81,6 +81,20 @@ public class CollectionToCollectionConverterTests {
 		assertEquals(37, result.get(1));
 	}
 
+
+	@Test
+	public void stringListToIntegerList() throws Exception{
+		List<String> list = new ArrayList<String>();
+		list.add("12");
+		list.add("13");
+
+		DefaultConversionService defaultConversionService = new DefaultConversionService();
+		List<Integer> ilist = new ArrayList<Integer>();
+		ilist = defaultConversionService.convert(list,ilist.getClass());
+
+		System.out.println(ilist.get(0));
+	}
+
 	@Test
 	public void emptyListToList() throws Exception {
 		conversionService.addConverter(new CollectionToCollectionConverter(conversionService));

@@ -94,10 +94,11 @@ public class PathVariableMethodArgumentResolver extends AbstractNamedValueMethod
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request) throws Exception {
+	protected Object resolveName(String name/**参数名*/, MethodParameter parameter, NativeWebRequest request) throws Exception {
 		Map<String, String> uriTemplateVars =
 			(Map<String, String>) request.getAttribute(
 					HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
+
 		return (uriTemplateVars != null) ? uriTemplateVars.get(name) : null;
 	}
 
@@ -107,9 +108,18 @@ public class PathVariableMethodArgumentResolver extends AbstractNamedValueMethod
 				"' for method parameter of type " + parameter.getParameterType().getSimpleName());
 	}
 
+	/**
+	 * 后续的处理
+	 *
+	 * @param arg the resolved argument value
+	 * @param name the argument name
+	 * @param parameter the argument parameter type
+	 * @param mavContainer the {@link ModelAndViewContainer}, which may be {@code null}
+     * @param request
+     */
 	@Override
 	@SuppressWarnings("unchecked")
-	protected void handleResolvedValue(Object arg, String name, MethodParameter parameter,
+	protected void handleResolvedValue(Object arg/**参数的值*/, String name/**参数的名*/, MethodParameter parameter,
 			ModelAndViewContainer mavContainer, NativeWebRequest request) {
 
 		String key = View.PATH_VARIABLES;
@@ -154,9 +164,15 @@ public class PathVariableMethodArgumentResolver extends AbstractNamedValueMethod
 
 	private static class PathVariableNamedValueInfo extends NamedValueInfo {
 
+		/**
+		 * 参数名，如果是PathVariable("xx"),那么参数名就是xx
+		 * @param annotation
+         */
+
+
 		public PathVariableNamedValueInfo(PathVariable annotation) {
 			//PathVariable("xi") xi = annotation.value() 且是必须的
-			super(annotation.value(), true, ValueConstants.DEFAULT_NONE);
+			super(annotation.value()/**参数名*/, true/**是否是必须的*/, ValueConstants.DEFAULT_NONE);
 		}
 	}
 

@@ -40,6 +40,7 @@ import org.springframework.util.Assert;
  * {@link #setSupportedMediaTypes(List) supportedMediaTypes} bean property. It also adds
  * support for {@code Content-Type} and {@code Content-Length} when writing to output messages.
  *
+ * 主要的功能：支持的媒体类型列表
  * @author Arjen Poutsma
  * @author Juergen Hoeller
  * @since 3.0
@@ -49,6 +50,9 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 支持的媒体类型
+	 */
 	private List<MediaType> supportedMediaTypes = Collections.emptyList();
 
 
@@ -61,6 +65,7 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 
 	/**
 	 * Construct an {@code AbstractHttpMessageConverter} with one supported media type.
+	 * 设置支持的媒体类型
 	 * @param supportedMediaType the supported media type
 	 */
 	protected AbstractHttpMessageConverter(MediaType supportedMediaType) {
@@ -69,6 +74,7 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 
 	/**
 	 * Construct an {@code AbstractHttpMessageConverter} with multiple supported media type.
+	 * 设置支持的媒体类型
 	 * @param supportedMediaTypes the supported media types
 	 */
 	protected AbstractHttpMessageConverter(MediaType... supportedMediaTypes) {
@@ -78,12 +84,17 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 
 	/**
 	 * Set the list of {@link MediaType} objects supported by this converter.
+	 * 设置支持的媒体类型
 	 */
 	public void setSupportedMediaTypes(List<MediaType> supportedMediaTypes) {
 		Assert.notEmpty(supportedMediaTypes, "'supportedMediaTypes' must not be empty");
 		this.supportedMediaTypes = new ArrayList<MediaType>(supportedMediaTypes);
 	}
 
+	/**
+	 * 返回支持的媒体类型
+	 * @return
+     */
 	@Override
 	public List<MediaType> getSupportedMediaTypes() {
 		return Collections.unmodifiableList(this.supportedMediaTypes);
@@ -137,6 +148,8 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 	 * Typically the value of an {@code Accept} header.
 	 * @return {@code true} if the supported media types are compatible with the media type,
 	 * or if the media type is {@code null}
+	 *
+	 * 这种媒体类型是否可以写入到客户端
 	 */
 	protected boolean canWrite(MediaType mediaType) {
 		if (mediaType == null || MediaType.ALL.equals(mediaType)) {
@@ -165,10 +178,12 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 	 * on the output message. It then calls {@link #writeInternal}.
 	 */
 	@Override
-	public final void write(final T t, MediaType contentType, HttpOutputMessage outputMessage)
+	public final void write(final T t/*返回值*/, MediaType contentType/*选中的媒体类型*/, HttpOutputMessage outputMessage/*输出*/)
 			throws IOException, HttpMessageNotWritableException {
 
+		//头部信息
 		final HttpHeaders headers = outputMessage.getHeaders();
+
 		if (headers.getContentType() == null) {
 			MediaType contentTypeToUse = contentType;
 			if (contentType == null || contentType.isWildcardType() || contentType.isWildcardSubtype()) {
@@ -205,7 +220,9 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 			});
 		}
 		else {
+			//将这个对象写入到由Http代表的输出中取
 			writeInternal(t, outputMessage);
+			//刷新这个输出
 			outputMessage.getBody().flush();
 		}
 	}
@@ -261,7 +278,7 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 	 * @throws IOException in case of I/O errors
 	 * @throws HttpMessageNotWritableException in case of conversion errors
 	 */
-	protected abstract void writeInternal(T t, HttpOutputMessage outputMessage)
+	protected abstract void writeInternal(T t /*待写入的数据*/, HttpOutputMessage outputMessage/*写入的目的地*/)
 			throws IOException, HttpMessageNotWritableException;
 
 }

@@ -54,6 +54,8 @@ import org.springframework.web.servlet.support.RequestContextUtils;
  * <li>{@link org.springframework.http.HttpMethod} (as of Spring 4.0)</li>
  * </ul>
  *
+ * Servlet请求的方法参数解析器
+ *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller

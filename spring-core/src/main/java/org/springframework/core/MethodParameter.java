@@ -38,6 +38,8 @@ import org.springframework.util.Assert;
  * @author Andy Clement
  * @since 2.0
  * @see GenericCollectionTypeResolver
+ *
+ * 返回值的类型
  */
 public class MethodParameter {
 

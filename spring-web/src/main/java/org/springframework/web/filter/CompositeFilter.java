@@ -88,8 +88,10 @@ public class CompositeFilter implements Filter {
 
 	private static class VirtualFilterChain implements FilterChain {
 
+		//FilterChain
 		private final FilterChain originalChain;
 
+		//过滤器
 		private final List<? extends Filter> additionalFilters;
 
 		private int currentPosition = 0;
@@ -108,6 +110,7 @@ public class CompositeFilter implements Filter {
 			}
 			else {
 				this.currentPosition++;
+				//拿到下一个过滤器
 				Filter nextFilter = this.additionalFilters.get(this.currentPosition - 1);
 				nextFilter.doFilter(request, response, this);
 			}

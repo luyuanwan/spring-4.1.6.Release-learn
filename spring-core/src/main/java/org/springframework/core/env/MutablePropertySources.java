@@ -43,6 +43,7 @@ public class MutablePropertySources implements PropertySources {
 
 	private final Log logger;
 
+	//很多属性源
 	private final List<PropertySource<?>> propertySourceList = new CopyOnWriteArrayList<PropertySource<?>>();
 
 
@@ -103,13 +104,16 @@ public class MutablePropertySources implements PropertySources {
 
 	/**
 	 * Add the given property source object with lowest precedence.
+	 * 添加一个属性源到最后
 	 */
-	public void addLast(PropertySource<?> propertySource) {
+	public void addLast(PropertySource<?> propertySource/**属性源*/) {
 		if (logger.isDebugEnabled()) {
 			logger.debug(String.format("Adding [%s] PropertySource with lowest search precedence",
 					propertySource.getName()));
 		}
+		//移除
 		removeIfPresent(propertySource);
+		//添加，因为它是List，所以一定在最后
 		this.propertySourceList.add(propertySource);
 	}
 

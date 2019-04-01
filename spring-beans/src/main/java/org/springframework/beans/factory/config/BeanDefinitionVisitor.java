@@ -74,11 +74,17 @@ public class BeanDefinitionVisitor {
 	 * @see #resolveStringValue(String)
 	 */
 	public void visitBeanDefinition(BeanDefinition beanDefinition) {
+		/**
+		 * 解析父名字
+		 */
 		visitParentName(beanDefinition);
 		visitBeanClassName(beanDefinition);
 		visitFactoryBeanName(beanDefinition);
 		visitFactoryMethodName(beanDefinition);
 		visitScope(beanDefinition);
+		/**
+		 * 解析属性，就是成员变量啦
+		 */
 		visitPropertyValues(beanDefinition.getPropertyValues());
 		ConstructorArgumentValues cas = beanDefinition.getConstructorArgumentValues();
 		visitIndexedArgumentValues(cas.getIndexedArgumentValues());
@@ -135,6 +141,9 @@ public class BeanDefinitionVisitor {
 		}
 	}
 
+	/**
+	 * 解析属性，就是成员变量啦
+	 */
 	protected void visitPropertyValues(MutablePropertyValues pvs) {
 		PropertyValue[] pvArray = pvs.getPropertyValues();
 		for (PropertyValue pv : pvArray) {

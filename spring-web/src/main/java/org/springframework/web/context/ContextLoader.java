@@ -259,6 +259,7 @@ public class ContextLoader {
 	 * @see #closeWebApplicationContext(ServletContext)
 	 */
 	public ContextLoader(WebApplicationContext context) {
+		//这里传入的是根上下文
 		this.context = context;
 	}
 
@@ -267,6 +268,9 @@ public class ContextLoader {
 	 * using the application context provided at construction time, or creating a new one
 	 * according to the "{@link #CONTEXT_CLASS_PARAM contextClass}" and
 	 * "{@link #CONFIG_LOCATION_PARAM contextConfigLocation}" context-params.
+	 *
+	 * 初始化WebApplicationContext
+	 *
 	 * @param servletContext current servlet context
 	 * @return the new WebApplicationContext
 	 * @see #ContextLoader(WebApplicationContext)
@@ -392,7 +396,7 @@ public class ContextLoader {
 
 		//WEB上下文中存入Servlet上下文
 		wac.setServletContext(sc);
-		//拿到contextConfigLocation的内容
+		//拿到contextConfigLocation的内容 比如 classpath*:config/spring/application-service.xml
 		String configLocationParam = sc.getInitParameter(CONFIG_LOCATION_PARAM);
 		if (configLocationParam != null) {
 			//如果不为空，则直接设置
@@ -404,6 +408,7 @@ public class ContextLoader {
 		// use in any post-processing or initialization that occurs below prior to #refresh
 		ConfigurableEnvironment env = wac.getEnvironment();
 		if (env instanceof ConfigurableWebEnvironment) {
+			//初始化属性源
 			((ConfigurableWebEnvironment) env).initPropertySources(sc, null);
 		}
 
@@ -555,11 +560,17 @@ public class ContextLoader {
 	protected ApplicationContext loadParentContext(ServletContext servletContext) {
 		//父上下文
 		ApplicationContext parentContext = null;
+
+		// 取得Web.xml初始化参数配置中对LOCATOR_FACTORY_SELECTOR_PARAM的配置串
+		// 这是Bean工厂定位器使用的Bean工厂的路径，如果这个值没有配置，则使用缺省的classpath*:beanRefFactory.xml
 		String locatorFactorySelector = servletContext.getInitParameter(LOCATOR_FACTORY_SELECTOR_PARAM);
+
+		// 取得Web.xml初始化参数配置中对LOCATOR_FACTORY_KEY_PARAM的配置串，这是用来取得Bean工厂的关键字
 		String parentContextKey = servletContext.getInitParameter(LOCATOR_FACTORY_KEY_PARAM);
 
 		if (parentContextKey != null) {
 			// locatorFactorySelector may be null, indicating the default "classpath*:beanRefContext.xml"
+			// locatorFactorySelector如果为空，则使用缺省值classpath*:beanRefFactory.xml初始化Bean工厂定位器
 			BeanFactoryLocator locator = ContextSingletonBeanFactoryLocator.getInstance(locatorFactorySelector);
 			Log logger = LogFactory.getLog(ContextLoader.class);
 			if (logger.isDebugEnabled()) {
@@ -567,6 +578,7 @@ public class ContextLoader {
 						parentContextKey + "' with BeanFactoryLocator");
 			}
 			this.parentContextRef = locator.useBeanFactory(parentContextKey);
+			//进而取得一个应用程序环境，这个应用程序环境作为根共享应用程序环境的父环境
 			parentContext = (ApplicationContext) this.parentContextRef.getFactory();
 		}
 

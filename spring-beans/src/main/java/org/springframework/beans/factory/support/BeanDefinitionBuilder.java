@@ -25,6 +25,8 @@ import org.springframework.util.ObjectUtils;
  * using the builder pattern. Intended primarily for use when implementing Spring 2.0
  * {@link org.springframework.beans.factory.xml.NamespaceHandler NamespaceHandlers}.
  *
+ * Bean定义生成器
+ *
  * @author Rod Johnson
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -34,6 +36,7 @@ public class BeanDefinitionBuilder {
 
 	/**
 	 * Create a new {@code BeanDefinitionBuilder} used to construct a {@link GenericBeanDefinition}.
+	 * 生成一个生成器，工厂方法
 	 */
 	public static BeanDefinitionBuilder genericBeanDefinition() {
 		BeanDefinitionBuilder builder = new BeanDefinitionBuilder();
@@ -118,6 +121,7 @@ public class BeanDefinitionBuilder {
 
 	/**
 	 * The {@code BeanDefinition} instance we are creating.
+	 * 抽象的bean定义
 	 */
 	private AbstractBeanDefinition beanDefinition;
 
@@ -135,6 +139,8 @@ public class BeanDefinitionBuilder {
 
 	/**
 	 * Return the current BeanDefinition object in its raw (unvalidated) form.
+	 * 获取原始的bean定义
+	 *
 	 * @see #getBeanDefinition()
 	 */
 	public AbstractBeanDefinition getRawBeanDefinition() {

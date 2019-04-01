@@ -31,6 +31,8 @@ import org.springframework.util.Assert;
  * calls to one of various target DataSources based on a lookup key. The latter is usually
  * (but not necessarily) determined through some thread-bound transaction context.
  *
+ * 抽象的 javax.sql.DataSource实现，它会路由getConnection()调用 从许多目标DataSources中选择一个基于一个查找key
+ *
  * @author Juergen Hoeller
  * @since 2.0.1
  * @see #setTargetDataSources
@@ -188,6 +190,8 @@ public abstract class AbstractRoutingDataSource extends AbstractDataSource imple
 	 * {@link #determineCurrentLookupKey() current lookup key}, performs
 	 * a lookup in the {@link #setTargetDataSources targetDataSources} map,
 	 * falls back to the specified
+	 *
+	 * 决定目标DataSource
 	 * {@link #setDefaultTargetDataSource default target DataSource} if necessary.
 	 * @see #determineCurrentLookupKey()
 	 */

@@ -84,22 +84,34 @@ class ConditionEvaluator {
 			return shouldSkip(metadata, ConfigurationPhase.REGISTER_BEAN);
 		}
 
+		//在这里是所有的接口
 		List<Condition> conditions = new ArrayList<Condition>();
+
+		//拿到所有注解类的字符串数组
 		for (String[] conditionClasses : getConditionClasses(metadata)) {
+
+			//遍历每一个注解类字符串
 			for (String conditionClass : conditionClasses) {
+				//拿到接口
 				Condition condition = getCondition(conditionClass, this.context.getClassLoader());
+				//添加接口
 				conditions.add(condition);
 			}
 		}
 
+		//排序
 		AnnotationAwareOrderComparator.sort(conditions);
 
+		//遍历每一个接口
 		for (Condition condition : conditions) {
 			ConfigurationPhase requiredPhase = null;
+			//是否是可配置的接口
 			if (condition instanceof ConfigurationCondition) {
+				//拿到配置解析
 				requiredPhase = ((ConfigurationCondition) condition).getConfigurationPhase();
 			}
 			if (requiredPhase == null || requiredPhase == phase) {
+				//找到配置解析相同的，则调用匹配方法，如果不匹配，则返回true，表示不能成为候选者bean
 				if (!condition.matches(this.context, metadata)) {
 					return true;
 				}

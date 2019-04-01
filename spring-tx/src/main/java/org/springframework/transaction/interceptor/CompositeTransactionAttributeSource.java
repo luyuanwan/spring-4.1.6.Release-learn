@@ -37,9 +37,13 @@ public class CompositeTransactionAttributeSource implements TransactionAttribute
 	/**
 	 * Create a new CompositeTransactionAttributeSource for the given sources.
 	 * @param transactionAttributeSources the TransactionAttributeSource instances to combine
+	 *
+	 * 构造函数
 	 */
 	public CompositeTransactionAttributeSource(TransactionAttributeSource[] transactionAttributeSources) {
 		Assert.notNull(transactionAttributeSources, "TransactionAttributeSource array must not be null");
+
+		//传递一个数组
 		this.transactionAttributeSources = transactionAttributeSources;
 	}
 
@@ -48,12 +52,16 @@ public class CompositeTransactionAttributeSource implements TransactionAttribute
 	 * CompositeTransactionAttributeSource combines.
 	 */
 	public final TransactionAttributeSource[] getTransactionAttributeSources() {
+		//返回这个数组
 		return this.transactionAttributeSources;
 	}
 
 
 	@Override
 	public TransactionAttribute getTransactionAttribute(Method method, Class<?> targetClass) {
+		/**
+		 * 拿到事务属性，就是遍历一下喽
+		 */
 		for (TransactionAttributeSource tas : this.transactionAttributeSources) {
 			TransactionAttribute ta = tas.getTransactionAttribute(method, targetClass);
 			if (ta != null) {

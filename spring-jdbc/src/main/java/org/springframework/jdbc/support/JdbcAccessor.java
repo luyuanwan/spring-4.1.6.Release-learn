@@ -40,6 +40,9 @@ public abstract class JdbcAccessor implements InitializingBean {
 	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 数据源
+	 */
 	private DataSource dataSource;
 
 	private SQLExceptionTranslator exceptionTranslator;
@@ -49,6 +52,7 @@ public abstract class JdbcAccessor implements InitializingBean {
 
 	/**
 	 * Set the JDBC DataSource to obtain connections from.
+	 * 设置数据源
 	 */
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -93,7 +97,11 @@ public abstract class JdbcAccessor implements InitializingBean {
 	 * @see #getDataSource()
 	 */
 	public synchronized SQLExceptionTranslator getExceptionTranslator() {
+		/**
+		 * 主要工作是初始化exceptionTranslator
+		 */
 		if (this.exceptionTranslator == null) {
+			//拿到数据源
 			DataSource dataSource = getDataSource();
 			if (dataSource != null) {
 				this.exceptionTranslator = new SQLErrorCodeSQLExceptionTranslator(dataSource);

@@ -52,13 +52,23 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  */
 public class HttpEntityMethodProcessor extends AbstractMessageConverterMethodProcessor {
 
+	/**
+	 * 构造函数中，带有许多的转换
+	 *
+	 * @param messageConverters
+     */
 	public HttpEntityMethodProcessor(List<HttpMessageConverter<?>> messageConverters) {
 		super(messageConverters);
 	}
 
+	/**
+	 * 构造函数中，带有许多的转换
+	 *
+	 * @param messageConverters
+	 * @param contentNegotiationManager
+     */
 	public HttpEntityMethodProcessor(List<HttpMessageConverter<?>> messageConverters,
 			ContentNegotiationManager contentNegotiationManager) {
-
 		super(messageConverters, contentNegotiationManager);
 	}
 

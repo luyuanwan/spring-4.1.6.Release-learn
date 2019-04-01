@@ -89,6 +89,7 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 	private final Map<Class<?>, ExceptionHandlerMethodResolver> exceptionHandlerCache =
 			new ConcurrentHashMap<Class<?>, ExceptionHandlerMethodResolver>(64);
 
+	//处理Bean ->  异常处理解析器
 	private final Map<ControllerAdviceBean, ExceptionHandlerMethodResolver> exceptionHandlerAdviceCache =
 			new LinkedHashMap<ControllerAdviceBean, ExceptionHandlerMethodResolver>();
 
@@ -249,6 +250,9 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 		}
 	}
 
+	/**
+	 * 初始化异常处理器
+	 */
 	private void initExceptionHandlerAdviceCache() {
 		if (getApplicationContext() == null) {
 			return;
@@ -257,10 +261,14 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 			logger.debug("Looking for exception mappings: " + getApplicationContext());
 		}
 
+		//拿到ApplicationContext上下文中的所有注解了ControllerAdvice的bean
 		List<ControllerAdviceBean> adviceBeans = ControllerAdviceBean.findAnnotatedBeans(getApplicationContext());
+		//排序
 		OrderComparator.sort(adviceBeans);
 
+		//遍历每一个Bean
 		for (ControllerAdviceBean adviceBean : adviceBeans) {
+			//生成异常处理器
 			ExceptionHandlerMethodResolver resolver = new ExceptionHandlerMethodResolver(adviceBean.getBeanType());
 			if (resolver.hasExceptionMappings()) {
 				this.exceptionHandlerAdviceCache.put(adviceBean, resolver);
@@ -339,12 +347,15 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 
 	/**
 	 * Find an {@code @ExceptionHandler} method and invoke it to handle the raised exception.
+	 * 处理异常
 	 */
 	@Override
 	protected ModelAndView doResolveHandlerMethodException(HttpServletRequest request,
-			HttpServletResponse response, HandlerMethod handlerMethod, Exception exception) {
+			HttpServletResponse response, HandlerMethod handlerMethod, Exception exception/**调用异常时抛出的异常*/) {
 
+		//拿到异常处理器
 		ServletInvocableHandlerMethod exceptionHandlerMethod = getExceptionHandlerMethod(handlerMethod, exception);
+		//如果没有异常处理器，则返回Null
 		if (exceptionHandlerMethod == null) {
 			return null;
 		}
@@ -359,7 +370,8 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 			if (logger.isDebugEnabled()) {
 				logger.debug("Invoking @ExceptionHandler method: " + exceptionHandlerMethod);
 			}
-			exceptionHandlerMethod.invokeAndHandle(webRequest, mavContainer, exception);
+			//调用异常处理器处理异常
+			exceptionHandlerMethod.invokeAndHandle(webRequest, mavContainer, exception/**调用异常时抛出的异常*/);
 		}
 		catch (Exception invocationEx) {
 			if (logger.isErrorEnabled()) {
@@ -411,7 +423,7 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 				ExceptionHandlerMethodResolver resolver = entry.getValue();
 				Method method = resolver.resolveMethod(exception);
 				if (method != null) {
-					return new ServletInvocableHandlerMethod(entry.getKey().resolveBean(), method);
+					return new ServletInvocableHandlerMethod(entry.getKey().resolveBean()/**控制器增强的具体bean*/, method/**处理的方法*/);
 				}
 			}
 		}

@@ -21,6 +21,8 @@ import org.springframework.aop.Pointcut;
 /**
  * Interface to be implemented by pointcuts that use String expressions.
  *
+ * 含表达式的切点
+ *
  * @author Rob Harrop
  * @since 2.0
  */

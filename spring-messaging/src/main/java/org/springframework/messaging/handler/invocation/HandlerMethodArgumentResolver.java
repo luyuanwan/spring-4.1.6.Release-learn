@@ -23,6 +23,8 @@ import org.springframework.messaging.Message;
  * Strategy interface for resolving method parameters into argument values
  * in the context of a given {@link Message}.
  *
+ * 方法中参数的解析器，可用于数据绑定场景
+ *
  * @author Rossen Stoyanchev
  * @since 4.0
  */

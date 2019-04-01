@@ -46,6 +46,8 @@ import org.springframework.web.servlet.HandlerMapping;
  * <p>For each registered handler method, a unique mapping is maintained with
  * subclasses defining the details of the mapping type {@code <T>}.
  *
+ * 抽象出来的东西是：方法的映射关系
+ *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller

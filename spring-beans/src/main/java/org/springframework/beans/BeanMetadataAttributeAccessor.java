@@ -26,6 +26,8 @@ import org.springframework.core.AttributeAccessorSupport;
  * @author Juergen Hoeller
  * @since 2.5
  */
+//继承了抽象的属性访问支持(AttributeAccessorSupport)，则表示支持Map的基本属性使用
+//我终于理解了这个类，就是一个Bean属性操作类，底层使用Map
 @SuppressWarnings("serial")
 public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport implements BeanMetadataElement {
 
@@ -49,8 +51,12 @@ public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport impl
 	/**
 	 * Add the given BeanMetadataAttribute to this accessor's set of attributes.
 	 * @param attribute the BeanMetadataAttribute object to register
+	 *
+	 * 添加一条属性
 	 */
 	public void addMetadataAttribute(BeanMetadataAttribute attribute) {
+
+		//交给底层(Map)，添加一条属性键值对
 		super.setAttribute(attribute.getName(), attribute);
 	}
 
@@ -59,11 +65,14 @@ public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport impl
 	 * @param name the name of the attribute
 	 * @return the corresponding BeanMetadataAttribute object,
 	 * or {@code null} if no such attribute defined
+	 *
+	 * 根据<属性名>获取属性
 	 */
 	public BeanMetadataAttribute getMetadataAttribute(String name) {
 		return (BeanMetadataAttribute) super.getAttribute(name);
 	}
 
+	//设置属性
 	@Override
 	public void setAttribute(String name, Object value) {
 		super.setAttribute(name, new BeanMetadataAttribute(name, value));

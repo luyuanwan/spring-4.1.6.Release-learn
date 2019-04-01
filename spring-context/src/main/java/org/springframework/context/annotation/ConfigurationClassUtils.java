@@ -69,6 +69,8 @@ abstract class ConfigurationClassUtils {
 	 * @param beanDef the bean definition to check
 	 * @param metadataReaderFactory the current factory in use by the caller
 	 * @return whether the candidate qualifies as (any kind of) configuration class
+	 *
+	 * 判定这个bean定义是否是Configuration
 	 */
 	public static boolean checkConfigurationClassCandidate(BeanDefinition beanDef, MetadataReaderFactory metadataReaderFactory) {
 		//判定class名字
@@ -77,7 +79,9 @@ abstract class ConfigurationClassUtils {
 			return false;
 		}
 
+		//拿到这个bean定义的注解元数据，看看他是不是被注解了@Configuration
 		AnnotationMetadata metadata;
+		//是注解定义 && 从注解元数据中拿到类名和class名一样  这个要怎么理解啊
 		if (beanDef instanceof AnnotatedBeanDefinition &&
 				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
 			// Can reuse the pre-parsed metadata from the given BeanDefinition...
@@ -147,6 +151,7 @@ abstract class ConfigurationClassUtils {
 	 */
 	public static boolean isLiteConfigurationCandidate(AnnotationMetadata metadata) {
 		// Do not consider an interface or an annotation...
+		// 一个类如果是接口，则在上面配置@Configuration是没有用的
 		if (metadata.isInterface()) {
 			return false;
 		}

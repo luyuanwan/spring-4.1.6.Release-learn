@@ -151,6 +151,7 @@ public class DateTimeFormatterRegistrar implements FormatterRegistrar {
 
 	@Override
 	public void registerFormatters(FormatterRegistry registry) {
+		//添加转换器
 		DateTimeConverters.registerConverters(registry);
 
 		DateTimeFormatter dateFormatter = getFormatter(Type.DATE);

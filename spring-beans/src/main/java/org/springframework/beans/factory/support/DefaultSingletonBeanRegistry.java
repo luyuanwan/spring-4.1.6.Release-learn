@@ -83,9 +83,15 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/** Cache of singleton objects: bean name --> bean instance */
+	/**
+	 * 单例存储在这里
+	 */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<String, Object>(64);
 
 	/** Cache of singleton factories: bean name --> ObjectFactory */
+	/**
+	 * 单例工厂存储在这里
+	 */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<String, ObjectFactory<?>>(16);
 
 	/** Cache of early singleton objects: bean name --> bean instance */
@@ -170,6 +176,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	@Override
 	public Object getSingleton(String beanName) {
+		//拿到单例
 		return getSingleton(beanName, true);
 	}
 
@@ -182,6 +189,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @return the registered singleton object, or {@code null} if none found
 	 */
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+		//单例的bean 只实例化一次  第一次实例化后会放到一个Map中 即singletonObjects map集合中  下次使用的时候直接拿
 		Object singletonObject = this.singletonObjects.get(beanName);
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {

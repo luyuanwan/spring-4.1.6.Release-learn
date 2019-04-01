@@ -36,6 +36,12 @@ import org.springframework.util.StreamUtils;
  *
  * @author Arjen Poutsma
  * @since 3.0
+ *
+ * 记住了，AbstractHttpMessageConverter<String>这个String的意思是返回值是String，比如下面这里
+ * @ResponseBody
+ * public String apply(@RequestBody body){
+ *
+ * }
  */
 public class StringHttpMessageConverter extends AbstractHttpMessageConverter<String> {
 
@@ -101,7 +107,7 @@ public class StringHttpMessageConverter extends AbstractHttpMessageConverter<Str
 	}
 
 	@Override
-	protected void writeInternal(String str, HttpOutputMessage outputMessage) throws IOException {
+	protected void writeInternal(String str/*待写入的数据*/, HttpOutputMessage outputMessage/*写入的目的地*/) throws IOException {
 		if (this.writeAcceptCharset) {
 			outputMessage.getHeaders().setAcceptCharset(getAcceptedCharsets());
 		}

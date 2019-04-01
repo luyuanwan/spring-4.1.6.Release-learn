@@ -32,6 +32,7 @@ import org.springframework.web.accept.ContentNegotiationStrategy;
  * lookups through the {@link ServletContext} and the Java Activation Framework
  * (if present) unless {@linkplain #mediaTypes(Map) media types} are configured.
  *
+ * 配置生成一个 从客户端请求中解析出媒体类型的管理器
  * @author Rossen Stoyanchev
  * @since 3.2
  */

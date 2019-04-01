@@ -56,6 +56,8 @@ import org.springframework.util.StringValueResolver;
  * <p>See {@link org.springframework.core.env.ConfigurableEnvironment ConfigurableEnvironment}
  * and related Javadoc for details on manipulating environment property sources.
  *
+ * 属性源，带占位符配置
+ *
  * @author Chris Beams
  * @since 3.1
  * @see org.springframework.core.env.ConfigurableEnvironment
@@ -80,6 +82,9 @@ public class PropertySourcesPlaceholderConfigurer extends PlaceholderConfigurerS
 
 	private MutablePropertySources propertySources;
 
+	/**
+	 * 很多属性源
+	 */
 	private PropertySources appliedPropertySources;
 
 	private Environment environment;
@@ -98,6 +103,9 @@ public class PropertySourcesPlaceholderConfigurer extends PlaceholderConfigurerS
 	/**
 	 * {@inheritDoc}
 	 * <p>{@code PropertySources} from this environment will be searched when replacing ${...} placeholders.
+	 *
+	 * 从代码中阅读，setEnvironment必须要在postProcessBeanFactory之前执行
+	 *
 	 * @see #setPropertySources
 	 * @see #postProcessBeanFactory
 	 */
@@ -125,11 +133,16 @@ public class PropertySourcesPlaceholderConfigurer extends PlaceholderConfigurerS
 	 */
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		//很多属性源
 		if (this.propertySources == null) {
+			//很多属性源
 			this.propertySources = new MutablePropertySources();
+
+			//环境属性源
 			if (this.environment != null) {
+				//添加环境属性源
 				this.propertySources.addLast(
-					new PropertySource<Environment>(ENVIRONMENT_PROPERTIES_PROPERTY_SOURCE_NAME, this.environment) {
+					new PropertySource<Environment>(ENVIRONMENT_PROPERTIES_PROPERTY_SOURCE_NAME/**属性源名字*/, this.environment/**属性源*/) {
 						@Override
 						public String getProperty(String key) {
 							return this.source.getProperty(key);
@@ -137,6 +150,10 @@ public class PropertySourcesPlaceholderConfigurer extends PlaceholderConfigurerS
 					}
 				);
 			}
+
+			/**
+			 * 本地属性源
+			 */
 			try {
 				PropertySource<?> localPropertySource =
 					new PropertiesPropertySource(LOCAL_PROPERTIES_PROPERTY_SOURCE_NAME, mergeProperties());
@@ -152,7 +169,11 @@ public class PropertySourcesPlaceholderConfigurer extends PlaceholderConfigurerS
 			}
 		}
 
-		processProperties(beanFactory, new PropertySourcesPropertyResolver(this.propertySources));
+		/**
+		 * 这里其实主要处理占位符问题
+		 */
+		processProperties(beanFactory/*工厂*/, new PropertySourcesPropertyResolver(this.propertySources));
+		//赋值
 		this.appliedPropertySources = this.propertySources;
 	}
 
@@ -161,15 +182,20 @@ public class PropertySourcesPlaceholderConfigurer extends PlaceholderConfigurerS
 	 * placeholders with values from the given properties.
 	 */
 	protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess,
-			final ConfigurablePropertyResolver propertyResolver) throws BeansException {
+			final ConfigurablePropertyResolver propertyResolver/*属性解析器*/) throws BeansException {
 
+		//设置前缀
 		propertyResolver.setPlaceholderPrefix(this.placeholderPrefix);
+		//设置后缀
 		propertyResolver.setPlaceholderSuffix(this.placeholderSuffix);
+		//设置分隔符
 		propertyResolver.setValueSeparator(this.valueSeparator);
 
+		//字符串值解析器
 		StringValueResolver valueResolver = new StringValueResolver() {
 			@Override
 			public String resolveStringValue(String strVal) {
+				//是否忽略不可解析的占位符
 				String resolved = ignoreUnresolvablePlaceholders ?
 						propertyResolver.resolvePlaceholders(strVal) :
 						propertyResolver.resolveRequiredPlaceholders(strVal);

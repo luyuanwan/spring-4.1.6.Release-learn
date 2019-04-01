@@ -49,6 +49,9 @@ public class AnnotatedBeanDefinitionReader {
 
 	private ScopeMetadataResolver scopeMetadataResolver = new AnnotationScopeMetadataResolver();
 
+	/**
+	 * 条件评估器
+	 */
 	private ConditionEvaluator conditionEvaluator;
 
 
@@ -137,6 +140,9 @@ public class AnnotatedBeanDefinitionReader {
 			@SuppressWarnings("unchecked") Class<? extends Annotation>... qualifiers) {
 
 		AnnotatedGenericBeanDefinition abd = new AnnotatedGenericBeanDefinition(annotatedClass);
+		/**
+		 * 拿到元数据，判定是否需要跳过
+		 */
 		if (this.conditionEvaluator.shouldSkip(abd.getMetadata())) {
 			return;
 		}

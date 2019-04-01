@@ -84,6 +84,7 @@ public class ControllerAdviceBean implements Ordered {
 		this.beanFactory = beanFactory;
 		Class<?> beanType;
 
+		//这个bean其实不是真正的增强控制器，而是控制器的名字，所以这里是要根据名字再次查找到这个真正的控制器增强
 		if (bean instanceof String) {
 			String beanName = (String) bean;
 			Assert.hasText(beanName, "Bean name must not be null");
@@ -92,15 +93,16 @@ public class ControllerAdviceBean implements Ordered {
 				throw new IllegalArgumentException("BeanFactory [" + beanFactory +
 						"] does not contain specified controller advice bean '" + beanName + "'");
 			}
-			beanType = this.beanFactory.getType(beanName);
-			this.order = initOrderFromBeanType(beanType);
+			beanType = this.beanFactory.getType(beanName);//找到真正的控制器增强
+			this.order = initOrderFromBeanType(beanType);//算出order
 		}
 		else {
 			Assert.notNull(bean, "Bean must not be null");
-			beanType = bean.getClass();
-			this.order = initOrderFromBean(bean);
+			beanType = bean.getClass();//控制器增强的类型
+			this.order = initOrderFromBean(bean);//算出order
 		}
 
+		//拿到这个注解
 		ControllerAdvice annotation = AnnotationUtils.findAnnotation(beanType, ControllerAdvice.class);
 		if (annotation == null) {
 			throw new IllegalArgumentException(

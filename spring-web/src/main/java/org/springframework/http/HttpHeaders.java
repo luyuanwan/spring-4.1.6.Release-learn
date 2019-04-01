@@ -546,7 +546,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	 * <p>Returns {@code null} when the content-type is unknown.
 	 */
 	public MediaType getContentType() {
-		String value = getFirst(CONTENT_TYPE);
+		String value = getFirst(CONTENT_TYPE);//为什么是拿第一个呢。。。。。。。。
 		return (StringUtils.hasLength(value) ? MediaType.parseMediaType(value) : null);
 	}
 

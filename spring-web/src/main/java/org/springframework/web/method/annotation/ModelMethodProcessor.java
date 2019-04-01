@@ -32,6 +32,8 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  * annotated with {@code @ModelAttribute} or {@code @ResponseBody} to ensure
  * they don't take over.
  *
+ * Model模型方法参数解析器
+ *
  * @author Rossen Stoyanchev
  * @since 3.1
  */

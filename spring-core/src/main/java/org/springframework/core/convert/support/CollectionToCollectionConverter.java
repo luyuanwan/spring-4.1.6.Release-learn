@@ -39,9 +39,16 @@ import org.springframework.core.convert.converter.ConditionalGenericConverter;
  */
 final class CollectionToCollectionConverter implements ConditionalGenericConverter {
 
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
 
+	/**
+	 * 构造的时候提供一个转换服务，这是要为将来转换的时候调用吗
+	 * @param conversionService
+     */
 	public CollectionToCollectionConverter(ConversionService conversionService) {
 		this.conversionService = conversionService;
 	}

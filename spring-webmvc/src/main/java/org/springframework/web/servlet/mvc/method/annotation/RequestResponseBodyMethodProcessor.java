@@ -99,6 +99,7 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 
 		Object arg = readWithMessageConverters(webRequest, parameter, parameter.getGenericParameterType());
 		String name = Conventions.getVariableNameForParameter(parameter);
+		//创建绑定器，这个绑定器包含了用户编写的@InitBinder东西
 		WebDataBinder binder = binderFactory.createBinder(webRequest, arg, name);
 		if (arg != null) {
 			validateIfApplicable(binder, parameter);
@@ -156,15 +157,30 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 		return null;
 	}
 
+	/**
+	 * 处理返回值
+	 *
+	 * @param returnValue the value returned from the handler method
+	 * @param returnType the type of the return value. This type must have
+	 * previously been passed to {@link #supportsReturnType} which must
+	 * have returned {@code true}.
+	 * @param mavContainer the ModelAndViewContainer for the current request
+	 * @param webRequest the current request
+	 * @throws IOException
+	 * @throws HttpMediaTypeNotAcceptableException
+     */
 	@Override
-	public void handleReturnValue(Object returnValue, MethodParameter returnType,
-			ModelAndViewContainer mavContainer, NativeWebRequest webRequest)
+	public void handleReturnValue(Object returnValue,/*返回值*/
+								  MethodParameter returnType,/*返回值的类型*/
+			ModelAndViewContainer mavContainer,/*容器*/
+								  NativeWebRequest webRequest/*请求*/)
 			throws IOException, HttpMediaTypeNotAcceptableException {
 
+		//正在处理这个请求
 		mavContainer.setRequestHandled(true);
 
 		// Try even with null return value. ResponseBodyAdvice could get involved.
-		writeWithMessageConverters(returnValue, returnType, webRequest);
+		writeWithMessageConverters(returnValue/*返回值*/, returnType/*返回值的类型*/, webRequest/*请求*/);
 	}
 
 }

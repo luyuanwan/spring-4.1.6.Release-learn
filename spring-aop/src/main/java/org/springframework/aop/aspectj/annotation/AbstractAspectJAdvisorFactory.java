@@ -69,6 +69,8 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 	protected static AspectJAnnotation<?> findAspectJAnnotationOnMethod(Method method) {
 		Class<?>[] classesToLookFor = new Class<?>[] {
 				Before.class, Around.class, After.class, AfterReturning.class, AfterThrowing.class, Pointcut.class};
+
+		//每一个都查找一遍
 		for (Class<?> c : classesToLookFor) {
 			AspectJAnnotation<?> foundAnnotation = findAnnotation(method, (Class<Annotation>) c);
 			if (foundAnnotation != null) {
@@ -79,8 +81,11 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 	}
 
 	private static <A extends Annotation> AspectJAnnotation<A> findAnnotation(Method method, Class<A> toLookFor) {
+
+		//找注解
 		A result = AnnotationUtils.findAnnotation(method, toLookFor);
 		if (result != null) {
+			//找到了的话，封装一下
 			return new AspectJAnnotation<A>(result);
 		}
 		else {
@@ -209,6 +214,7 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 
 		private static final String[] EXPRESSION_PROPERTIES = new String[] {"value", "pointcut"};
 
+		//类类型->aspect类型
 		private static Map<Class<?>, AspectJAnnotationType> annotationTypes =
 				new HashMap<Class<?>, AspectJAnnotationType>();
 
@@ -235,6 +241,7 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 			// We know these methods exist with the same name on each object,
 			// but need to invoke them reflectively as there isn't a common interface.
 			try {
+				//解析pointcut表达式
 				this.pointcutExpression = resolveExpression(annotation);
 				this.argumentNames = (String) annotation.getClass().getMethod("argNames").invoke(annotation);
 			}
@@ -243,6 +250,12 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 			}
 		}
 
+		/**
+		 * 根据注解获取AspectJAnnotationType
+		 *
+		 * @param annotation
+         * @return
+         */
 		private AspectJAnnotationType determineAnnotationType(A annotation) {
 			for (Class<?> type : annotationTypes.keySet()) {
 				if (type.isInstance(annotation)) {
@@ -252,7 +265,18 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 			throw new IllegalStateException("Unknown annotation type: " + annotation.toString());
 		}
 
+		/**
+		 * 解析一个注解的表达式
+		 *
+		 * 比如@Pointcut(value = "execution(* com.iydsj.server.campusapi.api.controller.datacollection.DataCollectController.share(..)) && args(request,shareModel)")
+		 * 会返回execution(* com.iydsj.server.campusapi.api.controller.datacollection.DataCollectController.share(..))
+		 *
+		 * @param annotation
+		 * @return
+         * @throws Exception
+         */
 		private String resolveExpression(A annotation) throws Exception {
+			//准备解析出来的表达式放这里
 			String expression = null;
 			for (String methodName : EXPRESSION_PROPERTIES) {
 				Method method;

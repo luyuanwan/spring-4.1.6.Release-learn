@@ -27,6 +27,8 @@ import java.util.Set;
  * A simple representation of command line arguments, broken into "option arguments" and
  * "non-option arguments".
  *
+ * Spring对应用程序运行的命令行参数进行了抽象，这个抽象是类CommandLineArgs
+ *
  * @author Chris Beams
  * @since 3.1
  * @see SimpleCommandLineArgsParser
@@ -41,6 +43,8 @@ class CommandLineArgs {
 	 * list of values associated with this option (of which there may be zero or more).
 	 * The given value may be {@code null}, indicating that the option was specified
 	 * without an associated value (e.g. "--foo" vs. "--foo=bar").
+	 *
+	 * 添加一个键值对
 	 */
 	public void addOptionArg(String optionName, String optionValue) {
 		if (!this.optionArgs.containsKey(optionName)) {

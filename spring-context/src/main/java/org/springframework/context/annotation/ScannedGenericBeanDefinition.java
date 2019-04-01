@@ -36,6 +36,8 @@ import org.springframework.util.Assert;
  * but distinguishes by type beans that have been <em>scanned</em> vs those that have
  * been otherwise registered or detected by other means.
  *
+ * 被扫描的一般bean定义
+ *
  * @author Juergen Hoeller
  * @author Chris Beams
  * @since 2.5
@@ -57,7 +59,15 @@ public class ScannedGenericBeanDefinition extends GenericBeanDefinition implemen
 	 */
 	public ScannedGenericBeanDefinition(MetadataReader metadataReader) {
 		Assert.notNull(metadataReader, "MetadataReader must not be null");
+
+		/**
+		 * 获取注解元数据
+		 */
 		this.metadata = metadataReader.getAnnotationMetadata();
+
+		/**
+		 * 获取类名
+		 */
 		setBeanClassName(this.metadata.getClassName());
 	}
 

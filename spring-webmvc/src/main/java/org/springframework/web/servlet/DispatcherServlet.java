@@ -479,7 +479,11 @@ public class DispatcherServlet extends FrameworkServlet {
 		initMultipartResolver(context);
 		initLocaleResolver(context);
 		initThemeResolver(context);
+
+		//
 		initHandlerMappings(context);
+
+		//
 		initHandlerAdapters(context);
 		initHandlerExceptionResolvers(context);
 		initRequestToViewNameTranslator(context);
@@ -699,6 +703,9 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	private void initViewResolvers(ApplicationContext context) {
 		this.viewResolvers = null;
+
+
+		//逻辑都一样，都是从容器中获取
 
 		if (this.detectAllViewResolvers) {
 			// Find all ViewResolvers in the ApplicationContext, including ancestor contexts.
@@ -931,11 +938,13 @@ public class DispatcherServlet extends FrameworkServlet {
 				// Determine handler for the current request.
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null || mappedHandler.getHandler() == null) {
+					//这里包装了一下，处理没有Handler的情况
 					noHandlerFound(processedRequest, response);
 					return;
 				}
 
 				// Determine handler adapter for the current request.
+				// 拿到处理对象（一般是Controller），然后封装为HandlerAdapter
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
 				// Process last-modified header, if supported by the handler.
@@ -1117,6 +1126,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				logger.trace(
 						"Testing handler map [" + hm + "] in DispatcherServlet with name '" + getServletName() + "'");
 			}
+			//拿处理器
 			HandlerExecutionChain handler = hm.getHandler(request);
 			if (handler != null) {
 				return handler;

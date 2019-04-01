@@ -37,6 +37,7 @@ import org.springframework.web.method.support.InvocableHandlerMethod;
  */
 public class InitBinderDataBinderFactory extends DefaultDataBinderFactory {
 
+	//用户编写的@InitBinder函数
 	private final List<InvocableHandlerMethod> binderMethods;
 
 	/**
@@ -59,6 +60,7 @@ public class InitBinderDataBinderFactory extends DefaultDataBinderFactory {
 	public void initBinder(WebDataBinder binder, NativeWebRequest request) throws Exception {
 		for (InvocableHandlerMethod binderMethod : this.binderMethods) {
 			if (isBinderMethodApplicable(binderMethod, binder)) {
+				//调用用户编写的@InitBinder函数
 				Object returnValue = binderMethod.invokeForRequest(request, null, binder);
 				if (returnValue != null) {
 					throw new IllegalStateException("@InitBinder methods should return void: " + binderMethod);

@@ -96,7 +96,7 @@ public class CompoundComparator<T> implements Comparator<T>, Serializable {
 		this.comparators.add(new InvertibleComparator(comparator, ascending));
 	}
 
-	/**
+	/**000
 	 * Replace the Comparator at the given index.
 	 * <p>The Comparator will default to ascending sort order,
 	 * unless it is a InvertibleComparator.

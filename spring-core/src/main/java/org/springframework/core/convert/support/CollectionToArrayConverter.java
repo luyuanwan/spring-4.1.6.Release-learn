@@ -38,8 +38,15 @@ import org.springframework.core.convert.converter.ConditionalGenericConverter;
  */
 final class CollectionToArrayConverter implements ConditionalGenericConverter {
 
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
+	/**
+	 * 构造函数，传入转换服务
+	 * @param conversionService
+     */
 	public CollectionToArrayConverter(ConversionService conversionService) {
 		this.conversionService = conversionService;
 	}

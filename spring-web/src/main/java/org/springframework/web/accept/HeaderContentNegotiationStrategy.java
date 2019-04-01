@@ -27,6 +27,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 
 /**
  * A ContentNegotiationStrategy that parses the 'Accept' header of the request.
+ * Accept头部的内容协商策略
  *
  * @author Rossen Stoyanchev
  * @since 3.2
@@ -41,10 +42,12 @@ public class HeaderContentNegotiationStrategy implements ContentNegotiationStrat
 	 */
 	@Override
 	public List<MediaType> resolveMediaTypes(NativeWebRequest webRequest) throws HttpMediaTypeNotAcceptableException {
+		//获取接受头部
 		String acceptHeader = webRequest.getHeader(ACCEPT_HEADER);
 		try {
 			if (StringUtils.hasText(acceptHeader)) {
 				List<MediaType> mediaTypes = MediaType.parseMediaTypes(acceptHeader);
+				//排序
 				MediaType.sortBySpecificityAndQuality(mediaTypes);
 				return mediaTypes;
 			}

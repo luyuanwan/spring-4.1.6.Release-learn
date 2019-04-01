@@ -98,6 +98,7 @@ public class CustomScopeConfigurer implements BeanFactoryPostProcessor, BeanClas
 				String scopeKey = entry.getKey();
 				Object value = entry.getValue();
 				if (value instanceof Scope) {
+					//注册scope
 					beanFactory.registerScope(scopeKey, (Scope) value);
 				}
 				else if (value instanceof Class) {

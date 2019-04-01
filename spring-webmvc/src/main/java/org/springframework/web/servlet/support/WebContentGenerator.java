@@ -261,12 +261,15 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 	 * response should be cacheable for, 0 to prevent caching
 	 * @param lastModified if the mapped handler provides Last-Modified support
 	 * @throws ServletException if the request cannot be handled because a check failed
+	 *
+	 * 检查方法是否支持、检查session、最后设置cache头部
 	 */
 	protected final void checkAndPrepare(
 			HttpServletRequest request, HttpServletResponse response, int cacheSeconds, boolean lastModified)
 			throws ServletException {
 
 		// Check whether we should support the request method.
+		/**方法不支持*/
 		String method = request.getMethod();
 		if (this.supportedMethods != null && !this.supportedMethods.contains(method)) {
 			throw new HttpRequestMethodNotSupportedException(
@@ -274,6 +277,7 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 		}
 
 		// Check whether a session is required.
+		/**检查session*/
 		if (this.requireSession) {
 			if (request.getSession(false) == null) {
 				throw new HttpSessionRequiredException("Pre-existing session required but none found");

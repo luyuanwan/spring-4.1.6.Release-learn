@@ -38,9 +38,13 @@ import org.springframework.web.servlet.HandlerInterceptor;
  */
 public final class MappedInterceptor {
 
+	//包含的模式
 	private final String[] includePatterns;
 
+	//排除的模式
 	private final String[] excludePatterns;
+
+	//这里的逻辑是如果符合要求，就会调用interceptor
 
 	private final HandlerInterceptor interceptor;
 
@@ -128,7 +132,10 @@ public final class MappedInterceptor {
 	 * @param pathMatcher a path matcher for path pattern matching
 	 */
 	public boolean matches(String lookupPath, PathMatcher pathMatcher) {
+		//1.拿到匹配器
 		PathMatcher pathMatcherToUse = (this.pathMatcher != null) ? this.pathMatcher : pathMatcher;
+
+		//2.检查排除的模式
 		if (this.excludePatterns != null) {
 			for (String pattern : this.excludePatterns) {
 				if (pathMatcherToUse.match(pattern, lookupPath)) {
@@ -136,6 +143,8 @@ public final class MappedInterceptor {
 				}
 			}
 		}
+
+		//3.检查包含模式
 		if (this.includePatterns == null) {
 			return true;
 		}

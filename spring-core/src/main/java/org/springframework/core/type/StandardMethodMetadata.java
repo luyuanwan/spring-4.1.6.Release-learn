@@ -122,6 +122,7 @@ public class StandardMethodMetadata implements MethodMetadata {
 
 	@Override
 	public MultiValueMap<String, Object> getAllAnnotationAttributes(String annotationType, boolean classValuesAsString) {
+		//拿到所有注解属性
 		return AnnotatedElementUtils.getAllAnnotationAttributes(this.introspectedMethod,
 				annotationType, classValuesAsString, this.nestedAnnotationsAsMap);
 	}

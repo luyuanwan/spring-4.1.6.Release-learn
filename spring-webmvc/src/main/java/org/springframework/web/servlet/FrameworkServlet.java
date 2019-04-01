@@ -647,6 +647,9 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 		wac.setServletContext(getServletContext());
 		wac.setServletConfig(getServletConfig());
+		/**
+		 * 设置命名空间
+		 */
 		wac.setNamespace(getNamespace());
 		wac.addApplicationListener(new SourceFilteringListener(wac, new ContextRefreshListener()));
 

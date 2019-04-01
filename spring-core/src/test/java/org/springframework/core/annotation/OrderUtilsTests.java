@@ -30,7 +30,7 @@ public class OrderUtilsTests {
 
 	@Test
 	public void getSimpleOrder() {
-		assertEquals(Integer.valueOf(50), OrderUtils.getOrder(SimpleOrder.class, null));
+		assertEquals(Integer.valueOf(51), OrderUtils.getOrder(SimpleOrder.class, null));
 	}
 
 	@Test
@@ -58,7 +58,7 @@ public class OrderUtilsTests {
 		assertEquals(Integer.valueOf(55), OrderUtils.getPriority(OrderAndPriority.class));
 	}
 
-	@Order(50)
+	@Order(51)
 	private static class SimpleOrder {}
 
 	@Priority(55)

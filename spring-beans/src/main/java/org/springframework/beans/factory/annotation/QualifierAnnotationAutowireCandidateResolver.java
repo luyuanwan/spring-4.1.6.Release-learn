@@ -45,6 +45,8 @@ import org.springframework.util.StringUtils;
  *
  * <p>Also supports JSR-330's {@link javax.inject.Qualifier} annotation, if available.
  *
+ * 看代码是获取Value中的值信息的
+ *
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @since 2.5
@@ -301,6 +303,7 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 	 */
 	@Override
 	public Object getSuggestedValue(DependencyDescriptor descriptor) {
+		//拿到值
 		Object value = findValue(descriptor.getAnnotations());
 		if (value == null) {
 			MethodParameter methodParam = descriptor.getMethodParameter();
@@ -315,8 +318,10 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 	 * Determine a suggested value from any of the given candidate annotations.
 	 */
 	protected Object findValue(Annotation[] annotationsToSearch) {
+		//遍历每一个注解
 		for (Annotation annotation : annotationsToSearch) {
 			if (this.valueAnnotationType.isInstance(annotation)) {
+				//直接返回了
 				return extractValue(annotation);
 			}
 		}

@@ -50,6 +50,8 @@ import org.springframework.context.ApplicationContextException;
  * {@link org.springframework.context.annotation.AnnotationConfigApplicationContext}
  * supports {@code @Configuration}-annotated classes as a source of bean definitions.
  *
+ * 可刷新的哦
+ *
  * @author Juergen Hoeller
  * @author Chris Beams
  * @since 1.1.3
@@ -115,18 +117,32 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * This implementation performs an actual refresh of this context's underlying
 	 * bean factory, shutting down the previous bean factory (if any) and
 	 * initializing a fresh bean factory for the next phase of the context's lifecycle.
+	 *
+	 * 因为这个类是可刷新的，所以这里就写成这个样子了，先干掉，再生成
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
+		/**
+		 * 这里的作用是销毁子容器
+		 */
 		if (hasBeanFactory()) {
 			destroyBeans();
 			closeBeanFactory();
 		}
 		try {
+			// 这里生成的beanFactory到底是什么呢
+			// 回答，这里其实生成的是子容器，叫做DefaultListableBeanFactory
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
+			// 设置容器的ID
 			beanFactory.setSerializationId(getId());
+			// 自定义bean工厂
 			customizeBeanFactory(beanFactory);
+			// 其实是在这个容器里面读取XML等  这个loadBeanDefinitions是个抽象类，所以说，加载BeanDefinition是在子容器中完成的哦
 			loadBeanDefinitions(beanFactory);
+
+			/**
+			 * 设置子容器
+			 */
 			synchronized (this.beanFactoryMonitor) {
 				this.beanFactory = beanFactory;
 			}
@@ -136,12 +152,20 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 		}
 	}
 
+	/**
+	 * 取消刷新（因为抛出了异常）
+	 *
+	 * @param ex the exception that led to the cancellation
+     */
 	@Override
 	protected void cancelRefresh(BeansException ex) {
 		synchronized (this.beanFactoryMonitor) {
-			if (this.beanFactory != null)
+			if (this.beanFactory != null) {
+				//直接设置ID为空
 				this.beanFactory.setSerializationId(null);
+			}
 		}
+		//调用父类
 		super.cancelRefresh(ex);
 	}
 
@@ -183,24 +207,6 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	}
 
 	/**
-	 * Create an internal bean factory for this context.
-	 * Called for each {@link #refresh()} attempt.
-	 * <p>The default implementation creates a
-	 * {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
-	 * with the {@linkplain #getInternalParentBeanFactory() internal bean factory} of this
-	 * context's parent as parent bean factory. Can be overridden in subclasses,
-	 * for example to customize DefaultListableBeanFactory's settings.
-	 * @return the bean factory for this context
-	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
-	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowEagerClassLoading
-	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowCircularReferences
-	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowRawInjectionDespiteWrapping
-	 */
-	protected DefaultListableBeanFactory createBeanFactory() {
-		return new DefaultListableBeanFactory(getInternalParentBeanFactory());
-	}
-
-	/**
 	 * Customize the internal bean factory used by this context.
 	 * Called for each {@link #refresh()} attempt.
 	 * <p>The default implementation applies this context's
@@ -221,6 +227,27 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 		if (this.allowCircularReferences != null) {
 			beanFactory.setAllowCircularReferences(this.allowCircularReferences);
 		}
+	}
+
+	/**
+	 * Create an internal bean factory for this context.
+	 * Called for each {@link #refresh()} attempt.
+	 * <p>The default implementation creates a
+	 * {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
+	 * with the {@linkplain #getInternalParentBeanFactory() internal bean factory} of this
+	 * context's parent as parent bean factory. Can be overridden in subclasses,
+	 * for example to customize DefaultListableBeanFactory's settings.
+	 *
+	 * 创建bean工厂
+	 *
+	 * @return the bean factory for this context
+	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
+	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowEagerClassLoading
+	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowCircularReferences
+	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowRawInjectionDespiteWrapping
+	 */
+	protected DefaultListableBeanFactory createBeanFactory() {
+		return new DefaultListableBeanFactory(getInternalParentBeanFactory());
 	}
 
 	/**

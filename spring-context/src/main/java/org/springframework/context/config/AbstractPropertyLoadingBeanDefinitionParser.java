@@ -38,14 +38,23 @@ abstract class AbstractPropertyLoadingBeanDefinitionParser extends AbstractSingl
 		return true;
 	}
 
+	/**
+	 *<context:property-placeholder location="mongoconfig/mongoconfig.dev.properties"/>
+	 * @param element the XML element being parsed
+	 * @param builder used to define the {@code BeanDefinition}
+     */
 	@Override
 	protected void doParse(Element element, BeanDefinitionBuilder builder) {
+		//<context:property-placeholder location="mongoconfig/mongoconfig.dev.properties"/>
+		//location is mongoconfig/mongoconfig.dev.properties
+		//设置location
 		String location = element.getAttribute("location");
 		if (StringUtils.hasLength(location)) {
 			String[] locations = StringUtils.commaDelimitedListToStringArray(location);
 			builder.addPropertyValue("locations", locations);
 		}
 
+		//设置properties-ref
 		String propertiesRef = element.getAttribute("properties-ref");
 		if (StringUtils.hasLength(propertiesRef)) {
 			builder.addPropertyReference("properties", propertiesRef);

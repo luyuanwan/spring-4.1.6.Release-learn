@@ -30,6 +30,8 @@ import org.springframework.beans.BeansException;
  * <p>For a list of all bean lifecycle methods, see the
  * {@link BeanFactory BeanFactory javadocs}.
  *
+ * 经过试验发现，它是在AbstractAutowireCapableBeanFactory.initializeBean中完成的，它在初始化方法调用之前会调用所有的Aware
+ *
  * @author Rod Johnson
  * @author Chris Beams
  * @since 11.03.2003

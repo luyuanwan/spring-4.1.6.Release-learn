@@ -163,6 +163,8 @@ public interface BeanFactory {
 	 * @throws NoUniqueBeanDefinitionException if more than one bean of the given type was found
 	 * @since 3.0
 	 * @see ListableBeanFactory
+	 *
+	 * 仅通过类型获得Bean
 	 */
 	<T> T getBean(Class<T> requiredType) throws BeansException;
 
@@ -200,6 +202,8 @@ public interface BeanFactory {
 	 * the affected bean isn't a prototype
 	 * @throws BeansException if the bean could not be created
 	 * @since 4.1
+	 *
+	 * 根据类型和构造参数获取bean
 	 */
 	<T> T getBean(Class<T> requiredType, Object... args) throws BeansException;
 

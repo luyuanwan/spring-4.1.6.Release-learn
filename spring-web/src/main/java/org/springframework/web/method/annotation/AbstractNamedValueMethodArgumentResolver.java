@@ -86,7 +86,8 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 		Class<?> paramType = parameter.getParameterType();
 		NamedValueInfo namedValueInfo = getNamedValueInfo(parameter);
 
-		Object arg = resolveName(namedValueInfo.name, parameter, webRequest);
+		//解析出参数的值,比如PathVariable("dd")
+		Object arg = resolveName(namedValueInfo.name/**参数名*/, parameter/**参数*/, webRequest);
 		if (arg == null) {
 			if (namedValueInfo.defaultValue != null) {
 				arg = resolveDefaultValue(namedValueInfo.defaultValue);
@@ -100,13 +101,16 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 			arg = resolveDefaultValue(namedValueInfo.defaultValue);
 		}
 
+		//如果有绑定工厂，则进入工厂进行绑定
 		if (binderFactory != null) {
+			//从工厂中生成绑定器
 			WebDataBinder binder = binderFactory.createBinder(webRequest, null, namedValueInfo.name);
-			arg = binder.convertIfNecessary(arg, paramType, parameter);
+			//绑定，并且依据需要进行转换
+			arg = binder.convertIfNecessary(arg/**参数的值*/, paramType/**参数类型*/, parameter/**参数信息*/);
 		}
 
+		//后续的处理
 		handleResolvedValue(arg, namedValueInfo.name, parameter, mavContainer, webRequest);
-
 		return arg;
 	}
 
@@ -136,7 +140,7 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 	 * Create a new NamedValueInfo based on the given NamedValueInfo with sanitized values.
 	 */
 	private NamedValueInfo updateNamedValueInfo(MethodParameter parameter, NamedValueInfo info) {
-		String name = info.name;
+		String name = info.name;//参数名
 		if (info.name.length() == 0) {
 			name = parameter.getParameterName();
 			if (name == null) {
@@ -217,13 +221,22 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 	 */
 	protected static class NamedValueInfo {
 
+		/**
+		 * 参数名
+		 */
 		private final String name;
 
+		/**
+		 * 是否是必须的
+		 */
 		private final boolean required;
 
+		/**
+		 * 默认值
+		 */
 		private final String defaultValue;
 
-		public NamedValueInfo(String name, boolean required, String defaultValue) {
+		public NamedValueInfo(String name/**参数名*/, boolean required/**是否是必须的*/, String defaultValue) {
 			this.name = name;
 			this.required = required;
 			this.defaultValue = defaultValue;

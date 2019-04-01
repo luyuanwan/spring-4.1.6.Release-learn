@@ -574,6 +574,7 @@ public abstract class AnnotationUtils {
 	 * @return the annotation attributes (a specialized Map) with attribute names as keys
 	 * and corresponding attribute values as values
 	 * @since 3.1.1
+	 * 检索出给定注解的所有属性，以map的形式返回
 	 */
 	public static AnnotationAttributes getAnnotationAttributes(Annotation annotation, boolean classValuesAsString,
 			boolean nestedAnnotationsAsMap) {

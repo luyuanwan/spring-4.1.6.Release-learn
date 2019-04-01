@@ -102,8 +102,9 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 		}
 
 		if (!ClassUtils.isAssignableValue(paramType, arg)) {
+			//通过转换服务进行转换
 			arg = this.conversionService.convert(
-					arg, TypeDescriptor.valueOf(arg.getClass()), new TypeDescriptor(parameter));
+					arg/**待转换的对象*/, TypeDescriptor.valueOf(arg.getClass())/**源类型*/, new TypeDescriptor(parameter)/**目标类型*/);
 		}
 
 		handleResolvedValue(arg, namedValueInfo.name, parameter, message);

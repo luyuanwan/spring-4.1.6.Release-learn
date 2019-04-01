@@ -68,20 +68,25 @@ public abstract class NamedParameterUtils {
 	/**
 	 * Parse the SQL statement and locate any placeholders or named parameters.
 	 * Named parameters are substituted for a JDBC placeholder.
+	 *
+	 * 解析一条SQL，比如select * from users where uid=&uidd,解析出他有几个命名参数等信息，存放在ParsedSql
+	 *
 	 * @param sql the SQL statement
 	 * @return the parsed statement, represented as ParsedSql instance
 	 */
 	public static ParsedSql parseSqlStatement(final String sql) {
 		Assert.notNull(sql, "SQL must not be null");
 
+		//命名的参数
 		Set<String> namedParameters = new HashSet<String>();
 		String sqlToUse = sql;
 		List<ParameterHolder> parameterList = new ArrayList<ParameterHolder>();
 
+		//变成数组
 		char[] statement = sql.toCharArray();
-		int namedParameterCount = 0;
-		int unnamedParameterCount = 0;
-		int totalParameterCount = 0;
+		int namedParameterCount = 0;//命名的参数个数
+		int unnamedParameterCount = 0;//未命名的参数个数
+		int totalParameterCount = 0;//参数的总个数
 
 		int escapes = 0;
 		int i = 0;
@@ -168,6 +173,7 @@ public abstract class NamedParameterUtils {
 		return parsedSql;
 	}
 
+
 	private static int addNamedParameter(
 			List<ParameterHolder> parameterList, int totalParameterCount, int escapes, int i, int j, String parameter) {
 
@@ -191,15 +197,20 @@ public abstract class NamedParameterUtils {
 	 * @return next position to process after any comments or quotes are skipped
 	 */
 	private static int skipCommentsAndQuotes(char[] statement, int position) {
+		//开头的，遍历
 		for (int i = 0; i < START_SKIP.length; i++) {
+			//第一个位置是否匹配
 			if (statement[position] == START_SKIP[i].charAt(0)) {
+				//第一个位置就匹配
 				boolean match = true;
+				//遍历下去，是否完全匹配，match表示了是否匹配
 				for (int j = 1; j < START_SKIP[i].length(); j++) {
 					if (!(statement[position + j] == START_SKIP[i].charAt(j))) {
 						match = false;
 						break;
 					}
 				}
+				//完全匹配
 				if (match) {
 					int offset = START_SKIP[i].length();
 					for (int m = position + offset; m < statement.length; m++) {
@@ -249,7 +260,7 @@ public abstract class NamedParameterUtils {
 	 * @return the SQL statement with substituted parameters
 	 * @see #parseSqlStatement
 	 */
-	public static String substituteNamedParameters(ParsedSql parsedSql, SqlParameterSource paramSource) {
+	public static String substituteNamedParameters(ParsedSql parsedSql/**解析后的SQL*/, SqlParameterSource paramSource) {
 		String originalSql = parsedSql.getOriginalSql();
 		StringBuilder actualSql = new StringBuilder();
 		List<String> paramNames = parsedSql.getParameterNames();

@@ -31,6 +31,8 @@ import org.apache.commons.logging.LogFactory;
  * user-supplied values. <p> Values for substitution can be supplied using a {@link Properties} instance or
  * using a {@link PlaceholderResolver}.
  *
+ * 占位符的核心步骤，有点模板模式的味道
+ *
  * @author Juergen Hoeller
  * @author Rob Harrop
  * @since 3.0
@@ -48,7 +50,7 @@ public class PropertyPlaceholderHelper {
 	}
 
 
-	private final String placeholderPrefix;
+	private final String placeholderPrefix;//占位符前缀
 
 	private final String placeholderSuffix;
 
@@ -56,7 +58,7 @@ public class PropertyPlaceholderHelper {
 
 	private final String valueSeparator;
 
-	private final boolean ignoreUnresolvablePlaceholders;
+	private final boolean ignoreUnresolvablePlaceholders;//忽略不可解析的占位符
 
 
 	/**
@@ -109,6 +111,7 @@ public class PropertyPlaceholderHelper {
 		return replacePlaceholders(value, new PlaceholderResolver() {
 			@Override
 			public String resolvePlaceholder(String placeholderName) {
+				//获取键值对中的值
 				return properties.getProperty(placeholderName);
 			}
 		});
@@ -117,35 +120,67 @@ public class PropertyPlaceholderHelper {
 	/**
 	 * Replaces all placeholders of format {@code ${name}} with the value returned
 	 * from the supplied {@link PlaceholderResolver}.
+	 *
+	 * 包含占位符的字符串，将《解析算法带入》
+	 *
 	 * @param value the value containing the placeholders to be replaced
 	 * @param placeholderResolver the {@code PlaceholderResolver} to use for replacement
 	 * @return the supplied value with placeholders replaced inline
 	 */
-	public String replacePlaceholders(String value, PlaceholderResolver placeholderResolver) {
+	public String replacePlaceholders(String value/**包含占位符的字符串*/, PlaceholderResolver placeholderResolver/**占位符解析器*/) {
+		//判定字符串是否为空
 		Assert.notNull(value, "'value' must not be null");
-		return parseStringValue(value, placeholderResolver, new HashSet<String>());
+
+		//解析字符串
+		return parseStringValue(value/**包含占位符的字符串*/, placeholderResolver/**占位符解析器*/, new HashSet<String>());
 	}
 
+	/**
+	 * 解析字符串
+	 *
+	 * 这种设计的好处：
+	 * 1、如果需要解析不同的《包含占位符的字符串》，则本函数可以复用
+	 * 2、如果解析占位符的算法发生变化，则本函数可以复用
+	 * 3、如果解析占位符的前后缀发生变化，则本函数可以复用，记得使用构造函数
+	 *
+	 * @param strVal                   包含占位符的字符串
+	 * @param placeholderResolver      占位符解析器
+	 * @param visitedPlaceholders
+     * @return
+     */
 	protected String parseStringValue(
-			String strVal, PlaceholderResolver placeholderResolver, Set<String> visitedPlaceholders) {
+			String strVal/*包含占位符的字符串*/, PlaceholderResolver placeholderResolver/*占位符解析器*/,
+			Set<String> visitedPlaceholders/*集合*/) {
 
+		//将<包含占位符的字符串>生成string
 		StringBuilder result = new StringBuilder(strVal);
 
+		//查找前缀符的位置
 		int startIndex = strVal.indexOf(this.placeholderPrefix);
 		while (startIndex != -1) {
+			//找到了前缀位置
+
+			//找后缀位置
 			int endIndex = findPlaceholderEndIndex(result, startIndex);
 			if (endIndex != -1) {
+				//找到了后缀位置
+
+				//准备替换的部分，例如${xx}中的xx
 				String placeholder = result.substring(startIndex + this.placeholderPrefix.length(), endIndex);
 				String originalPlaceholder = placeholder;
+
+				//添加到集合中
 				if (!visitedPlaceholders.add(originalPlaceholder)) {
 					throw new IllegalArgumentException(
 							"Circular placeholder reference '" + originalPlaceholder + "' in property definitions");
 				}
 				// Recursive invocation, parsing placeholders contained in the placeholder key.
-				placeholder = parseStringValue(placeholder, placeholderResolver, visitedPlaceholders);
+				placeholder = parseStringValue(placeholder/*准备替换的部分*/, placeholderResolver/*占位符解析器*/, visitedPlaceholders/*集合*/);
 				// Now obtain the value for the fully resolved key...
-				String propVal = placeholderResolver.resolvePlaceholder(placeholder);
+				String propVal = placeholderResolver.resolvePlaceholder(placeholder);/*占位符解析器解析占位符*/
+				//propVal==null 表示解析不成功
 				if (propVal == null && this.valueSeparator != null) {
+					//解析不成功 且 有默认值的分隔符
 					int separatorIndex = placeholder.indexOf(this.valueSeparator);
 					if (separatorIndex != -1) {
 						String actualPlaceholder = placeholder.substring(0, separatorIndex);

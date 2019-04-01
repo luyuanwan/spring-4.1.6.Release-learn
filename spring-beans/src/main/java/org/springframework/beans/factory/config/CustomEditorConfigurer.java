@@ -100,6 +100,9 @@ public class CustomEditorConfigurer implements BeanFactoryPostProcessor, Ordered
 
 	private PropertyEditorRegistrar[] propertyEditorRegistrars;
 
+	/**
+	 * 它是一个Map 类型。通过配置它便实现了自定义的编辑器注册。这个Map 的键值对对应着转换类型和编辑器（转换类型是Key，编辑器是Value）。
+	 */
 	private Map<Class<?>, Class<? extends PropertyEditor>> customEditors;
 
 

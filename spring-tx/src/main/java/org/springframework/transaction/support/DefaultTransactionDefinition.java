@@ -51,8 +51,10 @@ public class DefaultTransactionDefinition implements TransactionDefinition, Seri
 	/** Constants instance for TransactionDefinition */
 	static final Constants constants = new Constants(TransactionDefinition.class);
 
+	//默认传播策略
 	private int propagationBehavior = PROPAGATION_REQUIRED;
 
+	//默认隔离级别
 	private int isolationLevel = ISOLATION_DEFAULT;
 
 	private int timeout = TIMEOUT_DEFAULT;
@@ -76,6 +78,8 @@ public class DefaultTransactionDefinition implements TransactionDefinition, Seri
 
 	/**
 	 * Copy constructor. Definition can be modified through bean property setters.
+	 *
+	 * 拷贝构造函数
 	 * @see #setPropagationBehavior
 	 * @see #setIsolationLevel
 	 * @see #setTimeout
@@ -83,9 +87,13 @@ public class DefaultTransactionDefinition implements TransactionDefinition, Seri
 	 * @see #setName
 	 */
 	public DefaultTransactionDefinition(TransactionDefinition other) {
+		//传播策略
 		this.propagationBehavior = other.getPropagationBehavior();
+		//隔离级别
 		this.isolationLevel = other.getIsolationLevel();
+		//超时时间
 		this.timeout = other.getTimeout();
+		//是否只读
 		this.readOnly = other.isReadOnly();
 		this.name = other.getName();
 	}
@@ -100,6 +108,7 @@ public class DefaultTransactionDefinition implements TransactionDefinition, Seri
 	 * @see #setReadOnly
 	 */
 	public DefaultTransactionDefinition(int propagationBehavior) {
+		//传播策略
 		this.propagationBehavior = propagationBehavior;
 	}
 
@@ -112,6 +121,8 @@ public class DefaultTransactionDefinition implements TransactionDefinition, Seri
 	 * to one of the {@code PROPAGATION_} constants or is {@code null}
 	 * @see #setPropagationBehavior
 	 * @see #PROPAGATION_REQUIRED
+	 *
+	 * 设置传播策略
 	 */
 	public final void setPropagationBehaviorName(String constantName) throws IllegalArgumentException {
 		if (constantName == null || !constantName.startsWith(PREFIX_PROPAGATION)) {
@@ -126,6 +137,8 @@ public class DefaultTransactionDefinition implements TransactionDefinition, Seri
 	 * @exception IllegalArgumentException if the supplied value is not
 	 * one of the {@code PROPAGATION_} constants
 	 * @see #PROPAGATION_REQUIRED
+	 *
+	 * 设置传播策略
 	 */
 	public final void setPropagationBehavior(int propagationBehavior) {
 		if (!constants.getValues(PREFIX_PROPAGATION).contains(propagationBehavior)) {

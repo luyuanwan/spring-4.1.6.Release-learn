@@ -171,13 +171,15 @@ public class GenericConversionService implements ConfigurableConversionService {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T convert(Object source, Class<T> targetType) {
+	public <T> T convert(Object source/**待转换的对象*/, Class<T> targetType/**目标转换类型*/) {
+		//检查是否为空
 		Assert.notNull(targetType, "targetType to convert to cannot be null");
-		return (T) convert(source, TypeDescriptor.forObject(source), TypeDescriptor.valueOf(targetType));
+		//转换
+		return (T) convert(source /**待转换的对象*/, TypeDescriptor.forObject(source)/**源类型*/, TypeDescriptor.valueOf(targetType)/**目标类型*/);
 	}
 
 	@Override
-	public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+	public Object convert(Object source/**待转换的对象*/, TypeDescriptor sourceType, TypeDescriptor targetType) {
 		Assert.notNull(targetType, "targetType to convert to cannot be null");
 		if (sourceType == null) {
 			Assert.isTrue(source == null, "source must be [null] if sourceType == [null]");
@@ -187,6 +189,7 @@ public class GenericConversionService implements ConfigurableConversionService {
 			throw new IllegalArgumentException("source to convert from must be an instance of " +
 					sourceType + "; instead it was a " + source.getClass().getName());
 		}
+		//获取转换器
 		GenericConverter converter = getConverter(sourceType, targetType);
 		if (converter != null) {
 			Object result = ConversionUtils.invokeConverter(converter, source, sourceType, targetType);

@@ -26,6 +26,8 @@ import org.springframework.http.HttpStatus;
 /**
  * Represents a server-side HTTP response.
  *
+ * 包含 身体、头部、可刷新、可关闭
+ *
  * @author Arjen Poutsma
  * @since 3.0
  */

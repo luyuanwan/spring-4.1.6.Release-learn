@@ -130,8 +130,11 @@ public class MapSqlParameterSource extends AbstractSqlParameterSource {
 	 */
 	public MapSqlParameterSource addValues(Map<String, ?> values) {
 		if (values != null) {
+			//遍历每一个实体
 			for (Map.Entry<String, ?> entry : values.entrySet()) {
+				//存放
 				this.values.put(entry.getKey(), entry.getValue());
+
 				if (entry.getValue() instanceof SqlParameterValue) {
 					SqlParameterValue value = (SqlParameterValue) entry.getValue();
 					registerSqlType(entry.getKey(), value.getSqlType());

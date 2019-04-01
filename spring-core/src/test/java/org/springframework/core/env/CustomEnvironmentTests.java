@@ -74,16 +74,21 @@ public class CustomEnvironmentTests {
 			@Override
 			@SuppressWarnings("serial")
 			protected Set<String> getReservedDefaultProfiles() {
+				//默认的profiles
 				return new HashSet<String>() {{ add("rd1"); add("rd2");  }};
 			}
 		}
 
+		//可配置的环境
 		ConfigurableEnvironment env = new CustomEnvironment();
+		//判定是否启用了 default
 		assertThat(env.acceptsProfiles(AbstractEnvironment.RESERVED_DEFAULT_PROFILE_NAME), is(false));
+		//判定是否启用了 rd1 和  rd2
 		assertThat(env.acceptsProfiles("rd1", "rd2"), is(true));
 
 		// finally, issue additional assertions to cover all combinations of calling these
 		// methods, however unlikely.
+		// 设置默认的profiles 为 d1
 		env.setDefaultProfiles("d1");
 		assertThat(env.acceptsProfiles("rd1", "rd2"), is(false));
 		assertThat(env.acceptsProfiles("d1"), is(true));

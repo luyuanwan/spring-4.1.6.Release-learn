@@ -88,6 +88,11 @@ public interface HandlerInterceptor {
 	 * next interceptor or the handler itself. Else, DispatcherServlet assumes
 	 * that this interceptor has already dealt with the response itself.
 	 * @throws Exception in case of errors
+	 *
+	 * 顾名思义，该方法将在Controller处理之前进行调用，SpringMVC中的Interceptor拦截器是链式的，可以同时存在
+	 * 多个Interceptor，然后SpringMVC会根据声明的前后顺序一个接一个的执行，而且所有的Interceptor中的preHandle方法都会在
+	 * Controller方法调用之前调用。SpringMVC的这种Interceptor链式结构也是可以进行中断的，这种中断方式是令preHandle的返
+	 * 回值为false，当preHandle的返回值为false的时候整个请求就结束了。
 	 */
 	boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 	    throws Exception;
@@ -126,6 +131,10 @@ public interface HandlerInterceptor {
 	 * execution, for type and/or instance examination
 	 * @param ex exception thrown on handler execution, if any
 	 * @throws Exception in case of errors
+	 *
+	 * 该方法也是需要当前对应的Interceptor的preHandle方法的返回值为true时才会执行。该方法将在整个请求完成之后，也就是
+	 * DispatcherServlet渲染了视图执行
+	 * 这个方法的主要作用是用于清理资源的，当然这个方法也只能在当前这个Interceptor的preHandle方法的返回值为true时才会执行
 	 */
 	void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception;

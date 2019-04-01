@@ -54,6 +54,8 @@ import org.springframework.util.StringValueResolver;
  * registration of {@code PropertyPlaceholderConfigurer} through the namespace, even if using Spring 3.1;
  * simply do not update your {@code xsi:schemaLocation} and continue using the 3.0 XSD.
  *
+ * 这个可以配置在XML中的
+ *
  * @author Juergen Hoeller
  * @author Chris Beams
  * @since 02.10.2003
@@ -156,12 +158,15 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 	protected String resolvePlaceholder(String placeholder, Properties props, int systemPropertiesMode) {
 		String propVal = null;
 		if (systemPropertiesMode == SYSTEM_PROPERTIES_MODE_OVERRIDE) {
+			//首先解析系统属性
 			propVal = resolveSystemProperty(placeholder);
 		}
 		if (propVal == null) {
+			//再解析占位符
 			propVal = resolvePlaceholder(placeholder, props);
 		}
 		if (propVal == null && systemPropertiesMode == SYSTEM_PROPERTIES_MODE_FALLBACK) {
+			//解析系统属性
 			propVal = resolveSystemProperty(placeholder);
 		}
 		return propVal;
@@ -218,7 +223,13 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 	protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties props)
 			throws BeansException {
 
+		/**
+		 * 字符串解析器
+		 */
 		StringValueResolver valueResolver = new PlaceholderResolvingStringValueResolver(props);
+		/**
+		 * 对工厂里的很多bean进行解析
+		 */
 		doProcessProperties(beanFactoryToProcess, valueResolver);
 	}
 
@@ -241,28 +252,54 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 	}
 
 
+	/**
+	 * 字符串解析器
+	 */
 	private class PlaceholderResolvingStringValueResolver implements StringValueResolver {
 
 		private final PropertyPlaceholderHelper helper;
 
+		/**
+		 * 占位符解析器
+		 */
 		private final PlaceholderResolver resolver;
 
 		public PlaceholderResolvingStringValueResolver(Properties props) {
+			/**
+			 * 生成帮助类
+			 */
 			this.helper = new PropertyPlaceholderHelper(
 					placeholderPrefix, placeholderSuffix, valueSeparator, ignoreUnresolvablePlaceholders);
+			/**
+			 * 生成占位符解析器
+			 */
 			this.resolver = new PropertyPlaceholderConfigurerResolver(props);
 		}
 
+		/**
+		 * 返回解析后的字符串
+		 *
+		 * @param strVal the original String value
+		 * @return
+		 * @throws BeansException
+         */
 		@Override
 		public String resolveStringValue(String strVal) throws BeansException {
-			String value = this.helper.replacePlaceholders(strVal, this.resolver);
+			//返回解析后的字符串
+			String value = this.helper.replacePlaceholders(strVal/**包含占位符的字符串*/, this.resolver/**解析器*/);
 			return (value.equals(nullValue) ? null : value);
 		}
 	}
 
 
+	/**
+	 * 占位符解析
+	 */
 	private class PropertyPlaceholderConfigurerResolver implements PlaceholderResolver {
 
+		/**
+		 * 属性集合（不包含系统属性）
+		 */
 		private final Properties props;
 
 		private PropertyPlaceholderConfigurerResolver(Properties props) {
@@ -270,8 +307,8 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 		}
 
 		@Override
-		public String resolvePlaceholder(String placeholderName) {
-			return PropertyPlaceholderConfigurer.this.resolvePlaceholder(placeholderName, props, systemPropertiesMode);
+		public String resolvePlaceholder(String placeholderName/**待解析的占位符名*/) {
+			return PropertyPlaceholderConfigurer.this.resolvePlaceholder(placeholderName/**待解析的占位符名*/, props, systemPropertiesMode);
 		}
 	}
 

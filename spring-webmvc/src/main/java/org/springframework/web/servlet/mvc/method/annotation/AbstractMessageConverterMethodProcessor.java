@@ -81,6 +81,9 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 
 	/**
 	 * Creates a new {@link HttpOutputMessage} from the given {@link NativeWebRequest}.
+	 *
+	 * 创建输出
+	 *
 	 * @param webRequest the web request to create an output message from
 	 * @return the output message
 	 */
@@ -93,16 +96,20 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 	 * Writes the given return value to the given web request. Delegates to
 	 * {@link #writeWithMessageConverters(Object, MethodParameter, ServletServerHttpRequest, ServletServerHttpResponse)}
 	 */
-	protected <T> void writeWithMessageConverters(T returnValue, MethodParameter returnType, NativeWebRequest webRequest)
+	protected <T> void writeWithMessageConverters(T returnValue/*返回值*/, MethodParameter returnType/*返回值的类型*/, NativeWebRequest webRequest)
 			throws IOException, HttpMediaTypeNotAcceptableException {
 
 		ServletServerHttpRequest inputMessage = createInputMessage(webRequest);
 		ServletServerHttpResponse outputMessage = createOutputMessage(webRequest);
+
 		writeWithMessageConverters(returnValue, returnType, inputMessage, outputMessage);
 	}
 
 	/**
 	 * Writes the given return type to the given output message.
+	 *
+	 * 本质就是写入，并且使用Converter写入，我的疑问是，TA写入到哪里去了？
+	 *
 	 * @param returnValue the value to write to the output message
 	 * @param returnType the type of the value
 	 * @param inputMessage the input messages. Used to inspect the {@code Accept} header.
@@ -112,18 +119,26 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 	 * the request cannot be met by the message converters
 	 */
 	@SuppressWarnings("unchecked")
-	protected <T> void writeWithMessageConverters(T returnValue, MethodParameter returnType,
-			ServletServerHttpRequest inputMessage, ServletServerHttpResponse outputMessage)
+	protected <T> void writeWithMessageConverters(T returnValue,/*返回值*/
+												  MethodParameter returnType,/*返回值的类型*/
+												  ServletServerHttpRequest inputMessage,
+												  ServletServerHttpResponse outputMessage)
 			throws IOException, HttpMediaTypeNotAcceptableException {
 
 		Class<?> returnValueClass = getReturnValueType(returnValue, returnType);
 		HttpServletRequest servletRequest = inputMessage.getServletRequest();
+		//找到客户端可接受的媒体类型表示
 		List<MediaType> requestedMediaTypes = getAcceptableMediaTypes(servletRequest);
+		//找到服务端可生产的媒体类型表示
 		List<MediaType> producibleMediaTypes = getProducibleMediaTypes(servletRequest, returnValueClass);
 
+		//兼容的媒体类型
 		Set<MediaType> compatibleMediaTypes = new LinkedHashSet<MediaType>();
+
+		//从客户端可接受的中遍历
 		for (MediaType requestedType : requestedMediaTypes) {
 			for (MediaType producibleType : producibleMediaTypes) {
+				//判定媒体类型是否兼容
 				if (requestedType.isCompatibleWith(producibleType)) {
 					compatibleMediaTypes.add(getMostSpecificMediaType(requestedType, producibleType));
 				}
@@ -131,12 +146,15 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 		}
 		if (compatibleMediaTypes.isEmpty()) {
 			if (returnValue != null) {
+				//406 客户端的媒体类型不支持
 				throw new HttpMediaTypeNotAcceptableException(producibleMediaTypes);
 			}
 			return;
 		}
 
+		//将Set媒体类型转换成List
 		List<MediaType> mediaTypes = new ArrayList<MediaType>(compatibleMediaTypes);
+		//排序
 		MediaType.sortBySpecificityAndQuality(mediaTypes);
 
 		MediaType selectedMediaType = null;
@@ -151,14 +169,19 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 			}
 		}
 
-		if (selectedMediaType != null) {
-			selectedMediaType = selectedMediaType.removeQualityValue();
+		if (selectedMediaType != null) {//有选中的媒体类型
+
+			selectedMediaType = selectedMediaType.removeQualityValue();//去掉q=0这种东西
+
+			//遍历每一个消息转换器
 			for (HttpMessageConverter<?> messageConverter : this.messageConverters) {
-				if (messageConverter.canWrite(returnValueClass, selectedMediaType)) {
+				if (messageConverter.canWrite(returnValueClass, selectedMediaType)) {//是否能够写
+					//经过一些列转化
 					returnValue = this.adviceChain.invoke(returnValue, returnType, selectedMediaType,
 							(Class<HttpMessageConverter<?>>) messageConverter.getClass(), inputMessage, outputMessage);
+
 					if (returnValue != null) {
-						((HttpMessageConverter<T>) messageConverter).write(returnValue, selectedMediaType, outputMessage);
+						((HttpMessageConverter<T>) messageConverter).write(returnValue/*返回值*/, selectedMediaType/*选中的媒体类型*/, outputMessage);
 						if (logger.isDebugEnabled()) {
 							logger.debug("Written [" + returnValue + "] as \"" + selectedMediaType + "\" using [" +
 									messageConverter + "]");
@@ -180,7 +203,7 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 	 * null, then the returnType needs to be examined possibly including generic
 	 * type determination (e.g. {@code ResponseEntity<T>}).
 	 */
-	protected Class<?> getReturnValueType(Object returnValue, MethodParameter returnType) {
+	protected Class<?> getReturnValueType(Object returnValue/*返回值*/, MethodParameter returnType/*返回值的类型*/) {
 		return (returnValue != null ? returnValue.getClass() : returnType.getParameterType());
 	}
 
@@ -212,8 +235,17 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 		}
 	}
 
+	/**
+	 * 找到客户端可接受的媒体类型
+	 *
+	 * @param request
+	 * @return
+	 * @throws HttpMediaTypeNotAcceptableException
+     */
 	private List<MediaType> getAcceptableMediaTypes(HttpServletRequest request) throws HttpMediaTypeNotAcceptableException {
+		//客户端可接受的媒体类型
 		List<MediaType> mediaTypes = this.contentNegotiationManager.resolveMediaTypes(new ServletWebRequest(request));
+		//返回
 		return (mediaTypes.isEmpty() ? Collections.singletonList(MediaType.ALL) : mediaTypes);
 	}
 

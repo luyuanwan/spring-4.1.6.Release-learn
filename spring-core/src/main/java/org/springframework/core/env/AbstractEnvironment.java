@@ -107,7 +107,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 
 	private Set<String> defaultProfiles = new LinkedHashSet<String>(getReservedDefaultProfiles());
 
-	//他有一个数据源
+	//他有很多数据源
 	private final MutablePropertySources propertySources = new MutablePropertySources(this.logger);
 
 	//解析器
@@ -142,7 +142,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 * predictable results. For example:
 	 * <pre class="code">
 	 * public class Level1Environment extends AbstractEnvironment {
-	 *     &#064;Override
+	 *     Override
 	 *     protected void customizePropertySources(MutablePropertySources propertySources) {
 	 *         super.customizePropertySources(propertySources); // no-op from base class
 	 *         propertySources.addLast(new PropertySourceA(...));
@@ -212,6 +212,9 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	/**
 	 * Return the set of reserved default profile names. This implementation returns
 	 * {@value #RESERVED_DEFAULT_PROFILE_NAME}. Subclasses may override in order to
+	 *
+	 * 获取默认的Profiles，可以被覆盖，覆盖的效果就是改变了默认的Profiles，这样就增加了一定的复用性
+	 *
 	 * customize the set of reserved names.
 	 * @see #RESERVED_DEFAULT_PROFILE_NAME
 	 * @see #doGetDefaultProfiles()
@@ -225,6 +228,10 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	// Implementation of ConfigurableEnvironment interface
 	//---------------------------------------------------------------------
 
+	/**
+	 * 获取激活的profile
+	 * @return
+     */
 	@Override
 	public String[] getActiveProfiles() {
 		return StringUtils.toStringArray(doGetActiveProfiles());
@@ -248,6 +255,10 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 		return this.activeProfiles;
 	}
 
+	/**
+	 * 设置全新的profile
+	 * @param profiles
+     */
 	@Override
 	public void setActiveProfiles(String... profiles) {
 		Assert.notNull(profiles, "Profile array must not be null");
@@ -258,6 +269,10 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 		}
 	}
 
+	/**
+	 * 添加一个profile
+	 * @param profile
+     */
 	@Override
 	public void addActiveProfile(String profile) {
 		if (this.logger.isDebugEnabled()) {
@@ -307,9 +322,12 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	@Override
 	public void setDefaultProfiles(String... profiles) {
 		Assert.notNull(profiles, "Profile array must not be null");
+		//默认的profiles清空
 		this.defaultProfiles.clear();
+
 		for (String profile : profiles) {
 			validateProfile(profile);
+			//添加
 			this.defaultProfiles.add(profile);
 		}
 	}
@@ -318,6 +336,8 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	public boolean acceptsProfiles(String... profiles) {
 		Assert.notEmpty(profiles, "Must specify at least one profile");
 		for (String profile : profiles) {
+
+			//遍历每一个Profile
 			if (profile != null && profile.length() > 0 && profile.charAt(0) == '!') {
 				if (!isProfileActive(profile.substring(1))) {
 					return true;
@@ -327,12 +347,15 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 				return true;
 			}
 		}
+		//一个都没匹配到，返回 false
 		return false;
 	}
 
 	/**
 	 * Return whether the given profile is active, or if active profiles are empty
 	 * whether the profile should be active by default.
+	 *
+	 * 判定profile是否启用了
 	 * @throws IllegalArgumentException per {@link #validateProfile(String)}
 	 */
 	protected boolean isProfileActive(String profile) {
@@ -368,6 +391,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> getSystemEnvironment() {
+		//如果返回真，就直接返回空Map
 		if (suppressGetenvAccess()) {
 			return Collections.emptyMap();
 		}
@@ -404,11 +428,18 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 * returning {@code true} if its value equals "true" in any case.
 	 * @see #IGNORE_GETENV_PROPERTY_NAME
 	 * @see SpringProperties#getFlag
+	 *
+	 * @return   true 抑制访问getSystemEnvironment  false 可访问getSystemEnvironment
 	 */
 	protected boolean suppressGetenvAccess() {
 		return SpringProperties.getFlag(IGNORE_GETENV_PROPERTY_NAME);
 	}
 
+	/**
+	 * 获取系统属性
+	 *
+	 * @return
+     */
 	@Override
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> getSystemProperties() {

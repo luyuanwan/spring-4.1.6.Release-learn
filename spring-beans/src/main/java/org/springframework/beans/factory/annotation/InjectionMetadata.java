@@ -48,8 +48,14 @@ public class InjectionMetadata {
 
 	private static final Log logger = LogFactory.getLog(InjectionMetadata.class);
 
+	/**
+	 * 哪个类
+	 */
 	private final Class<?> targetClass;
 
+	/**
+	 * 目标元素（包含方法和字段）
+	 */
 	private final Collection<InjectedElement> injectedElements;
 
 	private volatile Set<InjectedElement> checkedElements;
@@ -111,8 +117,9 @@ public class InjectionMetadata {
 
 	public static abstract class InjectedElement {
 
+		//注解的成员
 		protected final Member member;
-
+		//是否是字段
 		protected final boolean isField;
 
 		protected final PropertyDescriptor pd;
@@ -163,18 +170,24 @@ public class InjectionMetadata {
 		 * Either this or {@link #getResourceToInject} needs to be overridden.
 		 */
 		protected void inject(Object target, String requestingBeanName, PropertyValues pvs) throws Throwable {
+			// 是字段
 			if (this.isField) {
 				Field field = (Field) this.member;
+				//可以被访问
 				ReflectionUtils.makeAccessible(field);
+				//设置值
 				field.set(target, getResourceToInject(target, requestingBeanName));
 			}
+			// 是方法
 			else {
 				if (checkPropertySkipping(pvs)) {
 					return;
 				}
 				try {
 					Method method = (Method) this.member;
+					//可以被访问
 					ReflectionUtils.makeAccessible(method);
+					// 调用方法
 					method.invoke(target, getResourceToInject(target, requestingBeanName));
 				}
 				catch (InvocationTargetException ex) {

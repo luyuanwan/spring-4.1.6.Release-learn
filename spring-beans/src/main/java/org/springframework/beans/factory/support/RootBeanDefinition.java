@@ -83,6 +83,9 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 
 	private Set<Member> externallyManagedConfigMembers;
 
+	/**
+	 * 外部的初始化方法名
+	 */
 	private Set<String> externallyManagedInitMethods;
 
 	private Set<String> externallyManagedDestroyMethods;
@@ -280,6 +283,12 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 		}
 	}
 
+	/**
+	 * 判定initMethod是否为初始化方法
+	 *
+	 * @param initMethod
+	 * @return
+     */
 	public boolean isExternallyManagedInitMethod(String initMethod) {
 		synchronized (this.postProcessingLock) {
 			return (this.externallyManagedInitMethods != null &&

@@ -348,10 +348,13 @@ class ConstructorResolver {
 	 * @param explicitArgs argument values passed in programmatically via the getBean
 	 * method, or {@code null} if none (-> use constructor argument values from bean definition)
 	 * @return a BeanWrapper for the new instance
+	 *
+	 * 用工厂创建一个bean
 	 */
 	public BeanWrapper instantiateUsingFactoryMethod(
 			final String beanName, final RootBeanDefinition mbd, final Object[] explicitArgs) {
 
+		//生成一个实现
 		BeanWrapperImpl bw = new BeanWrapperImpl();
 		this.beanFactory.initBeanWrapper(bw);
 
@@ -359,12 +362,14 @@ class ConstructorResolver {
 		Class<?> factoryClass;
 		boolean isStatic;
 
+		// 工厂bean名字
 		String factoryBeanName = mbd.getFactoryBeanName();
 		if (factoryBeanName != null) {
 			if (factoryBeanName.equals(beanName)) {
 				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
 						"factory-bean reference points back to the same bean definition");
 			}
+			//工厂bean
 			factoryBean = this.beanFactory.getBean(factoryBeanName);
 			if (factoryBean == null) {
 				throw new BeanCreationException(mbd.getResourceDescription(), beanName,
@@ -374,6 +379,7 @@ class ConstructorResolver {
 				throw new IllegalStateException("About-to-be-created singleton instance implicitly appeared " +
 						"through the creation of the factory bean that its bean definition points to");
 			}
+			//工厂类
 			factoryClass = factoryBean.getClass();
 			isStatic = false;
 		}

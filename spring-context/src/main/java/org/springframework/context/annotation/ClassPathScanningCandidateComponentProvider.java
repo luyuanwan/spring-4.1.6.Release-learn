@@ -74,8 +74,14 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * EnvironmentCapable 他含有环境
+	 */
 	private Environment environment;
 
+	/**
+	 * 资源搜索器
+	 */
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
 	private MetadataReaderFactory metadataReaderFactory =

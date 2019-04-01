@@ -49,6 +49,7 @@ public class WebContentInterceptor extends WebContentGenerator implements Handle
 
 	private UrlPathHelper urlPathHelper = new UrlPathHelper();
 
+	/**缓存一下映射关系   path->缓存时间*/
 	private Map<String, Integer> cacheMappings = new HashMap<String, Integer>();
 
 	private PathMatcher pathMatcher = new AntPathMatcher();

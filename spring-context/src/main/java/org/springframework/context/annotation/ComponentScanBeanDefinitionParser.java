@@ -148,7 +148,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 	}
 
 	protected void registerComponents(
-			XmlReaderContext readerContext, Set<BeanDefinitionHolder> beanDefinitions, Element element) {
+			XmlReaderContext readerContext/*XML阅读上下文*/, Set<BeanDefinitionHolder> beanDefinitions/*bean定义*/, Element element) {
 
 		Object source = readerContext.extractSource(element);
 		CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(element.getTagName(), source);

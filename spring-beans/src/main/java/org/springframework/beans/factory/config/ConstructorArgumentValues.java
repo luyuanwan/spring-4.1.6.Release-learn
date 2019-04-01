@@ -42,8 +42,10 @@ import org.springframework.util.ObjectUtils;
  */
 public class ConstructorArgumentValues {
 
+	//带索引的构造参数
 	private final Map<Integer, ValueHolder> indexedArgumentValues = new LinkedHashMap<Integer, ValueHolder>(0);
 
+	//不带索引的构造参数
 	private final List<ValueHolder> genericArgumentValues = new LinkedList<ValueHolder>();
 
 
@@ -428,10 +430,13 @@ public class ConstructorArgumentValues {
 	 */
 	public static class ValueHolder implements BeanMetadataElement {
 
+		//变量值
 		private Object value;
 
+		//变量类型
 		private String type;
 
+		//变量名
 		private String name;
 
 		private Object source;

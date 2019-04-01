@@ -58,13 +58,20 @@ class SimpleCommandLineArgsParser {
 	 * @param args command line arguments, typically from a {@code main()} method
 	 */
 	public CommandLineArgs parse(String... args) {
+		//生成一个命令行抽象
 		CommandLineArgs commandLineArgs = new CommandLineArgs();
+		//遍历每一个参数
 		for (String arg : args) {
+			//判断TA是不是--开头的
 			if (arg.startsWith("--")) {
+				//获取--后面的数据
 				String optionText = arg.substring(2, arg.length());
+
 				String optionName;
 				String optionValue = null;
+				//是否包含等于号
 				if (optionText.contains("=")) {
+					//这是一个键值对
 					optionName = optionText.substring(0, optionText.indexOf("="));
 					optionValue = optionText.substring(optionText.indexOf("=")+1, optionText.length());
 				}

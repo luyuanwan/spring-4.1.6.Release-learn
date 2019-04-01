@@ -168,6 +168,7 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 	}
 
 
+	@Override
 	public void afterPropertiesSet() {
 		Assert.state(getCacheOperationSource() != null, "The 'cacheOperationSources' property is required: " +
 				"If there are no cacheable methods, then don't use a cache aspect.");

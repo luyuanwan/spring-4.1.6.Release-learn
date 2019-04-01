@@ -100,6 +100,8 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
  * See {@link WebApplicationInitializer} Javadoc for examples and detailed usage
  * recommendations.<p>
  *
+ *     ServletContainerInitializer 也是 Servlet 3.0 新增的一个接口，主要用于在容器启动阶段通过编程风格注册Filter, Servlet以及Listener，以取代通过web.xml配置注册。这样就利于开发内聚的web应用框架。
+ *
  * @author Chris Beams
  * @author Juergen Hoeller
  * @author Rossen Stoyanchev
@@ -171,6 +173,7 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 		AnnotationAwareOrderComparator.sort(initializers);
 		servletContext.log("Spring WebApplicationInitializers detected on classpath: " + initializers);
 
+		//spring只处理WebApplicationInitializer类型，全部实例化后再依次调用WebApplicationInitializer的onStartup接口。
 		for (WebApplicationInitializer initializer : initializers) {
 			initializer.onStartup(servletContext);
 		}

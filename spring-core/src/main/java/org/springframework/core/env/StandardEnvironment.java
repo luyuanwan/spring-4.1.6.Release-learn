@@ -75,8 +75,14 @@ public class StandardEnvironment extends AbstractEnvironment {
 	 */
 	@Override
 	protected void customizePropertySources(MutablePropertySources propertySources) {
+		/**
+		 * 添加系统属性  Map（name -> Object）(key -> value)
+		 */
 		propertySources.addLast(new MapPropertySource(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, getSystemProperties()));
+
+		/**
+		 * 添加系统环境属性
+		 */
 		propertySources.addLast(new SystemEnvironmentPropertySource(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, getSystemEnvironment()));
 	}
-
 }

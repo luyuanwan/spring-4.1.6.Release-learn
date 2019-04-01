@@ -43,6 +43,8 @@ import org.springframework.web.util.UrlPathHelper;
  * {@link #PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE}. Support for this attribute
  * is up to concrete subclasses, typically based on request URL mappings.
  *
+ * 抽象出来的东西是：处理器的映射关系
+ *
  * @author Juergen Hoeller
  * @author Rossen Stoyanchev
  * @since 07.04.2003
@@ -65,6 +67,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 	private PathMatcher pathMatcher = new AntPathMatcher();
 
+	//在初始化之前，这里面就已经有东西了
 	private final List<Object> interceptors = new ArrayList<Object>();
 
 	private final List<HandlerInterceptor> adaptedInterceptors = new ArrayList<HandlerInterceptor>();
@@ -231,6 +234,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	protected void initInterceptors() {
 		if (!this.interceptors.isEmpty()) {
 			for (int i = 0; i < this.interceptors.size(); i++) {
+				//遍历每一个interceptor
 				Object interceptor = this.interceptors.get(i);
 				if (interceptor == null) {
 					throw new IllegalArgumentException("Entry number " + i + " in interceptors array is null");
@@ -290,14 +294,21 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	/**
 	 * Look up a handler for the given request, falling back to the default
 	 * handler if no specific one is found.
+	 *
+	 * 获取处理器的顶层方法
+	 * 1、先问子类有没有处理器
+	 * 2、没有的话，则使用默认处理器
+	 *
 	 * @param request current HTTP request
 	 * @return the corresponding handler instance, or the default handler
 	 * @see #getHandlerInternal
 	 */
 	@Override
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+		//1、先问子类有没有处理器
 		Object handler = getHandlerInternal(request);
 		if (handler == null) {
+			//2、没有的话，则使用默认处理器
 			handler = getDefaultHandler();
 		}
 		if (handler == null) {
