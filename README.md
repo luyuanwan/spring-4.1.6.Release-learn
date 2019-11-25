@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## Spring Framework
 The Spring Framework provides a comprehensive programming and configuration
 model for modern Java-based enterprise applications - on any kind of deployment
@@ -100,7 +99,3 @@ The Spring Framework is released under version 2.0 of the [Apache License][].
 [The Spring Blog]: http://spring.io/blog/
 [news feed]: http://spring.io/blog/category/news
 [Apache License]: http://www.apache.org/licenses/LICENSE-2.0
-=======
-# spring-4.1.6.Release-learn
-spring源码学习
->>>>>>> github/master
