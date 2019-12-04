@@ -44,6 +44,8 @@ import org.springframework.util.MultiValueMap;
  * @author Phillip Webb
  * @author Sam Brannen
  * @since 2.5
+ *
+ * 注解元数据读取器
  */
 public class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor implements AnnotationMetadata {
 
@@ -63,7 +65,7 @@ public class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisito
 	protected final Set<MethodMetadata> methodMetadataSet = new LinkedHashSet<MethodMetadata>(4);
 
 
-	public AnnotationMetadataReadingVisitor(ClassLoader classLoader) {
+	public AnnotationMetadataReadingVisitor(ClassLoader classLoader/**类加载器*/) {
 		this.classLoader = classLoader;
 	}
 
@@ -163,8 +165,11 @@ public class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisito
 	@Override
 	public Set<MethodMetadata> getAnnotatedMethods(String annotationType) {
 		Set<MethodMetadata> annotatedMethods = new LinkedHashSet<MethodMetadata>(4);
+		// 遍历一个元数据集合
 		for (MethodMetadata methodMetadata : this.methodMetadataSet) {
+			//是否是annotationType的子类
 			if (methodMetadata.isAnnotated(annotationType)) {
+				//添加
 				annotatedMethods.add(methodMetadata);
 			}
 		}

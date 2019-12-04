@@ -159,6 +159,7 @@ public class WebMvcConfigurationSupportExtensionTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void requestMappingHandlerAdapter() throws Exception {
+		//拿到映射处理器总的适配器
 		RequestMappingHandlerAdapter adapter = this.config.requestMappingHandlerAdapter();
 
 		// ConversionService

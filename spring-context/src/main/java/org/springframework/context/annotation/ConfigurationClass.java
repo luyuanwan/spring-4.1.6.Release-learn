@@ -94,8 +94,8 @@ final class ConfigurationClass {
 	 * @param importedBy the configuration class importing this one or {@code null}
 	 * @since 3.1.1
 	 */
-	public ConfigurationClass(MetadataReader metadataReader, ConfigurationClass importedBy) {
-		this.metadata = metadataReader.getAnnotationMetadata();
+	public ConfigurationClass(MetadataReader metadataReader/**元数据读取器*/, ConfigurationClass importedBy) {
+		this.metadata = metadataReader.getAnnotationMetadata();// 从读取器中拿到元数据
 		this.resource = metadataReader.getResource();
 		this.importedBy.add(importedBy);
 	}
@@ -171,6 +171,7 @@ final class ConfigurationClass {
 	 * @see #getImportedBy()
 	 */
 	public boolean isImported() {
+		// 如果为真，表示它依赖于别的bean而被导入创建
 		return !this.importedBy.isEmpty();
 	}
 

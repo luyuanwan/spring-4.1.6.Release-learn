@@ -76,6 +76,7 @@ public class OrderComparator implements Comparator<Object> {
 		// Direct evaluation instead of Integer.compareTo to avoid unnecessary object creation.
 		int i1 = getOrder(o1, sourceProvider);
 		int i2 = getOrder(o2, sourceProvider);
+		// 越小越靠前
 		return (i1 < i2) ? -1 : (i1 > i2) ? 1 : 0;
 	}
 

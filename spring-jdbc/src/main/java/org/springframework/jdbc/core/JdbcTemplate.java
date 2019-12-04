@@ -16,27 +16,6 @@
 
 package org.springframework.jdbc.core;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.sql.BatchUpdateException;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import javax.sql.DataSource;
-
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.support.DataAccessUtils;
@@ -51,6 +30,14 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.util.StringUtils;
+
+import javax.sql.DataSource;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.sql.*;
+import java.util.*;
 
 /**
  * <b>This is the central class in the JDBC core package.</b>
@@ -334,6 +321,14 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	// Methods dealing with a plain java.sql.Connection
 	//-------------------------------------------------------------------------
 
+	/**
+	 * 这是一个最外层的执行框架
+	 *
+	 * @param action the callback object that specifies the action
+	 * @param <T>
+	 * @return
+	 * @throws DataAccessException
+     */
 	@Override
 	public <T> T execute(ConnectionCallback<T> action) throws DataAccessException {
 		Assert.notNull(action, "Callback object must not be null");
@@ -349,6 +344,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 				// Create close-suppressing Connection proxy, also preparing returned Statements.
 				conToUse = createConnectionProxy(con);
 			}
+			//拿到Connection
 			return action.doInConnection(conToUse);
 		}
 		catch (SQLException ex) {
@@ -959,9 +955,11 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		return execute(psc, new PreparedStatementCallback<Integer>() {
 			@Override
 			public Integer doInPreparedStatement(PreparedStatement ps) throws SQLException {
+				//影响行数
 				int rows = ps.executeUpdate();
 				List<Map<String, Object>> generatedKeys = generatedKeyHolder.getKeyList();
 				generatedKeys.clear();
+				//结果集合
 				ResultSet keys = ps.getGeneratedKeys();
 				if (keys != null) {
 					try {

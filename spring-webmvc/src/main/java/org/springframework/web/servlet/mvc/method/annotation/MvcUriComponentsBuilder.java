@@ -40,7 +40,7 @@ import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.objenesis.ObjenesisStd;
+//import org.springframework.objenesis.ObjenesisStd;//......注释掉了
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;

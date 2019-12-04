@@ -22,8 +22,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.cglib.proxy.Callback;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.Factory;
-import org.springframework.objenesis.ObjenesisException;
-import org.springframework.objenesis.ObjenesisStd;
+//import org.springframework.objenesis.ObjenesisException;
+//import org.springframework.objenesis.ObjenesisStd;
 
 /**
  * Objenesis based extension of {@link CglibAopProxy} to create proxy instances without
@@ -37,7 +37,8 @@ class ObjenesisCglibAopProxy extends CglibAopProxy {
 
 	private static final Log logger = LogFactory.getLog(ObjenesisCglibAopProxy.class);
 
-	private final ObjenesisStd objenesis;
+//	private final ObjenesisStd objenesis;
+	//.......这里注释掉了
 
 
 	/**
@@ -46,25 +47,26 @@ class ObjenesisCglibAopProxy extends CglibAopProxy {
 	 */
 	public ObjenesisCglibAopProxy(AdvisedSupport config) {
 		super(config);
-		this.objenesis = new ObjenesisStd(true);
+//		this.objenesis = new ObjenesisStd(true);
 	}
 
 
 	@Override
 	@SuppressWarnings("unchecked")
 	protected Object createProxyClassAndInstance(Enhancer enhancer, Callback[] callbacks) {
-		try {
-			Factory factory = (Factory) this.objenesis.newInstance(enhancer.createClass());
-			factory.setCallbacks(callbacks);
-			return factory;
-		}
-		catch (ObjenesisException ex) {
-			// Fallback to regular proxy construction on unsupported JVMs
-			if (logger.isDebugEnabled()) {
-				logger.debug("Unable to instantiate proxy using Objenesis, falling back to regular proxy construction", ex);
-			}
-			return super.createProxyClassAndInstance(enhancer, callbacks);
-		}
+//		try {
+//			Factory factory = (Factory) this.objenesis.newInstance(enhancer.createClass());
+//			factory.setCallbacks(callbacks);
+//			return factory;
+//		}
+//		catch (ObjenesisException ex) {
+//			// Fallback to regular proxy construction on unsupported JVMs
+//			if (logger.isDebugEnabled()) {
+//				logger.debug("Unable to instantiate proxy using Objenesis, falling back to regular proxy construction", ex);
+//			}
+//			return super.createProxyClassAndInstance(enhancer, callbacks);
+//		}
+		return null;
 	}
 
 }

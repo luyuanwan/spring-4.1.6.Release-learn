@@ -119,9 +119,11 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	// 自动注入类型
 	private final Set<Class<? extends Annotation>> autowiredAnnotationTypes =
 			new LinkedHashSet<Class<? extends Annotation>>();
 
+	// 是否需要
 	private String requiredParameterName = "required";
 
 	private boolean requiredParameterValue = true;
@@ -423,13 +425,14 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 				if (ann != null) {
 					if (Modifier.isStatic(field.getModifiers())) {
 						if (logger.isWarnEnabled()) {
+							//不支持静态字段注入
 							logger.warn("Autowired annotation is not supported on static fields: " + field);
 						}
 						continue;
 					}
 					//
 					boolean required = determineRequiredStatus(ann);
-					//添加
+					//添加字段注入
 					currElements.add(new AutowiredFieldElement(field, required));
 				}
 			}
@@ -455,10 +458,13 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 					}
 					boolean required = determineRequiredStatus(ann);
 					PropertyDescriptor pd = BeanUtils.findPropertyForMethod(bridgedMethod, clazz);
+
+					//添加方法注入
 					currElements.add(new AutowiredMethodElement(method, required, pd));
 				}
 			}
 			elements.addAll(0, currElements);
+			// 找到其父类
 			targetClass = targetClass.getSuperclass();
 		}
 		while (targetClass != null && targetClass != Object.class);
@@ -549,17 +555,28 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	 */
 	private class AutowiredFieldElement extends InjectionMetadata.InjectedElement {
 
+		// 是否需要
 		private final boolean required;
 
+		// 是否需要缓存
 		private volatile boolean cached = false;
 
+		// 字段值
 		private volatile Object cachedFieldValue;
 
-		public AutowiredFieldElement(Field field, boolean required) {
+		public AutowiredFieldElement(Field field/**哪个字段*/, boolean required/**是否需要*/) {
 			super(field, null);
 			this.required = required;
 		}
 
+		/**
+		 * 实际的注入
+		 *
+		 * @param bean
+		 * @param beanName
+		 * @param pvs
+         * @throws Throwable
+         */
 		@Override
 		protected void inject(Object bean, String beanName, PropertyValues pvs) throws Throwable {
 			// 拿到这个字段
@@ -575,7 +592,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 					Set<String> autowiredBeanNames = new LinkedHashSet<String>(1);
 					// 拿到转换器
 					TypeConverter typeConverter = beanFactory.getTypeConverter();
-					// 根据接口定为到实现类的过程发生在此处
+					// 根据接口定位到实现类的过程发生在此处
 					value = beanFactory.resolveDependency(desc, beanName, autowiredBeanNames, typeConverter);
 					synchronized (this) {
 						if (!this.cached) {

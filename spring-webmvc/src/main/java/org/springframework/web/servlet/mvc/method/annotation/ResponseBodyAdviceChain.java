@@ -31,6 +31,7 @@ import org.springframework.web.method.ControllerAdviceBean;
  *
  * @author Rossen Stoyanchev
  * @since 4.1
+ * HTTP返回时需要经过一系列转化，这些转化就包装在这里面
  */
 class ResponseBodyAdviceChain {
 
@@ -46,14 +47,29 @@ class ResponseBodyAdviceChain {
 		return !CollectionUtils.isEmpty(this.advice);
 	}
 
+
+	/**
+	 * HTTP返回时需要经过一系列转化，这些转化就包装在这个函数里面（我感觉这像一种增强）
+	 *
+	 * @param body
+	 * @param returnType
+	 * @param selectedContentType
+	 * @param selectedConverterType
+	 * @param request
+	 * @param response
+     * @param <T>
+     * @return
+     */
 	@SuppressWarnings("unchecked")
-	public <T> T invoke(T body, MethodParameter returnType,
-			MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType,
+	public <T> T invoke(T body/**body体*/, MethodParameter returnType/**返回类型*/,
+			MediaType selectedContentType/**选择的媒体类型*/, Class<? extends HttpMessageConverter<?>> selectedConverterType,
 			ServerHttpRequest request, ServerHttpResponse response) {
 
 		if (this.advice != null) {
 			for (Object advice : this.advice) {
+				//如果是ControllerAdviceBean
 				if (advice instanceof ControllerAdviceBean) {
+					//强转成ControllerAdviceBean
 					ControllerAdviceBean adviceBean = (ControllerAdviceBean) advice;
 					if (!adviceBean.isApplicableToBeanType(returnType.getContainingClass())) {
 						continue;

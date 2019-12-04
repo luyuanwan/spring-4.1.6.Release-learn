@@ -32,7 +32,7 @@ import org.springframework.util.PropertiesPersister;
  * from one or more resources. Supports local properties as well, with
  * configurable overriding.
  *
- * 属性加载的支持底层抽象类
+ * 属性加载支持的底层抽象类
  *
  * @author Juergen Hoeller
  * @since 1.2.2
@@ -42,6 +42,7 @@ public abstract class PropertiesLoaderSupport {
 	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	//很多属性
 	protected Properties[] localProperties;
 
 	protected boolean localOverride = false;
@@ -62,6 +63,8 @@ public abstract class PropertiesLoaderSupport {
 	 * Set local properties, e.g. via the "props" tag in XML bean definitions.
 	 * These can be considered defaults, to be overridden by properties
 	 * loaded from files.
+	 *
+	 * 设置一个属性
 	 */
 	public void setProperties(Properties properties) {
 		this.localProperties = new Properties[] {properties};
@@ -70,6 +73,8 @@ public abstract class PropertiesLoaderSupport {
 	/**
 	 * Set local properties, e.g. via the "props" tag in XML bean definitions,
 	 * allowing for merging multiple properties sets into one.
+	 *
+	 * 设置很多属性
 	 */
 	public void setPropertiesArray(Properties... propertiesArray) {
 		this.localProperties = propertiesArray;
@@ -79,6 +84,8 @@ public abstract class PropertiesLoaderSupport {
 	 * Set a location of a properties file to be loaded.
 	 * <p>Can point to a classic properties file or to an XML file
 	 * that follows JDK 1.5's properties XML format.
+	 *
+	 * 设置资源的位置
 	 */
 	public void setLocation(Resource location) {
 		this.locations = new Resource[] {location};
@@ -92,6 +99,8 @@ public abstract class PropertiesLoaderSupport {
 	 * properties defined earlier files, in case of overlapping keys.
 	 * Hence, make sure that the most specific files are the last
 	 * ones in the given list of locations.
+	 *
+	 * 设置资源的位置
 	 */
 	public void setLocations(Resource... locations) {
 		this.locations = locations;
@@ -102,6 +111,8 @@ public abstract class PropertiesLoaderSupport {
 	 * <p>Default is "false": Properties from files override local defaults.
 	 * Can be switched to "true" to let local properties override defaults
 	 * from files.
+	 *
+	 * 设置是否本地覆盖
 	 */
 	public void setLocalOverride(boolean localOverride) {
 		this.localOverride = localOverride;
@@ -111,6 +122,8 @@ public abstract class PropertiesLoaderSupport {
 	 * Set if failure to find the property resource should be ignored.
 	 * <p>"true" is appropriate if the properties file is completely optional.
 	 * Default is "false".
+	 *
+	 * 设置是否忽略找不到的资源
 	 */
 	public void setIgnoreResourceNotFound(boolean ignoreResourceNotFound) {
 		this.ignoreResourceNotFound = ignoreResourceNotFound;
@@ -122,6 +135,8 @@ public abstract class PropertiesLoaderSupport {
 	 * default encoding.
 	 * <p>Only applies to classic properties files, not to XML files.
 	 * @see org.springframework.util.PropertiesPersister#load
+	 *
+	 * 设置文件编码
 	 */
 	public void setFileEncoding(String encoding) {
 		this.fileEncoding = encoding;
@@ -131,6 +146,8 @@ public abstract class PropertiesLoaderSupport {
 	 * Set the PropertiesPersister to use for parsing properties files.
 	 * The default is DefaultPropertiesPersister.
 	 * @see org.springframework.util.DefaultPropertiesPersister
+	 *
+	 * 设置文件持久化
 	 */
 	public void setPropertiesPersister(PropertiesPersister propertiesPersister) {
 		this.propertiesPersister =
@@ -141,6 +158,8 @@ public abstract class PropertiesLoaderSupport {
 	/**
 	 * Return a merged Properties instance containing both the
 	 * loaded properties and properties set on this FactoryBean.
+	 *
+	 * 多个配置合并成一个配置
 	 */
 	protected Properties mergeProperties() throws IOException {
 		Properties result = new Properties();

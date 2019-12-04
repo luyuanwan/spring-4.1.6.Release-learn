@@ -98,6 +98,7 @@ public abstract class WebMvcConfigurerAdapter implements WebMvcConfigurer {
 	 */
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+		//添加参数解析器
 	}
 
 	/**

@@ -1227,6 +1227,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				for (BeanPostProcessor bp : getBeanPostProcessors()) {
 					if (bp instanceof InstantiationAwareBeanPostProcessor) {
 						InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
+						//......@Autowired就在这里实现的
 						pvs = ibp.postProcessPropertyValues(pvs, filteredPds, bw.getWrappedInstance(), beanName);
 						if (pvs == null) {
 							return;
@@ -1338,11 +1339,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected String[] unsatisfiedNonSimpleProperties(AbstractBeanDefinition mbd, BeanWrapper bw) {
 		Set<String> result = new TreeSet<String>();
+		// 属性
 		PropertyValues pvs = mbd.getPropertyValues();
+		// 描述符
 		PropertyDescriptor[] pds = bw.getPropertyDescriptors();
+
 		for (PropertyDescriptor pd : pds) {
-			if (pd.getWriteMethod() != null && !isExcludedFromDependencyCheck(pd) && !pvs.contains(pd.getName()) &&
-					!BeanUtils.isSimpleProperty(pd.getPropertyType())) {
+			if (pd.getWriteMethod() != null /**是写方法*/&& !isExcludedFromDependencyCheck(pd) && !pvs.contains(pd.getName()) &&
+					!BeanUtils.isSimpleProperty(pd.getPropertyType())/**不是简单属性*/) {
 				result.add(pd.getName());
 			}
 		}
@@ -1446,7 +1450,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @param bw the BeanWrapper wrapping the target object
 	 * @param pvs the new property values
 	 */
-	protected void applyPropertyValues(String beanName, BeanDefinition mbd, BeanWrapper bw, PropertyValues pvs) {
+	protected void applyPropertyValues(String beanName/**bean名字*/, BeanDefinition mbd, BeanWrapper bw, PropertyValues pvs) {
 		if (pvs == null || pvs.isEmpty()) {
 			return;
 		}

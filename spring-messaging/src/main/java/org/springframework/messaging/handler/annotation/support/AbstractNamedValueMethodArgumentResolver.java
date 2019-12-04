@@ -57,6 +57,7 @@ import org.springframework.util.ClassUtils;
  */
 public abstract class AbstractNamedValueMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
+	//转换服务
 	private final ConversionService conversionService;
 
 	private final ConfigurableBeanFactory configurableBeanFactory;
@@ -85,8 +86,9 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 	@Override
 	public Object resolveArgument(MethodParameter parameter, Message<?> message) throws Exception {
 		Class<?> paramType = parameter.getParameterType();
+		//拿到键值对
 		NamedValueInfo namedValueInfo = getNamedValueInfo(parameter);
-
+		//内部解析参数
 		Object arg = resolveArgumentInternal(parameter, message, namedValueInfo.name);
 		if (arg == null) {
 			if (namedValueInfo.defaultValue != null) {
@@ -107,6 +109,7 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 					arg/**待转换的对象*/, TypeDescriptor.valueOf(arg.getClass())/**源类型*/, new TypeDescriptor(parameter)/**目标类型*/);
 		}
 
+		//后处理
 		handleResolvedValue(arg, namedValueInfo.name, parameter, message);
 
 		return arg;
@@ -118,7 +121,9 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 	private NamedValueInfo getNamedValueInfo(MethodParameter parameter) {
 		NamedValueInfo namedValueInfo = this.namedValueInfoCache.get(parameter);
 		if (namedValueInfo == null) {
+			//创建键值对
 			namedValueInfo = createNamedValueInfo(parameter);
+			//更新键值对
 			namedValueInfo = updateNamedValueInfo(parameter, namedValueInfo);
 			this.namedValueInfoCache.put(parameter, namedValueInfo);
 		}
@@ -189,8 +194,9 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 	 * A {@code null} results in a {@code false} value for {@code boolean}s or an
 	 * exception for other primitives.
 	 */
-	private Object handleNullValue(String name, Object value, Class<?> paramType) {
+	private Object handleNullValue(String name, Object value, Class<?> paramType/**目标参数类型*/) {
 		if (value == null) {
+			//目标参数是布尔类型，则直接返回FALSE
 			if (Boolean.TYPE.equals(paramType)) {
 				return Boolean.FALSE;
 			}

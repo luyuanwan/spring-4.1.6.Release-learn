@@ -144,7 +144,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	 * @since 4.1
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	protected void invokeListener(ApplicationListener listener/*监听器*/, ApplicationEvent event/*事件*/) {
+	protected void invokeListener(ApplicationListener listener/**监听器*/, ApplicationEvent event/**事件*/) {
 		ErrorHandler errorHandler = getErrorHandler();
 		if (errorHandler != null) {
 			try {

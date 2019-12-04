@@ -327,12 +327,13 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 			// Read the model and create bean definitions based on its content
 			if (this.reader == null) {
-				this.reader = new ConfigurationClassBeanDefinitionReader(registry, this.sourceExtractor,
-						this.problemReporter, this.metadataReaderFactory, this.resourceLoader, this.environment/**环境信息*/,
+				this.reader = new ConfigurationClassBeanDefinitionReader(registry/**注册器*/, this.sourceExtractor,
+						this.problemReporter/**问题报告器*/, this.metadataReaderFactory, this.resourceLoader, this.environment/**环境信息*/,
 						this.importBeanNameGenerator/**名字生成器*/, parser.getImportRegistry());
 			}
 			//加载Bean定义
 			this.reader.loadBeanDefinitions(configClasses);
+			// 已经解析过了
 			alreadyParsed.addAll(configClasses);
 
 			configCandidates.clear();
@@ -359,6 +360,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 		// Register the ImportRegistry as a bean in order to support ImportAware @Configuration classes
 		if (singletonRegistry != null) {
+			//不包含的话，就注册一个单例
 			if (!singletonRegistry.containsSingleton(IMPORT_REGISTRY_BEAN_NAME)) {
 				singletonRegistry.registerSingleton(IMPORT_REGISTRY_BEAN_NAME, parser.getImportRegistry());
 			}
@@ -432,12 +434,24 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			return Ordered.HIGHEST_PRECEDENCE;
 		}
 
+		/**
+		 * 这里本质就是设置了一下元数据
+		 *
+		 * @param bean the new bean instance
+		 * @param beanName the name of the bean
+         * @return
+         */
 		@Override
 		public Object postProcessBeforeInitialization(Object bean, String beanName)  {
 			if (bean instanceof ImportAware) {
+				// 拿到ImportRegistry
 				ImportRegistry importRegistry = this.beanFactory.getBean(IMPORT_REGISTRY_BEAN_NAME, ImportRegistry.class);
+
+				// 拿到元数据
 				AnnotationMetadata importingClass = importRegistry.getImportingClassFor(bean.getClass().getSuperclass().getName());
+
 				if (importingClass != null) {
+					// 设置导入元数据
 					((ImportAware) bean).setImportMetadata(importingClass);
 				}
 			}

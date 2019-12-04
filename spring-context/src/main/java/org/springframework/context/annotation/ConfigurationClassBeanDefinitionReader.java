@@ -126,7 +126,7 @@ class ConfigurationClassBeanDefinitionReader {
 		//遍历每一个用户自定义的配置类
 		for (ConfigurationClass configClass : configurationModel) {
 			//从配置类中加载bean定义
-			loadBeanDefinitionsForConfigurationClass(configClass, trackedConditionEvaluator);
+			loadBeanDefinitionsForConfigurationClass(configClass/**用户自定义的配置类*/, trackedConditionEvaluator/**评估器*/);
 		}
 	}
 
@@ -139,7 +139,9 @@ class ConfigurationClassBeanDefinitionReader {
 
 		//是否要跳过，跳过的话，就直接return了
 		if (trackedConditionEvaluator.shouldSkip(configClass)) {
+			// 用户自定义的配置类的名字
 			String beanName = configClass.getBeanName();
+			// 如果已经注册过了定义（containsBeanDefinition），就移除它的定义（removeBeanDefinition），因为要跳过呀
 			if (StringUtils.hasLength(beanName) && this.registry.containsBeanDefinition(beanName)) {
 				this.registry.removeBeanDefinition(beanName);
 			}
@@ -149,21 +151,22 @@ class ConfigurationClassBeanDefinitionReader {
 
 		//是否是导入的
 		if (configClass.isImported()) {
-			registerBeanDefinitionForImportedConfigurationClass(configClass);
+			registerBeanDefinitionForImportedConfigurationClass(configClass/**用户自定义的配置类*/);
 		}
 		for (BeanMethod beanMethod : configClass.getBeanMethods()) {
+			//比如在一个method上有@Bean
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
+		//loadBeanDefinitionsFromImportedResources like classpath:
 		loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());
-		//从注册器中加载bean定义
+		//loadBeanDefinitionsFromRegistrars like @Import
 		loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());
 	}
 
 	/**
 	 * Register the {@link Configuration} class itself as a bean definition.
-	 * 如果某个类是@Import进来的，则会执行本方法
 	 */
-	private void registerBeanDefinitionForImportedConfigurationClass(ConfigurationClass configClass/**配置类*/) {
+	private void registerBeanDefinitionForImportedConfigurationClass(ConfigurationClass configClass/**用户自定义的配置类*/) {
 		//拿到注解元数据
 		AnnotationMetadata metadata = configClass.getMetadata();
 		AnnotatedGenericBeanDefinition configBeanDef = new AnnotatedGenericBeanDefinition(metadata);
@@ -173,6 +176,8 @@ class ConfigurationClassBeanDefinitionReader {
 			configBeanDef.setScope(scopeMetadata.getScopeName());
 			String configBeanName = this.importBeanNameGenerator.generateBeanName(configBeanDef, this.registry);
 			AnnotationConfigUtils.processCommonDefinitionAnnotations(configBeanDef, metadata);
+
+			// 生成bean定义的Holder
 			BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(configBeanDef, configBeanName);
 			definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
 			//注册bean定义
@@ -183,6 +188,7 @@ class ConfigurationClassBeanDefinitionReader {
 			}
 		}
 		else {
+			//报告有错误，好经典
 			this.problemReporter.error(
 					new InvalidConfigurationImportProblem(metadata.getClassName(), configClass.getResource(), metadata));
 		}
@@ -191,6 +197,8 @@ class ConfigurationClassBeanDefinitionReader {
 	/**
 	 * Read the given {@link BeanMethod}, registering bean definitions
 	 * with the BeanDefinitionRegistry based on its contents.
+	 *
+	 * 比如在一个method上有@Bean
 	 */
 	private void loadBeanDefinitionsForBeanMethod(BeanMethod beanMethod) {
 		//拿到配置类
@@ -319,12 +327,14 @@ class ConfigurationClassBeanDefinitionReader {
 	}
 
 	private void loadBeanDefinitionsFromImportedResources(
-			Map<String, Class<? extends BeanDefinitionReader>> importedResources) {
+			Map<String, Class<? extends BeanDefinitionReader>> importedResources/**通过ImportResource进来的资源*/) {
 
 		Map<Class<?>, BeanDefinitionReader> readerInstanceCache = new HashMap<Class<?>, BeanDefinitionReader>();
 
 		for (Map.Entry<String, Class<? extends BeanDefinitionReader>> entry : importedResources.entrySet()) {
+			//拿到名字
 			String resource = entry.getKey();
+			//拿到阅读器
 			Class<? extends BeanDefinitionReader> readerClass = entry.getValue();
 
 			// Default reader selection necessary?

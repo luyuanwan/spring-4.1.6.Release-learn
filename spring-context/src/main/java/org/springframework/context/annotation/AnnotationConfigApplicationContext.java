@@ -85,12 +85,25 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	/**
 	 * Create a new AnnotationConfigApplicationContext, deriving bean definitions
 	 * from the given annotated classes and automatically refreshing the context.
+	 *
+	 * 翻译：
+	 * 创建一个新的AnnotationConfigApplicationContext，bean定义是从指定的带注解的类中
+	 *
 	 * @param annotatedClasses one or more annotated classes,
 	 * e.g. {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... annotatedClasses) {
+		/**
+		 * 父类
+		 */
 		this();
+		/**
+		 * 注册
+		 */
 		register(annotatedClasses);
+		/**
+		 * 刷新
+		 */
 		refresh();
 	}
 
@@ -100,6 +113,9 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * @param basePackages the packages to check for annotated classes
 	 */
 	public AnnotationConfigApplicationContext(String... basePackages) {
+		/**
+		 * 父类
+		 */
 		this();
 		/**
 		 * 扫描包

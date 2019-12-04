@@ -16,20 +16,11 @@
 
 package org.springframework.jdbc.support.lob;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.io.*;
+import java.sql.*;
 
 /**
  * Default implementation of the {@link LobHandler} interface.
@@ -79,6 +70,8 @@ import org.apache.commons.logging.LogFactory;
  * @see java.sql.PreparedStatement#setString
  * @see java.sql.PreparedStatement#setAsciiStream
  * @see java.sql.PreparedStatement#setCharacterStream
+ *
+ * 默认的Lob处理器，继承自抽象的LOB处理器
  */
 public class DefaultLobHandler extends AbstractLobHandler {
 
@@ -178,6 +171,7 @@ public class DefaultLobHandler extends AbstractLobHandler {
 			return clob.getSubString(1, (int) clob.length());
 		}
 		else {
+			//直接获取字段值
 			return rs.getString(columnIndex);
 		}
 	}

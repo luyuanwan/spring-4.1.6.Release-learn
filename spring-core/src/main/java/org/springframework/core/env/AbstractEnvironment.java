@@ -123,6 +123,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 * @see #customizePropertySources(MutablePropertySources)
 	 */
 	public AbstractEnvironment() {
+		// 自定义化属性
 		customizePropertySources(this.propertySources);
 		if (this.logger.isDebugEnabled()) {
 			this.logger.debug(format(

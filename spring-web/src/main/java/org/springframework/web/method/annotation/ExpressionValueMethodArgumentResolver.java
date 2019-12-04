@@ -75,7 +75,7 @@ public class ExpressionValueMethodArgumentResolver extends AbstractNamedValueMet
 	private static class ExpressionValueNamedValueInfo extends NamedValueInfo {
 
 		private ExpressionValueNamedValueInfo(Value annotation) {
-			super("@Value", false, annotation.value());
+			super("@Value", false/**不是必须的*/, annotation.value()/**默认值*/);
 		}
 	}
 

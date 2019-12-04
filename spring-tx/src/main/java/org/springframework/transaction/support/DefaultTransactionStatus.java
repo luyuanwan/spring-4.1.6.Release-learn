@@ -77,8 +77,8 @@ public class DefaultTransactionStatus extends AbstractTransactionStatus {
 	 * for this transaction, if any
 	 */
 	public DefaultTransactionStatus(
-			Object transaction, boolean newTransaction, boolean newSynchronization,
-			boolean readOnly, boolean debug, Object suspendedResources) {
+			Object transaction/**事务*/, boolean newTransaction/**如果是使用注解，最外层就是新事务的开始*/, boolean newSynchronization,
+			boolean readOnly/**是否是只读事务*/, boolean debug, Object suspendedResources/**挂起的其他事务*/) {
 
 		this.transaction = transaction;
 		this.newTransaction = newTransaction;

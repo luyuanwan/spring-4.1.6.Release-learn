@@ -456,14 +456,18 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	 * <li>{@link #addReturnValueHandlers} for adding custom return value handlers.
 	 * <li>{@link #configureMessageConverters} for adding custom message converters.
 	 * </ul>
+	 *
+	 * 返回一个映射总的处理器适配器
 	 */
 	@Bean
 	public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
+		//方法参数
 		List<HandlerMethodArgumentResolver> argumentResolvers = new ArrayList<HandlerMethodArgumentResolver>();
-		addArgumentResolvers(argumentResolvers);
+		addArgumentResolvers(argumentResolvers);//由子类覆盖
 
+		//返回值参数
 		List<HandlerMethodReturnValueHandler> returnValueHandlers = new ArrayList<HandlerMethodReturnValueHandler>();
-		addReturnValueHandlers(returnValueHandlers);
+		addReturnValueHandlers(returnValueHandlers);//由子类覆盖
 
 		RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter();
 		//设置从客户端请求中解析出媒体类型的管理器
@@ -482,7 +486,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 		}
 
 		AsyncSupportConfigurer configurer = new AsyncSupportConfigurer();
-		configureAsyncSupport(configurer);
+		configureAsyncSupport(configurer);//交给子类去配置
 
 		if (configurer.getTaskExecutor() != null) {
 			adapter.setTaskExecutor(configurer.getTaskExecutor());

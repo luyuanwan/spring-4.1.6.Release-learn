@@ -16,13 +16,6 @@
 
 package org.springframework.jms.listener;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.Session;
-
 import org.springframework.jms.connection.ConnectionFactoryUtils;
 import org.springframework.jms.connection.JmsResourceHolder;
 import org.springframework.jms.connection.SingleConnectionFactory;
@@ -33,6 +26,8 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.ResourceTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionSynchronizationUtils;
+
+import javax.jms.*;
 
 /**
  * Base class for listener container implementations which are based on polling.
@@ -220,6 +215,7 @@ public abstract class AbstractPollingMessageListenerContainer extends AbstractMe
 
 		if (this.transactionManager != null) {
 			// Execute receive within transaction.
+			// 根据事务定义，获取事务状态
 			TransactionStatus status = this.transactionManager.getTransaction(this.transactionDefinition);
 			boolean messageReceived;
 			try {

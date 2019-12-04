@@ -123,11 +123,12 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	 * @param dependencyCheck whether to perform a dependency check for objects
 	 * (not applicable to autowiring a constructor, thus ignored there)
 	 */
-	public RootBeanDefinition(Class<?> beanClass, int autowireMode, boolean dependencyCheck) {
+	public RootBeanDefinition(Class<?> beanClass, int autowireMode, boolean dependencyCheck/**需要做依赖检查*/) {
 		super();
 		setBeanClass(beanClass);
 		setAutowireMode(autowireMode);
-		if (dependencyCheck && getResolvedAutowireMode() != AUTOWIRE_CONSTRUCTOR) {
+
+		if (dependencyCheck /**需要做依赖检查*/ && getResolvedAutowireMode() != AUTOWIRE_CONSTRUCTOR) {
 			setDependencyCheck(RootBeanDefinition.DEPENDENCY_CHECK_OBJECTS);
 		}
 	}

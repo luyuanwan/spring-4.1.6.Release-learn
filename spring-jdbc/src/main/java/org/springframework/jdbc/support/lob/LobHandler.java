@@ -86,6 +86,8 @@ import java.sql.SQLException;
  * @see java.sql.ResultSet#getString
  * @see java.sql.ResultSet#getAsciiStream
  * @see java.sql.ResultSet#getCharacterStream
+ *
+ * LobHandler 接口为操作 BLOB/CLOB 提供了统一访问接口，而不管底层数据库究竟是以大对象的方式还是以一般数据类型的方式进行操作。此外，LobHandler 还充当了 LobCreator 的工厂类。
  */
 public interface LobHandler {
 
@@ -122,6 +124,8 @@ public interface LobHandler {
 	 * @return the content as binary stream, or {@code null} in case of SQL NULL
 	 * @throws SQLException if thrown by JDBC methods
 	 * @see java.sql.ResultSet#getBinaryStream
+	 *
+	 * 获取输入流
 	 */
 	InputStream getBlobAsBinaryStream(ResultSet rs, String columnName) throws SQLException;
 
@@ -134,6 +138,8 @@ public interface LobHandler {
 	 * @return the content as binary stream, or {@code null} in case of SQL NULL
 	 * @throws SQLException if thrown by JDBC methods
 	 * @see java.sql.ResultSet#getBinaryStream
+	 *
+	 * 获取输入流
 	 */
 	InputStream getBlobAsBinaryStream(ResultSet rs, int columnIndex) throws SQLException;
 
@@ -146,6 +152,8 @@ public interface LobHandler {
 	 * @return the content as String, or {@code null} in case of SQL NULL
 	 * @throws SQLException if thrown by JDBC methods
 	 * @see java.sql.ResultSet#getString
+	 *
+	 * 获取String
 	 */
 	String getClobAsString(ResultSet rs, String columnName) throws SQLException;
 
@@ -158,6 +166,8 @@ public interface LobHandler {
 	 * @return the content as String, or {@code null} in case of SQL NULL
 	 * @throws SQLException if thrown by JDBC methods
 	 * @see java.sql.ResultSet#getString
+	 *
+	 * 获取String
 	 */
 	String getClobAsString(ResultSet rs, int columnIndex) throws SQLException;
 

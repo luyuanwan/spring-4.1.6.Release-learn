@@ -16,10 +16,6 @@
 
 package org.springframework.jdbc.datasource;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.transaction.TransactionDefinition;
@@ -28,6 +24,10 @@ import org.springframework.transaction.support.AbstractPlatformTransactionManage
 import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.ResourceTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * {@link org.springframework.transaction.PlatformTransactionManager}
@@ -246,9 +246,17 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 		}
 	}
 
+	/**
+	 * 挂起
+	 *
+	 * @param transaction transaction object returned by {@code doGetTransaction}
+	 * @return
+     */
 	@Override
 	protected Object doSuspend(Object transaction) {
+		//事务对象
 		DataSourceTransactionObject txObject = (DataSourceTransactionObject) transaction;
+		//设置连接信息为null
 		txObject.setConnectionHolder(null);
 		ConnectionHolder conHolder = (ConnectionHolder)
 				TransactionSynchronizationManager.unbindResource(this.dataSource);
@@ -269,6 +277,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 			logger.debug("Committing JDBC transaction on Connection [" + con + "]");
 		}
 		try {
+			//核心
 			con.commit();
 		}
 		catch (SQLException ex) {
@@ -284,6 +293,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 			logger.debug("Rolling back JDBC transaction on Connection [" + con + "]");
 		}
 		try {
+			//核心
 			con.rollback();
 		}
 		catch (SQLException ex) {

@@ -382,6 +382,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @return the bean class, or {@code null} if none defined
 	 * @throws IllegalStateException if the bean definition does not define a bean class,
 	 * or a specified bean class name has not been resolved into an actual Class
+	 *
+	 * 拿到类
 	 */
 	public Class<?> getBeanClass() throws IllegalStateException {
 		Object beanClassObject = this.beanClass;
@@ -392,6 +394,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 			throw new IllegalStateException(
 					"Bean class name [" + beanClassObject + "] has not been resolved into an actual Class");
 		}
+		// 强转，哈哈
 		return (Class<?>) beanClassObject;
 	}
 

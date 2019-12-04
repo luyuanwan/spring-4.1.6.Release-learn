@@ -40,6 +40,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 @Configuration
 public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
 
+	//一个总的适配器
 	private final WebMvcConfigurerComposite configurers = new WebMvcConfigurerComposite();
 
 
@@ -92,11 +93,22 @@ public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
 		this.configurers.configureDefaultServletHandling(configurer);
 	}
 
+	/**
+	 * 添加参数解析器
+	 *
+	 * @param argumentResolvers the list of custom converters;
+     */
 	@Override
 	protected void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+		//添加参数解析器 将我们自己编写的内容添加进去，实在是精彩
 		this.configurers.addArgumentResolvers(argumentResolvers);
 	}
 
+	/**
+	 * 添加返回值处理器
+	 *
+	 * @param returnValueHandlers the list of custom handlers;
+     */
 	@Override
 	protected void addReturnValueHandlers(List<HandlerMethodReturnValueHandler> returnValueHandlers) {
 		this.configurers.addReturnValueHandlers(returnValueHandlers);

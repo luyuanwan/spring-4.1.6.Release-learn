@@ -46,7 +46,7 @@ final class SimpleMetadataReader implements MetadataReader {
 	private final AnnotationMetadata annotationMetadata;
 
 
-	SimpleMetadataReader(Resource resource/*资源*/, ClassLoader classLoader) throws IOException {
+	SimpleMetadataReader(Resource resource/**资源*/, ClassLoader classLoader/**类加载器*/) throws IOException {
 		InputStream is = new BufferedInputStream(resource.getInputStream());
 		ClassReader classReader;
 		try {
@@ -61,10 +61,11 @@ final class SimpleMetadataReader implements MetadataReader {
 			is.close();
 		}
 
-		//访问者模式
+		//访问者模式  生成注解元数据
 		AnnotationMetadataReadingVisitor visitor = new AnnotationMetadataReadingVisitor(classLoader);
 		classReader.accept(visitor, ClassReader.SKIP_DEBUG);
 
+		// 注解元数据
 		this.annotationMetadata = visitor;
 		// (since AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor)
 		this.classMetadata = visitor;

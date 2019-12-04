@@ -16,10 +16,6 @@
 
 package org.springframework.context.annotation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -33,6 +29,10 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MultiValueMap;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Internal class used to evaluate {@link Conditional} annotations.
@@ -68,9 +68,10 @@ class ConditionEvaluator {
 	 * Determine if an item should be skipped based on {@code @Conditional} annotations.
 	 * @param metadata the meta data
 	 * @param phase the phase of the call
-	 * @return if the item should be skipped
+	 * @return if the item should be skipped  true 表示需要跳过  false 表示不需要跳过
 	 */
 	public boolean shouldSkip(AnnotatedTypeMetadata metadata, ConfigurationPhase phase) {
+		// 没有元数据 或者 没有Conditional注解，这就表示，在method上也可以有Conditional注解存在
 		if (metadata == null || !metadata.isAnnotated(Conditional.class.getName())) {
 			// 不该跳过，从而成为spring管理的Bean
 			return false;
@@ -87,10 +88,10 @@ class ConditionEvaluator {
 		//在这里是所有的接口
 		List<Condition> conditions = new ArrayList<Condition>();
 
-		//拿到所有注解类的字符串数组
-		for (String[] conditionClasses : getConditionClasses(metadata)) {
+		//拿到所有Condition类的字符串数组
+		for (String[] conditionClasses : getConditionClasses(metadata)/**拿到条件类*/) {
 
-			//遍历每一个注解类字符串
+			//遍历每一个Condition类字符串
 			for (String conditionClass : conditionClasses) {
 				//拿到接口
 				Condition condition = getCondition(conditionClass, this.context.getClassLoader());
@@ -99,7 +100,7 @@ class ConditionEvaluator {
 			}
 		}
 
-		//排序
+		//排序 Condition是可以排序的 Order
 		AnnotationAwareOrderComparator.sort(conditions);
 
 		//遍历每一个接口
@@ -112,7 +113,9 @@ class ConditionEvaluator {
 			}
 			if (requiredPhase == null || requiredPhase == phase) {
 				//找到配置解析相同的，则调用匹配方法，如果不匹配，则返回true，表示不能成为候选者bean
+				//Profile("dev")的作用是使得某个class跳过，或者不跳过
 				if (!condition.matches(this.context, metadata)) {
+					// 跳過
 					return true;
 				}
 			}
@@ -122,12 +125,19 @@ class ConditionEvaluator {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<String[]> getConditionClasses(AnnotatedTypeMetadata metadata) {
+	private List<String[]> getConditionClasses(AnnotatedTypeMetadata metadata/**元数据*/) {
 		MultiValueMap<String, Object> attributes = metadata.getAllAnnotationAttributes(Conditional.class.getName(), true);
 		Object values = (attributes != null ? attributes.get("value") : null);
 		return (List<String[]>) (values != null ? values : Collections.emptyList());
 	}
 
+	/**
+	 * 本质就是生成一个实例
+	 *
+	 * @param conditionClassName
+	 * @param classloader
+     * @return
+     */
 	private Condition getCondition(String conditionClassName, ClassLoader classloader) {
 		Class<?> conditionClass = ClassUtils.resolveClassName(conditionClassName, classloader);
 		return (Condition) BeanUtils.instantiateClass(conditionClass);

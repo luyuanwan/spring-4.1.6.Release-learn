@@ -28,30 +28,36 @@ import java.sql.Driver;
  * @author Sam Brannen
  * @since 3.0
  * @see DataSourceFactory
+ *
+ * 连接属性
  */
 public interface ConnectionProperties {
 
 	/**
 	 * Set the JDBC driver class to use to connect to the database.
 	 * @param driverClass the jdbc driver class
+	 *                    设置JDBC驱动类
 	 */
 	void setDriverClass(Class<? extends Driver> driverClass);
 
 	/**
 	 * Set the JDBC connection URL for the database.
 	 * @param url the connection url
+	 *            设置数据库URL
 	 */
 	void setUrl(String url);
 
 	/**
 	 * Set the username to use to connect to the database.
 	 * @param username the username
+	 *                 设置用户名
 	 */
 	void setUsername(String username);
 
 	/**
 	 * Set the password to use to connect to the database.
 	 * @param password the password
+	 *                 设置密码
 	 */
 	void setPassword(String password);
 

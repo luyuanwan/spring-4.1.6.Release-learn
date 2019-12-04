@@ -481,21 +481,22 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 			// Prepare the bean factory for use in this context.
 			// 初始化beanfactory的基本信息，包括classloader,environment
-			// 这里会添加一些BeanPostProcessor
+			// 这里会添加一些BeanPostProcessor  prepare
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
-				// 后处理 bean工厂
+				// postProcess
+				// 交给子类完成一些事情
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
-				// 调用BeanFactoryPostProcessors 在这里处理 @Import @Configureation这些生成bean的注解信息
+				// 调用BeanFactoryPostProcessors 在这里处理 @Import @Configuration这些生成bean的注解信息
+				// 这里，调用所有的beanFactoryPostProcessor
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
-				//注册BEAN的POST处理器,在调用之前，工厂里面已经有所有BEAN了
-				//这里注册了BeanPostProcessor，包括AutowiredAnnotationBeanPostProcessor
+				// 将容器中已经存在的BeanPostProcessor，标记他们，让他们成为BeanPostProcessor，这里很值得思考.........
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.

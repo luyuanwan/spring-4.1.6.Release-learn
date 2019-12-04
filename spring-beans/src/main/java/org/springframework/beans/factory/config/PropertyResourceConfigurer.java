@@ -81,6 +81,7 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 			Properties mergedProps = mergeProperties();
 
 			// Convert the merged properties, if necessary.
+			// 转换属性
 			convertProperties(mergedProps);
 
 			// Let the subclass process the properties.
@@ -98,13 +99,23 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 	 * for each property value, replacing the original with the converted value.
 	 * @param props the Properties to convert
 	 * @see #processProperties
+	 *
+	 * 转换属性
 	 */
 	protected void convertProperties(Properties props) {
+		//拿到所有的名字
 		Enumeration<?> propertyNames = props.propertyNames();
+		//遍历每一个名字
 		while (propertyNames.hasMoreElements()) {
+			//属性名
 			String propertyName = (String) propertyNames.nextElement();
+			//属性值
 			String propertyValue = props.getProperty(propertyName);
-			String convertedValue = convertProperty(propertyName, propertyValue);
+
+			//转换的工作交给子类换成
+			String convertedValue = convertProperty(propertyName/**属性名*/, propertyValue/**属性值*/);
+
+			//再设置回去
 			if (!ObjectUtils.nullSafeEquals(propertyValue, convertedValue)) {
 				props.setProperty(propertyName, convertedValue);
 			}

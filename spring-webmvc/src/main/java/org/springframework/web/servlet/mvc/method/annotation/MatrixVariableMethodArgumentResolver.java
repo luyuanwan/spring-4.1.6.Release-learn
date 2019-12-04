@@ -49,10 +49,13 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueMeth
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		//如果没有标注MatrixVariable，就表示不支持
 		if (!parameter.hasParameterAnnotation(MatrixVariable.class)) {
 			return false;
 		}
+		//必须是Map类的子类
 		if (Map.class.isAssignableFrom(parameter.getParameterType())) {
+			//必须要有文本value
 			String paramName = parameter.getParameterAnnotation(MatrixVariable.class).value();
 			return StringUtils.hasText(paramName);
 		}
@@ -77,6 +80,7 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueMeth
 			return null;
 		}
 
+		//拿到路径值
 		String pathVar = parameter.getParameterAnnotation(MatrixVariable.class).pathVar();
 		List<String> paramValues = null;
 

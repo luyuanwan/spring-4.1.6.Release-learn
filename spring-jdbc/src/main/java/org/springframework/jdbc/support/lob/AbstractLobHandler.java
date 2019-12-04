@@ -38,6 +38,14 @@ public abstract class AbstractLobHandler implements LobHandler {
 		return getBlobAsBytes(rs, rs.findColumn(columnName));
 	}
 
+	/**
+	 * 获取blob作为二进制流
+	 *
+	 * @param rs the ResultSet to retrieve the content from
+	 * @param columnName the column name to use
+	 * @return
+	 * @throws SQLException
+     */
 	@Override
 	public InputStream getBlobAsBinaryStream(ResultSet rs, String columnName) throws SQLException {
 		return getBlobAsBinaryStream(rs, rs.findColumn(columnName));

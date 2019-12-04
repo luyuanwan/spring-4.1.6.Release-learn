@@ -124,7 +124,7 @@ public class RequestParamMethodArgumentResolver extends AbstractNamedValueMethod
 	 */
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
-		//参数类型
+		//方法中的参数类型
 		Class<?> paramType = parameter.getParameterType();
 		//是否含有注解RequestParam
 		if (parameter.hasParameterAnnotation(RequestParam.class)) {
@@ -166,8 +166,20 @@ public class RequestParamMethodArgumentResolver extends AbstractNamedValueMethod
 		return (ann != null ? new RequestParamNamedValueInfo(ann) : new RequestParamNamedValueInfo());
 	}
 
+	/**
+	 * 解析名字
+	 *
+	 * @param name the name of the value being resolved
+	 * @param parameter the method parameter to resolve to an argument value
+	 * @param webRequest
+	 * @return
+     * @throws Exception
+     */
 	@Override
-	protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest webRequest) throws Exception {
+	protected Object resolveName(String name/**参数名，在这里就是 annotation.value()*/,
+								 MethodParameter parameter,
+								 NativeWebRequest webRequest) throws Exception {
+
 		HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
 		MultipartHttpServletRequest multipartRequest =
 				WebUtils.getNativeRequest(servletRequest, MultipartHttpServletRequest.class);
@@ -210,6 +222,7 @@ public class RequestParamMethodArgumentResolver extends AbstractNamedValueMethod
 				}
 			}
 			if (arg == null) {
+				//找到第一个名字叫做name的参数，也就是annotation.value()的名字的参数值
 				String[] paramValues = webRequest.getParameterValues(name);
 				if (paramValues != null) {
 					arg = paramValues.length == 1 ? paramValues[0] : paramValues;

@@ -420,7 +420,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	public void registerDependentBean(String beanName, String dependentBeanName) {
 		// A quick check for an existing entry upfront, avoiding synchronization...
+		// 拿到名字
 		String canonicalName = canonicalName(beanName);
+		// 如果已经存在，则直接返回
 		Set<String> dependentBeans = this.dependentBeanMap.get(canonicalName);
 		if (dependentBeans != null && dependentBeans.contains(dependentBeanName)) {
 			return;

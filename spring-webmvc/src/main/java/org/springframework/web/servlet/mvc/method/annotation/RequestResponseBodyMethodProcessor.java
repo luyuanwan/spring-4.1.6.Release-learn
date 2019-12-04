@@ -78,6 +78,7 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		//支持的是RequestBody注解
 		return parameter.hasParameterAnnotation(RequestBody.class);
 	}
 
@@ -94,7 +95,7 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 	 * converter to read the content with.
 	 */
 	@Override
-	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
+	public Object resolveArgument(MethodParameter parameter/**方法参数*/, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
 		Object arg = readWithMessageConverters(webRequest, parameter, parameter.getGenericParameterType());

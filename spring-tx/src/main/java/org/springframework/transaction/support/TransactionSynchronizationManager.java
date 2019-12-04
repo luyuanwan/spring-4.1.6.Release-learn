@@ -264,6 +264,8 @@ public abstract class TransactionSynchronizationManager {
 	 * Activate transaction synchronization for the current thread.
 	 * Called by a transaction manager on transaction begin.
 	 * @throws IllegalStateException if synchronization is already active
+	 *
+	 * 激活同步器，只能初始化一次
 	 */
 	public static void initSynchronization() throws IllegalStateException {
 		if (isSynchronizationActive()) {
@@ -287,6 +289,7 @@ public abstract class TransactionSynchronizationManager {
 			throws IllegalStateException {
 
 		Assert.notNull(synchronization, "TransactionSynchronization must not be null");
+		//事务同步未激活，抛出异常
 		if (!isSynchronizationActive()) {
 			throw new IllegalStateException("Transaction synchronization is not active");
 		}

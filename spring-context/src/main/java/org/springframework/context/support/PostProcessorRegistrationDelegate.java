@@ -16,18 +16,8 @@
 
 package org.springframework.context.support;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -41,6 +31,9 @@ import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.OrderComparator;
 import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Delegate for AbstractApplicationContext's post-processor handling.
@@ -69,7 +62,7 @@ class PostProcessorRegistrationDelegate {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 
 			//常规处理器
-			List<BeanFactoryPostProcessor> regularPostProcessors = new LinkedList<>();
+			List<BeanFactoryPostProcessor> regularPostProcessors = new LinkedList<BeanFactoryPostProcessor>();
 
 			//注册处理器
 			List<BeanDefinitionRegistryPostProcessor> registryPostProcessors = new LinkedList<>();
@@ -111,7 +104,7 @@ class PostProcessorRegistrationDelegate {
 			OrderComparator.sort(priorityOrderedPostProcessors);
 			registryPostProcessors.addAll(priorityOrderedPostProcessors);
 			//PostProcessor，告知他们
-			invokeBeanDefinitionRegistryPostProcessors(priorityOrderedPostProcessors, registry);
+			invokeBeanDefinitionRegistryPostProcessors(priorityOrderedPostProcessors, registry);//......
 
 			// Next, invoke the BeanDefinitionRegistryPostProcessors that implement Ordered.
 			postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
@@ -161,6 +154,7 @@ class PostProcessorRegistrationDelegate {
 
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
 		// uninitialized to let the bean factory post-processors apply to them!
+		// 到此为止才是我们的功能开始的地方，啊哈哈啊......
 		String[] postProcessorNames =
 				beanFactory.getBeanNamesForType(BeanFactoryPostProcessor.class, true, false);
 
@@ -187,22 +181,21 @@ class PostProcessorRegistrationDelegate {
 				nonOrderedPostProcessorNames.add(ppName);
 			}
 		}
-
 		// First, invoke the BeanFactoryPostProcessors that implement PriorityOrdered.
-		//排序并依次调用
+		// 1. 有优先级,排序并依次调用
 		OrderComparator.sort(priorityOrderedPostProcessors);
 		invokeBeanFactoryPostProcessors(priorityOrderedPostProcessors, beanFactory);
 
-		// Next, invoke the BeanFactoryPostProcessors that implement Ordered.
+		//2.  Next, invoke the BeanFactoryPostProcessors that implement Ordered.
 		List<BeanFactoryPostProcessor> orderedPostProcessors = new ArrayList<BeanFactoryPostProcessor>();
 		for (String postProcessorName : orderedPostProcessorNames) {
 			orderedPostProcessors.add(beanFactory.getBean(postProcessorName, BeanFactoryPostProcessor.class));
 		}
-		//排序并依次调用
+		//有Ordered,排序并依次调用
 		OrderComparator.sort(orderedPostProcessors);
 		invokeBeanFactoryPostProcessors(orderedPostProcessors, beanFactory);
 
-		// Finally, invoke all other BeanFactoryPostProcessors.
+		//3. Finally, invoke all other BeanFactoryPostProcessors.
 		List<BeanFactoryPostProcessor> nonOrderedPostProcessors = new ArrayList<BeanFactoryPostProcessor>();
 		for (String postProcessorName : nonOrderedPostProcessorNames) {
 			nonOrderedPostProcessors.add(beanFactory.getBean(postProcessorName, BeanFactoryPostProcessor.class));
@@ -227,6 +220,9 @@ class PostProcessorRegistrationDelegate {
 		 *
 		 * 经过测试，这里可以拿到所有的processor的名字
 		 * 提问：这个时候工厂中怎么已经有BeanPostProcessor了？
+		 * 回答：在上一步的时候放进去的
+		 *
+		 * 注意，此时工厂中有BeanPostProcessor，但他们还不是BeanPostProcessor。。。。。。。。。
 		 */
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
@@ -267,15 +263,16 @@ class PostProcessorRegistrationDelegate {
 			}
 		}
 
-		// First, register the BeanPostProcessors that implement PriorityOrdered.
+		//1.  First, register the BeanPostProcessors that implement PriorityOrdered.
 		//排序
 		OrderComparator.sort(priorityOrderedPostProcessors);
 		//注册BeanPostProcessor
 		registerBeanPostProcessors(beanFactory, priorityOrderedPostProcessors);
 
-		// Next, register the BeanPostProcessors that implement Ordered.
+		//2.  Next, register the BeanPostProcessors that implement Ordered.
 		List<BeanPostProcessor> orderedPostProcessors = new ArrayList<BeanPostProcessor>();
 		for (String ppName : orderedPostProcessorNames) {
+			// 拿到bean
 			BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
 			orderedPostProcessors.add(pp);
 			if (pp instanceof MergedBeanDefinitionPostProcessor) {
@@ -286,7 +283,7 @@ class PostProcessorRegistrationDelegate {
 		//注册BeanPostProcessor
 		registerBeanPostProcessors(beanFactory, orderedPostProcessors);
 
-		// Now, register all regular BeanPostProcessors.
+		//3.  Now, register all regular BeanPostProcessors.
 		List<BeanPostProcessor> nonOrderedPostProcessors = new ArrayList<BeanPostProcessor>();
 		for (String ppName : nonOrderedPostProcessorNames) {
 			BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);

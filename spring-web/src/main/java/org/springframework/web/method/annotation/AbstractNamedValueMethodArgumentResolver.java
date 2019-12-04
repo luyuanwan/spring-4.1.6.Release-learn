@@ -86,15 +86,19 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 		Class<?> paramType = parameter.getParameterType();
 		NamedValueInfo namedValueInfo = getNamedValueInfo(parameter);
 
-		//解析出参数的值,比如PathVariable("dd")
-		Object arg = resolveName(namedValueInfo.name/**参数名*/, parameter/**参数*/, webRequest);
+		//解析出参数的值,比如PathVariable("dd")，那么name就是dd
+		Object arg = resolveName(namedValueInfo.name/**参数名*/, parameter/**参数*/, webRequest/**请求*/);
+		//如果解析不出来，就看看有没有默认值
 		if (arg == null) {
+			//解析默认值
 			if (namedValueInfo.defaultValue != null) {
 				arg = resolveDefaultValue(namedValueInfo.defaultValue);
 			}
+			//如果是必须要有的话，就处理丢失值的情况handle missing value(这更像一种通知)
 			else if (namedValueInfo.required && !parameter.getParameterType().getName().equals("java.util.Optional")) {
 				handleMissingValue(namedValueInfo.name, parameter);
 			}
+			//处理空值的情况
 			arg = handleNullValue(namedValueInfo.name, arg, paramType);
 		}
 		else if ("".equals(arg) && namedValueInfo.defaultValue != null) {
@@ -116,13 +120,16 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 
 	/**
 	 * Obtain the named value for the given method parameter.
+	 * 工厂模式，子类负责实现具体的函数
 	 */
 	private NamedValueInfo getNamedValueInfo(MethodParameter parameter) {
 		NamedValueInfo namedValueInfo = this.namedValueInfoCache.get(parameter);
 		if (namedValueInfo == null) {
 			// 创建
 			namedValueInfo = createNamedValueInfo(parameter);
+			// 更新
 			namedValueInfo = updateNamedValueInfo(parameter, namedValueInfo);
+			// 放缓存
 			this.namedValueInfoCache.put(parameter, namedValueInfo);
 		}
 		return namedValueInfo;
@@ -133,11 +140,14 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 	 * retrieve the method annotation by means of {@link MethodParameter#getParameterAnnotation(Class)}.
 	 * @param parameter the method parameter
 	 * @return the named value information
+	 *
+	 * 子类实现
 	 */
 	protected abstract NamedValueInfo createNamedValueInfo(MethodParameter parameter);
 
 	/**
 	 * Create a new NamedValueInfo based on the given NamedValueInfo with sanitized values.
+	 * 子类实现（覆盖）
 	 */
 	private NamedValueInfo updateNamedValueInfo(MethodParameter parameter, NamedValueInfo info) {
 		String name = info.name;//参数名
@@ -159,12 +169,15 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 	 * @param request the current request
 	 * @return the resolved argument. May be {@code null}
 	 * @throws Exception in case of errors
+	 *
+	 * 解析名字，子类实现
 	 */
 	protected abstract Object resolveName(String name, MethodParameter parameter, NativeWebRequest request)
 			throws Exception;
 
 	/**
 	 * Resolves the given default value into an argument value.
+	 * 解析默认值
 	 */
 	private Object resolveDefaultValue(String defaultValue) {
 		if (this.configurableBeanFactory == null) {
@@ -183,11 +196,14 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 	 * returned {@code null} and there is no default value. Subclasses typically throw an exception in this case.
 	 * @param name the name for the value
 	 * @param parameter the method parameter
+	 *
+	 * 处理丢失值
 	 */
 	protected abstract void handleMissingValue(String name, MethodParameter parameter) throws ServletException;
 
 	/**
 	 * A {@code null} results in a {@code false} value for {@code boolean}s or an exception for other primitives.
+	 * 处理null值
 	 */
 	private Object handleNullValue(String name, Object value, Class<?> paramType) {
 		if (value == null) {
@@ -236,7 +252,7 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 		 */
 		private final String defaultValue;
 
-		public NamedValueInfo(String name/**参数名*/, boolean required/**是否是必须的*/, String defaultValue) {
+		public NamedValueInfo(String name/**参数名*/, boolean required/**是否是必须的*/, String defaultValue/**默认值*/) {
 			this.name = name;
 			this.required = required;
 			this.defaultValue = defaultValue;

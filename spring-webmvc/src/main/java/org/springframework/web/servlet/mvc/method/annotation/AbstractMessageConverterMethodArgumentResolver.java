@@ -183,6 +183,7 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 	protected void validateIfApplicable(WebDataBinder binder, MethodParameter methodParam) {
 		Annotation[] annotations = methodParam.getParameterAnnotations();
 		for (Annotation ann : annotations) {
+			//拿到这个
 			Validated validatedAnn = AnnotationUtils.getAnnotation(ann, Validated.class);
 			if (validatedAnn != null || ann.annotationType().getSimpleName().startsWith("Valid")) {
 				Object hints = (validatedAnn != null ? validatedAnn.value() : AnnotationUtils.getValue(ann));

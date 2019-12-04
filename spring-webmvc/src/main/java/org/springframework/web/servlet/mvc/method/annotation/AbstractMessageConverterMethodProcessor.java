@@ -54,6 +54,7 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 
 	private final ContentNegotiationManager contentNegotiationManager;
 
+	//HTTP返回时需要经过一系列转化，这些转化就包装在这里面
 	private final ResponseBodyAdviceChain adviceChain;
 
 
@@ -144,6 +145,7 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 				}
 			}
 		}
+		//客户端媒体无法兼容
 		if (compatibleMediaTypes.isEmpty()) {
 			if (returnValue != null) {
 				//406 客户端的媒体类型不支持
@@ -157,8 +159,11 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 		//排序
 		MediaType.sortBySpecificityAndQuality(mediaTypes);
 
+		//选择返回的媒体类型
 		MediaType selectedMediaType = null;
+		//遍历每一个媒体
 		for (MediaType mediaType : mediaTypes) {
+			//媒体类型是否是具体的
 			if (mediaType.isConcrete()) {
 				selectedMediaType = mediaType;
 				break;

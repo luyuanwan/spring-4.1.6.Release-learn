@@ -16,8 +16,6 @@
 
 package org.springframework.transaction.interceptor;
 
-import java.util.Properties;
-
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.AbstractSingletonProxyFactoryBean;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
@@ -26,6 +24,8 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import java.util.Properties;
 
 /**
  * Proxy factory bean for simplified declarative transaction handling.
@@ -114,6 +114,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBean
 		implements BeanFactoryAware {
 
+	//直接写死
 	private final TransactionInterceptor transactionInterceptor = new TransactionInterceptor();
 
 	private Pointcut pointcut;

@@ -76,7 +76,7 @@ class ComponentScanAnnotationParser {
 	public Set<BeanDefinitionHolder> parse(AnnotationAttributes componentScan/*注解属性*/, final String declaringClass) {
 		//定义扫描器
 		ClassPathBeanDefinitionScanner scanner =
-				new ClassPathBeanDefinitionScanner(this.registry, componentScan.getBoolean("useDefaultFilters"));
+				new ClassPathBeanDefinitionScanner(this.registry/**注册器*/, componentScan.getBoolean("useDefaultFilters")/**是否使用默认过滤器*/);
 
 		//设置环境
 		Assert.notNull(this.environment, "Environment must not be null");

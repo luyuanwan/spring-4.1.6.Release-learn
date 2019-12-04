@@ -16,11 +16,11 @@
 
 package org.springframework.jdbc.datasource;
 
+import org.springframework.util.Assert;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
-
-import org.springframework.util.Assert;
 
 /**
  * Abstract base class for JDBC {@link javax.sql.DataSource} implementations
@@ -30,6 +30,8 @@ import org.springframework.util.Assert;
  * @since 2.5.5
  * @see SimpleDriverDataSource
  * @see DriverManagerDataSource
+ *
+ * 这里实现了最核心的功能
  */
 public abstract class AbstractDriverBasedDataSource extends AbstractDataSource {
 
@@ -141,7 +143,9 @@ public abstract class AbstractDriverBasedDataSource extends AbstractDataSource {
 	 * @see java.sql.Driver#connect(String, java.util.Properties)
 	 */
 	protected Connection getConnectionFromDriver(String username, String password) throws SQLException {
+		//属性
 		Properties mergedProps = new Properties();
+		//属性
 		Properties connProps = getConnectionProperties();
 		if (connProps != null) {
 			mergedProps.putAll(connProps);

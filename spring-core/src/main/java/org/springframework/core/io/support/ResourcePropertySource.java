@@ -80,7 +80,7 @@ public class ResourcePropertySource extends PropertiesPropertySource {
 	 * {@link Resource#getDescription() description} of the given resource.
 	 */
 	public ResourcePropertySource(Resource resource) throws IOException {
-		super(getNameForResource(resource), PropertiesLoaderUtils.loadProperties(new EncodedResource(resource)));
+		super(getNameForResource(resource)/**名字*/, PropertiesLoaderUtils.loadProperties(new EncodedResource(resource))/**键值对*/);
 		this.resourceName = null;
 	}
 

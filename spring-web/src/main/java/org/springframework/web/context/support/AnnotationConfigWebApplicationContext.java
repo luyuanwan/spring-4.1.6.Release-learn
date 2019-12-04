@@ -195,6 +195,7 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 		AnnotatedBeanDefinitionReader reader = new AnnotatedBeanDefinitionReader(beanFactory);
 		reader.setEnvironment(getEnvironment());
 
+		// 定义扫描器
 		ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(beanFactory);
 		scanner.setEnvironment(getEnvironment());
 

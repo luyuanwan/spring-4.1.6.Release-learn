@@ -56,6 +56,9 @@ import java.sql.SQLException;
  * @see java.sql.PreparedStatement#setString
  * @see java.sql.PreparedStatement#setAsciiStream
  * @see java.sql.PreparedStatement#setCharacterStream
+ *
+ * 虽然 JDBC 定义了两个操作 LOB 类型的接口：java.sql.Blob 和 java.sql.Clob，但有些厂商的 JDBC 驱动程序并不支持这两个接口。为此，Spring 定义了一个独立于 java.sql.Blob/Clob 的 LobCreator 接口，以统一的方式操作各种数据库的 LOB 类型数据。因为 LobCreator 本身持有 LOB 所对应的数据库资源，所以它不是线程安全的，一个 LobCreator 只能操作一个 LOB 数据。
+ * https://blog.csdn.net/xuemingyuan88/article/details/49634237
  */
 public interface LobCreator extends Closeable {
 
@@ -68,6 +71,8 @@ public interface LobCreator extends Closeable {
 	 * @param content the content as byte array, or {@code null} for SQL NULL
 	 * @throws SQLException if thrown by JDBC methods
 	 * @see java.sql.PreparedStatement#setBytes
+	 *
+	 * 通过二进制数据填充 BLOB 数据
 	 */
 	void setBlobAsBytes(PreparedStatement ps, int paramIndex, byte[] content)
 			throws SQLException;
@@ -81,6 +86,8 @@ public interface LobCreator extends Closeable {
 	 * @param contentStream the content as binary stream, or {@code null} for SQL NULL
 	 * @throws SQLException if thrown by JDBC methods
 	 * @see java.sql.PreparedStatement#setBinaryStream
+	 *
+	 * 通过流填充 BLOB 数据
 	 */
 	void setBlobAsBinaryStream(
 			PreparedStatement ps, int paramIndex, InputStream contentStream, int contentLength)
@@ -95,6 +102,8 @@ public interface LobCreator extends Closeable {
 	 * @param content the content as String, or {@code null} for SQL NULL
 	 * @throws SQLException if thrown by JDBC methods
 	 * @see java.sql.PreparedStatement#setBytes
+	 *
+	 * 通过字符串填充 CLOB 数据
 	 */
 	void setClobAsString(PreparedStatement ps, int paramIndex, String content)
 			throws SQLException;
@@ -108,6 +117,8 @@ public interface LobCreator extends Closeable {
 	 * @param asciiStream the content as ASCII stream, or {@code null} for SQL NULL
 	 * @throws SQLException if thrown by JDBC methods
 	 * @see java.sql.PreparedStatement#setAsciiStream
+	 *
+	 * 通过 Ascii 字符流填充 CLOB 数据
 	 */
 	void setClobAsAsciiStream(
 			PreparedStatement ps, int paramIndex, InputStream asciiStream, int contentLength)
@@ -122,6 +133,8 @@ public interface LobCreator extends Closeable {
 	 * @param characterStream the content as character stream, or {@code null} for SQL NULL
 	 * @throws SQLException if thrown by JDBC methods
 	 * @see java.sql.PreparedStatement#setCharacterStream
+	 *
+	 * 通过 Unicode 字符流填充 CLOB 数据
 	 */
 	void setClobAsCharacterStream(
 			PreparedStatement ps, int paramIndex, Reader characterStream, int contentLength)
@@ -134,6 +147,8 @@ public interface LobCreator extends Closeable {
 	 * <p><b>NOTE</b>: Needs to be invoked after the involved PreparedStatements have
 	 * been executed or the affected O/R mapping sessions have been flushed.
 	 * Otherwise, the database resources for the temporary BLOBs might stay allocated.
+	 *
+	 * 关闭会话，并释放 LOB 资源
 	 */
 	@Override
 	void close();

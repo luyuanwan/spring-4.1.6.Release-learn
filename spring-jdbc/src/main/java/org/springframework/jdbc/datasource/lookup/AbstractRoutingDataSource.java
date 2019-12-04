@@ -16,15 +16,15 @@
 
 package org.springframework.jdbc.datasource.lookup;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.jdbc.datasource.AbstractDataSource;
+import org.springframework.util.Assert;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.sql.DataSource;
-
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.jdbc.datasource.AbstractDataSource;
-import org.springframework.util.Assert;
 
 /**
  * Abstract {@link javax.sql.DataSource} implementation that routes {@link #getConnection()}
@@ -63,6 +63,8 @@ public abstract class AbstractRoutingDataSource extends AbstractDataSource imple
 	 * generic lookup process only. The concrete key representation will
 	 * be handled by {@link #resolveSpecifiedLookupKey(Object)} and
 	 * {@link #determineCurrentLookupKey()}.
+	 *
+	 * 设置目标
 	 */
 	public void setTargetDataSources(Map<Object, Object> targetDataSources) {
 		this.targetDataSources = targetDataSources;
@@ -115,6 +117,7 @@ public abstract class AbstractRoutingDataSource extends AbstractDataSource imple
 			throw new IllegalArgumentException("Property 'targetDataSources' is required");
 		}
 		this.resolvedDataSources = new HashMap<Object, DataSource>(this.targetDataSources.size());
+
 		for (Map.Entry<Object, Object> entry : this.targetDataSources.entrySet()) {
 			Object lookupKey = resolveSpecifiedLookupKey(entry.getKey());
 			DataSource dataSource = resolveSpecifiedDataSource(entry.getValue());
@@ -197,7 +200,9 @@ public abstract class AbstractRoutingDataSource extends AbstractDataSource imple
 	 */
 	protected DataSource determineTargetDataSource() {
 		Assert.notNull(this.resolvedDataSources, "DataSource router not initialized");
+		//查找的KEY
 		Object lookupKey = determineCurrentLookupKey();
+		//从一个池子中拿到DataSource
 		DataSource dataSource = this.resolvedDataSources.get(lookupKey);
 		if (dataSource == null && (this.lenientFallback || lookupKey == null)) {
 			dataSource = this.resolvedDefaultDataSource;

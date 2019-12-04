@@ -319,6 +319,7 @@ public class SimpAnnotationMethodMessageHandlerTests {
 
 	private static class StringTestValidator implements Validator {
 
+		//无效值
 		private final String invalidValue;
 
 		private StringTestValidator(String invalidValue) {

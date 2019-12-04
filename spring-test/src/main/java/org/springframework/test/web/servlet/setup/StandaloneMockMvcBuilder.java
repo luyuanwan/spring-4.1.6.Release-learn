@@ -324,7 +324,9 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 		hm.registerHandlers(this.controllers);
 		wac.addBean("requestMappingHandlerMapping", hm);
 
+		//映射处理器的总适配器
 		RequestMappingHandlerAdapter handlerAdapter = config.requestMappingHandlerAdapter();
+		//把上下文信息设置进去
 		handlerAdapter.setServletContext(wac.getServletContext());
 		handlerAdapter.setApplicationContext(wac);
 		handlerAdapter.afterPropertiesSet();

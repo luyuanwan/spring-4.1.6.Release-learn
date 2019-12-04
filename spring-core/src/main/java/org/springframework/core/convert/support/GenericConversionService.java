@@ -16,35 +16,18 @@
 
 package org.springframework.core.convert.support;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.core.ResolvableType;
-import org.springframework.core.convert.ConversionException;
-import org.springframework.core.convert.ConversionFailedException;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.ConverterNotFoundException;
-import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.core.convert.converter.ConditionalConverter;
-import org.springframework.core.convert.converter.ConditionalGenericConverter;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.convert.converter.ConverterFactory;
-import org.springframework.core.convert.converter.ConverterRegistry;
-import org.springframework.core.convert.converter.GenericConverter;
+import org.springframework.core.convert.*;
+import org.springframework.core.convert.converter.*;
 import org.springframework.core.convert.converter.GenericConverter.ConvertiblePair;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Base {@link ConversionService} implementation suitable for use in most environments.
@@ -521,6 +504,8 @@ public class GenericConversionService implements ConfigurableConversionService {
 		 * @param sourceType the source type
 		 * @param targetType the target type
 		 * @return a matching {@link GenericConverter}, or {@code null} if none found
+		 *
+		 * 这个地方的搜索路径是什么？
 		 */
 		public GenericConverter find(TypeDescriptor sourceType, TypeDescriptor targetType) {
 			// Search the full type hierarchy

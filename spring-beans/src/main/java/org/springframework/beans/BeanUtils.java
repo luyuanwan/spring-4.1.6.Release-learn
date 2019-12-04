@@ -503,6 +503,8 @@ public abstract class BeanUtils {
 	 * @return whether the given type represents a "simple" property
 	 * @see org.springframework.beans.factory.support.RootBeanDefinition#DEPENDENCY_CHECK_SIMPLE
 	 * @see org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#checkDependencies
+	 *
+	 * 是否是简单属性
 	 */
 	public static boolean isSimpleProperty(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");

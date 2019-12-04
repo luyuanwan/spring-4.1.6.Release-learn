@@ -114,7 +114,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @see #setResourceLoader
 	 * @see #setEnvironment
 	 */
-	public ClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry, boolean useDefaultFilters) {
+	public ClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry/**注册器*/, boolean useDefaultFilters/**是否使用默认过滤器*/) {
 		this(registry, useDefaultFilters, getOrCreateEnvironment(registry));
 	}
 
@@ -139,7 +139,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @since 3.1
 	 * @see #setResourceLoader
 	 */
-	public ClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry, boolean useDefaultFilters, Environment environment) {
+	public ClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry, boolean useDefaultFilters/**是否使用默认过滤器*/, Environment environment) {
 		super(useDefaultFilters, environment);
 
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
@@ -236,6 +236,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 
 		// Register annotation config processors, if necessary.
 		if (this.includeAnnotationConfig) {
+			// 注册一些Processor
 			AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 		}
 

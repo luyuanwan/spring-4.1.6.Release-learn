@@ -78,6 +78,9 @@ public class BeanDefinitionVisitor {
 		 * 解析父名字
 		 */
 		visitParentName(beanDefinition);
+		/**
+		 * 解析类名
+		 */
 		visitBeanClassName(beanDefinition);
 		visitFactoryBeanName(beanDefinition);
 		visitFactoryMethodName(beanDefinition);
